@@ -1,0 +1,60 @@
+{
+  "name": "@ratmath/geo",
+  "version": "0.0.0",
+  "description": "Geometry for RatMath: Euclidean constructions and checked theorems, spherical, hyperbolic, projective and finite geometries, symmetry and tilings",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "src/",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "test": "bun test ./tests",
+    "docs:build": "bun scripts/build-docs.js"
+  },
+  "keywords": [
+    "geometry",
+    "euclidean",
+    "hyperbolic",
+    "projective",
+    "symmetry",
+    "tiling",
+    "exact",
+    "ratmath"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ratmath/geo.git"
+  },
+  "homepage": "https://ratmath.com/geo/",
+  "bugs": {
+    "url": "https://github.com/ratmath/geo/issues"
+  },
+  "dependencies": {
+    "@ratmath/core": "^0.10.0"
+  },
+  "devDependencies": {
+    "katex": "0.19.1"
+  },
+  "types": "index.d.ts",
+  "author": "James Taylor",
+  "engines": {
+    "node": ">=22"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
