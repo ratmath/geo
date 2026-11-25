@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RatMath Geometry</title>
+<meta name="description" content="Geometry for RatMath: Euclidean constructions and checked theorems, spherical, hyperbolic, projective and finite geometries, symmetry and tilings.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<script type="module" src="assets/site.js"></script>
+</head>
+<body>
+<div class="shell">
+<aside></aside>
+<main>
+<article>
+<div class="eyebrow">@ratmath/geo</div>
+<h1>Many geometries, each with exact coordinates</h1>
+<p class="lede">A library for exploring geometries, continuous and discrete: the Euclidean plane with constructions and checked theorems, the sphere and the hyperbolic plane, projective and finite geometries, lattices, symmetry groups and tilings.</p>
+<p class="notice"><strong>Planned, not built yet.</strong> This site is the frame the package will grow into. The full plan is in the <a href="https://github.com/ratmath/ratmath/blob/main/docs/design/library-roadmap.md#11-a-geometry-package-ratmathgeo">library roadmap</a>, and the <a href="https://ratmath.com/shelf/">RatMath Shelf</a> page lists what exists across all the libraries.</p>
+
+<h2>What it will cover</h2>
+<ul>
+  <li>The Euclidean plane: constructions, triangle centres, transformations, theorems checked exactly.</li>
+  <li>Exact computational geometry and lattice geometry (Pick's theorem, convex hulls), and other metrics.</li>
+  <li>Spherical geometry and the models of the hyperbolic plane.</li>
+  <li>Projective planes and finite geometries.</li>
+  <li>Solids, symmetry groups, friezes, wallpaper groups and tilings.</li>
+  <li>General proofs of theorems by elimination.</li>
+</ul>
+
+<h2>The order of work</h2>
+<p>The phases below come from the roadmap. Sizes are rough estimates in lines of source.</p>
+<div class="tablewrap"><table class="plan">
+<tr><th>Phase</th><th>Contents</th><th>Estimate</th></tr>
+<tr><td>1</td><td>Euclidean plane: constructions, centres, transformations, checked theorems</td><td>1,200</td></tr>
+<tr><td>2</td><td>Exact computational and lattice geometry, other metrics</td><td>1,100</td></tr>
+<tr><td>3</td><td>Spherical and hyperbolic models</td><td>1,400</td></tr>
+<tr><td>4</td><td>Projective and finite geometries</td><td>1,000</td></tr>
+<tr><td>5</td><td>Solids, symmetry groups, friezes, wallpaper groups, tilings</td><td>1,300</td></tr>
+<tr><td>6</td><td>General proofs of theorems by elimination</td><td>800</td></tr>
+<tr><td>7</td><td>Pictures</td><td>1,000 in graphics</td></tr>
+</table></div>
+<p>It will build on: Core, graphics (the plane kernel and drawing), algebraic and linalg; structures for symmetry groups and proofs, complex for the hyperbolic models, analytic for enclosures.</p>
+
+<h2>How the docs will be laid out</h2>
+<p>Like every library on the Shelf: this overview, an <a href="explore.html">Explore</a> page for trying things without writing code, a <a href="reference.html">Reference</a> listing every function, and one page per topic that explains the usage and the mathematics. Every page ends with a box of code you can edit and run.</p>
+<div class="cards" id="cards"></div>
+
+<h2>Until then</h2>
+<p>The box below already runs, with <code>@ratmath/core</code> in scope. It shows the kind of exactness the package is built on, done by hand.</p>
+<template data-runbox>
+// Exact coordinates make theorems checkable. The medians of a triangle meet at one point:
+const P = (x, y) =&gt; ({ x: new Rational(x), y: new Rational(y) });
+const mid = (a, b) =&gt; ({ x: a.x.add(b.x).divide(new Rational(2)), y: a.y.add(b.y).divide(new Rational(2)) });
+// the signed area of a triangle is zero exactly when its corners are on one line
+const area2 = (a, b, c) =&gt; b.x.subtract(a.x).multiply(c.y.subtract(a.y)).subtract(c.x.subtract(a.x).multiply(b.y.subtract(a.y)));
+const [A, B, C] = [P("1/3", 2), P(7, "-5/2"), P("22/7", 9)];
+const G = { x: A.x.add(B.x).add(C.x).divide(new Rational(3)), y: A.y.add(B.y).add(C.y).divide(new Rational(3)) };
+PRINT("centroid:", `(${G.x}, ${G.y})`);
+for (const [v, m, name] of [[A, mid(B, C), "A"], [B, mid(A, C), "B"], [C, mid(A, B), "C"]]) PRINT(`median from ${name} passes through it:`, area2(v, m, G).equals(new Rational(0)));
+PRINT("area of the triangle:", area2(A, B, C).divide(new Rational(2)).abs().toString());
+plan.map((p) =&gt; `${p.phase}. ${p.contents}`)
+</template>
+</article>
+</main>
+</div>
+<script type="module">
+import { topicCards } from "./assets/site.js";
+topicCards(document.getElementById("cards"));
+</script>
+</body>
+</html>
