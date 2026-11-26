@@ -1,3 +1,9 @@
 [submodule "vendor/algebraic"]
 	path = vendor/algebraic
 	url = https://github.com/ratmath/algebraic.git
+[submodule "vendor/graphics"]
+	path = vendor/graphics
+	url = https://github.com/ratmath/graphics.git
+[submodule "vendor/analytic"]
+	path = vendor/analytic
+	url = https://github.com/ratmath/analytic.git

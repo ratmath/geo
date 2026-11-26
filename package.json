@@ -45,7 +45,9 @@
   },
   "dependencies": {
     "@ratmath/core": "^0.10.0",
-    "@ratmath/algebraic": "^0.1.0"
+    "@ratmath/algebraic": "^0.1.0",
+    "@ratmath/graphics": "workspace:*",
+    "@ratmath/analytic": "workspace:*"
   },
   "devDependencies": {
     "katex": "0.19.1"
@@ -59,6 +61,8 @@
     "access": "public"
   },
   "workspaces": [
-    "vendor/algebraic"
+    "vendor/algebraic",
+    "vendor/analytic",
+    "vendor/graphics"
   ]
 }

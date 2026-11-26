@@ -504,3 +504,25 @@ export function polygonAngle(n: number): Rational;
 export function vertexTypes(): number[][];
 export function uniformTiling(type: string | number[]): { type: string; fits: boolean; uniform: boolean; reason: string };
 export function regularTilings(): Array<{ p: number; q: number; symbol: string; dual: string }>;
+export function tilingPatch(type: string | number[], options?: { radius?: number; maxPolygons?: number }): { readonly type: string; readonly ok: boolean; readonly polygons: { n: number; points: [number, number][] }[]; readonly vertices: number; readonly choices: number; readonly reason?: string };
+
+// ---- pictures and the join with graphics ----
+import type { Figure, Frames, Camera, Point as GPoint, Line as GLine, Circle as GCircle, Polygon as GPolygon, Surd } from "@ratmath/graphics";
+export { figureSVG, figurePNG, figurePDF, figureTikZ, figureASCII, framesSVG, framesPNG } from "@ratmath/graphics";
+/** An exact number as a graphics Surd a + b√d, or null when it is not rational or quadratic. */
+export function toSurd(x: unknown): Surd | null;
+/** A geo object as the graphics object with the same exact coordinates; refuses numbers outside Q(√d). */
+export function toGraphics(x: Point): GPoint;
+export function toGraphics(x: Line): GLine;
+export function toGraphics(x: Circle): GCircle;
+export function toGraphics(x: Polygon | Triangle): GPolygon;
+export function fromGraphics(x: GPoint): Point;
+export function fromGraphics(x: GLine): Line;
+export function fromGraphics(x: GCircle): Circle;
+export function fromGraphics(x: GPolygon): Polygon;
+export function geoFigure(items: unknown[], options?: { x?: [number, number]; y?: [number, number]; title?: string; axes?: boolean }): Figure;
+export function constructionFrames(c: Construction, options?: { title?: string }): Frames;
+export function tilingFigure(type: string | number[], options?: { radius?: number; view?: number; title?: string }): Figure;
+export function solidPicture(poly: Polyhedron | { vertices: unknown[][]; faces: number[][]; name?: string }, options?: { cam?: Camera; colors?: string[]; opacity?: number }): Figure;
+export function wallpaperFigure(pattern: { gram: unknown[][]; points: unknown[][]; labels?: number[] }, options?: { cells?: number; title?: string }): Figure;
+export function incidenceFigure(geometry: Incidence, options?: { title?: string }): Figure;

@@ -13,8 +13,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
 <link rel="stylesheet" href="https://ratmath.com/assets/katex/0.19.1/katex.min.css">
-<link rel="stylesheet" href="assets/style.css?v=e69cf58dbd">
-<script type="module" src="assets/site.js?v=e69cf58dbd"></script>
+<link rel="stylesheet" href="assets/style.css?v=124a82ef6a">
+<script type="module" src="assets/site.js?v=124a82ef6a"></script>
 </head>
 <body>
 <div class="shell">
@@ -57,10 +57,10 @@ metric("taxicab").pi;                       // 4</code></pre>
 <p>Rational figures stay rational and fast. Figures with square roots are slower, since each comparison works with minimal polynomials; a triangle's incentre and the circles around it take a fraction of a second.</p>
 
 <h2>Projective, finite, solid and symmetric</h2>
-<p>The <a href="projective.html">projective plane</a> works in homogeneous coordinates, where cross-ratios and projective maps are exact and Desargues, Pappus, Pascal and Brianchon can be checked on any exact figure. <a href="finite-geometries.html">Finite geometries</a> are built over algebraic's finite fields, from the seven-point Fano plane up, with their collineation groups. <a href="polyhedra.html">Polyhedra</a> have exact coordinates in Q(√2) or Q(√5): volumes, dihedral angles, duals and symmetry groups. Plane patterns get their <a href="symmetry.html">rosette, frieze or wallpaper group</a>, and the <a href="tilings.html">tilings page</a> shows why only 11 of the 21 vertex types of regular polygons tile uniformly.</p>
+<p>The <a href="projective.html">projective plane</a> works in homogeneous coordinates, where cross-ratios and projective maps are exact and Desargues, Pappus, Pascal and Brianchon can be checked on any exact figure. <a href="finite-geometries.html">Finite geometries</a> are built over algebraic's finite fields, from the seven-point Fano plane up, with their collineation groups. <a href="polyhedra.html">Polyhedra</a> have exact coordinates in Q(√2) or Q(√5): volumes, dihedral angles, duals and symmetry groups. Plane patterns get their <a href="symmetry.html">rosette, frieze or wallpaper group</a>, and the <a href="tilings.html">tilings page</a> shows why only 11 of the 21 vertex types of regular polygons tile uniformly. <a href="pictures.html">Pictures of geometry</a> grows and draws those 11 tilings, draws solids, patterns, finite planes and constructions with RatMath Graphics, and joins geo's exact plane with graphics'.</p>
 
 <h2>Still to come</h2>
-<p>Spherical and hyperbolic models; general proofs of theorems by elimination; pictures in graphics. The <code>plan</code> export lists the phases, from the <a href="https://github.com/ratmath/ratmath/blob/main/docs/design/library-roadmap.md#11-a-geometry-package-ratmathgeo">library roadmap</a>, and the <a href="https://ratmath.com/shelf/">RatMath Shelf</a> page lists what exists across all the libraries.</p>
+<p>Spherical and hyperbolic models, and general proofs of theorems by elimination. The <code>plan</code> export lists the phases, from the <a href="https://github.com/ratmath/ratmath/blob/main/docs/design/library-roadmap.md#11-a-geometry-package-ratmathgeo">library roadmap</a>, and the <a href="https://ratmath.com/shelf/">RatMath Shelf</a> page lists what exists across all the libraries.</p>
 <section class="runbox" aria-label="Runnable code">
   <div class="runbox-head"><strong>Try it</strong><span>Edit the code and run it with <code>@ratmath/geo</code> and Core's <code>Rational</code> in scope. The last line's value is shown; <code>PRINT(…)</code> adds lines, <code>TEX(…)</code> typesets math.</span></div>
   <textarea spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Code">const t = triangle([0, 0], [4, 0], [1, 3]);
@@ -78,7 +78,7 @@ plan.map((p) =&gt; `${p.phase}. ${p.contents}`)</textarea>
 </main>
 </div>
 <script type="module">
-import { topicCards } from "./assets/site.js?v=e69cf58dbd";
+import { topicCards } from "./assets/site.js?v=124a82ef6a";
 topicCards(document.getElementById("cards"));
 </script>
 </body>

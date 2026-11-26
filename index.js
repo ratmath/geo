@@ -23,4 +23,7 @@ export {
 export { Incidence, incidence, FiniteProjectivePlane, FiniteAffinePlane, projectivePlane, affinePlane, fano } from "./src/finite.js";
 export { Polyhedron, polyhedron, solids, prism } from "./src/solids.js";
 export { figureSymmetry, wallpaperGroup, wallpaper, friezeGroup, friezes } from "./src/symmetry.js";
-export { polygonAngle, vertexTypes, uniformTiling, regularTilings } from "./src/tilings.js";
+export { polygonAngle, vertexTypes, uniformTiling, regularTilings, tilingPatch } from "./src/tilings.js";
+export { toSurd, toGraphics, fromGraphics, geoFigure, constructionFrames, tilingFigure, solidPicture, wallpaperFigure, incidenceFigure } from "./src/pictures.js";
+// Drawing a figure, from @ratmath/graphics (re-exported so geo's pictures need no second import).
+export { figureSVG, figurePNG, figurePDF, figureTikZ, figureASCII, framesSVG, framesPNG } from "@ratmath/graphics";

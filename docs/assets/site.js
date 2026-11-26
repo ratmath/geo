@@ -1,8 +1,8 @@
 // Shared page furniture for the geo docs: the contents column, the theme
 // switch and the code boxes. Add each topic page to PAGES as it is written.
 
-import * as A from "./geo.js?v=e69cf58dbd";
-import { mountRunboxes } from "./runbox.js?v=e69cf58dbd";
+import * as A from "./geo.js?v=124a82ef6a";
+import { mountRunboxes } from "./runbox.js?v=124a82ef6a";
 
 export { A };
 
@@ -26,6 +26,8 @@ export const PAGES = [
   { href: "polyhedra.html", title: "Polyhedra", blurb: "Platonic and Archimedean solids: volumes, angles, duals, symmetry groups" },
   { href: "symmetry.html", title: "Symmetry groups", blurb: "Rosettes, the 7 frieze groups and the 17 wallpaper groups" },
   { href: "tilings.html", title: "Tilings", blurb: "The 21 vertex types and the 11 uniform tilings" },
+  { group: "Pictures" },
+  { href: "pictures.html", title: "Pictures of geometry", blurb: "Tilings grown from vertex types, solids, patterns, finite planes; the join with graphics" },
 ];
 
 export const h = (tag, attrs = {}, ...kids) => {

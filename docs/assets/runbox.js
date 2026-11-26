@@ -3,7 +3,8 @@
 // Every docs page ends with an editable JavaScript box. Run evaluates the
 // code with the library in scope, shows the value of the last expression,
 // and shows each PRINT(...) line above it. TEX(latex) typesets a line of
-// math (KaTeX is loaded only then). The same file is shared verbatim by
+// math (KaTeX is loaded only then). SHOW(svg) shows a picture: an SVG
+// string, an <img> string, or a DOM element (added for the graphics docs; harmless elsewhere). The same file is shared verbatim by
 // core, analytic, linalg and algebraic (docs/assets/runbox.js): keep the
 // copies in sync.
 //
@@ -156,7 +157,7 @@ export function ratmathFormat(v, depth = 0) {
  * Promises (and anything with .then) are awaited.
  */
 export async function runCode(code, scope = {}, { format } = {}) {
-  const names = Object.keys(scope).filter((n) => NAME.test(n) && !RESERVED.has(n) && n !== "PRINT" && n !== "TEX");
+  const names = Object.keys(scope).filter((n) => NAME.test(n) && !RESERVED.has(n) && n !== "PRINT" && n !== "TEX" && n !== "SHOW");
   const prints = [];
   const both = (x, depth) => {
     const custom = format ? format(x, depth) : undefined;
@@ -169,6 +170,10 @@ export async function runCode(code, scope = {}, { format } = {}) {
   const TEX = (latex, display = true) => {
     prints.push({ kind: "tex", text: String(latex), display });
   };
+  const SHOW = (pic) => {
+    const text = typeof pic === "string" ? pic : pic && typeof pic.outerHTML === "string" ? pic.outerHTML : String(pic);
+    prints.push({ kind: "svg", text });
+  };
   const t0 = typeof performance !== "undefined" ? performance.now() : Date.now();
   const out = { value: undefined, hasValue: false, type: "", prints, error: null, ms: 0 };
   try {
@@ -176,8 +181,8 @@ export async function runCode(code, scope = {}, { format } = {}) {
     const { head, expr } = lastExpression(src);
     // The code runs in a block, so its own declarations may reuse library names.
     const body = `"use strict";\n{\n${head}\n${expr === null ? "" : `return (\n${expr}\n);`}\n}`;
-    const run = new AsyncFunction(...names, "PRINT", "TEX", body);
-    let value = await run(...names.map((n) => scope[n]), PRINT, TEX);
+    const run = new AsyncFunction(...names, "PRINT", "TEX", "SHOW", body);
+    let value = await run(...names.map((n) => scope[n]), PRINT, TEX, SHOW);
     if (value && typeof value.then === "function") value = await value;
     if (expr !== null) {
       out.hasValue = true;
@@ -205,12 +210,14 @@ const CSS = `
 .runbox-bar .runbox-meta { color: var(--muted, #5b6676); font-size: .78rem; margin-left: auto; font-family: var(--font-mono, monospace); }
 .runbox-out { display: flex; flex-direction: column; gap: .2rem; min-height: 1.5rem; font: .84rem/1.5 var(--font-mono, ui-monospace, monospace); overflow-x: auto; }
 .runbox-out:empty::before { content: "Output appears here."; color: var(--muted, #5b6676); font-family: var(--font-body, system-ui); }
-.runbox-out .rb-print { white-space: pre-wrap; overflow-wrap: anywhere; }
+.runbox-out .rb-print { white-space: pre-wrap; overflow-wrap: anywhere; font-variant-ligatures: none; }
+.runbox-out .rb-art { white-space: pre; overflow-wrap: normal; line-height: 1.2; font-family: var(--font-mono, ui-monospace, monospace), "DejaVu Sans Mono", "Segoe UI Symbol", "Apple Braille", monospace; }
 .runbox-out .rb-value { white-space: pre-wrap; overflow-wrap: anywhere; border-top: 1px dashed var(--line, #d9dee7); padding-top: .35rem; margin-top: .15rem; font-weight: 500; }
 .runbox-out .rb-value:first-child { border-top: 0; padding-top: 0; margin-top: 0; }
 .runbox-out .rb-type { font: 600 .68rem/1 var(--font-body, system-ui); text-transform: uppercase; letter-spacing: .07em; color: var(--muted, #5b6676); margin-right: .5rem; }
 .runbox-out .rb-error { color: var(--bad, #b42318); white-space: pre-wrap; }
 .runbox-out .rb-tex { overflow-x: auto; }
+.runbox-out .rb-svg { margin: .3rem 0; } .runbox-out .rb-svg svg { display: block; max-width: 100%; height: auto; border: 1px solid var(--line, #d9dee7); border-radius: 8px; background: var(--surface, #fff); }
 pre.rb-has-try { position: relative; }
 pre .rb-try { position: absolute; top: .35rem; right: .35rem; font: 500 .72rem/1 var(--font-body, system-ui); padding: .3rem .5rem; border-radius: 6px; border: 1px solid var(--line, #d9dee7); background: var(--surface, #fff); color: var(--accent, #2b55c9); cursor: pointer; opacity: .75; }
 pre .rb-try:hover, pre .rb-try:focus-visible { opacity: 1; }
@@ -247,7 +254,12 @@ function render(outEl, res) {
       loadKatex()
         .then((katex) => katex.render(p.text, d, { displayMode: p.display, throwOnError: false }))
         .catch(() => {});
-    } else outEl.append(el("div", "rb-print", p.text));
+    } else if (p.kind === "svg") {
+      const d = el("div", "rb-svg");
+      if (/^\s*<(svg|img)[\s>]/i.test(p.text)) d.innerHTML = p.text;
+      else d.textContent = p.text;
+      outEl.append(d);
+    } else outEl.append(el("div", p.text.includes("\n") ? "rb-print rb-art" : "rb-print", p.text));
   }
   if (res.error) {
     const e = res.error;
