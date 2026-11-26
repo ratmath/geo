@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Transformations · RatMath Geo</title>
+<meta name="description" content="Isometries, similarities and affine maps of the plane with exact matrices, classified; inversion in a circle.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<script type="module" src="assets/site.js"></script>
+</head>
+<body>
+<div class="shell">
+<aside></aside>
+<main>
+<article>
+<div class="eyebrow">Topic</div>
+<h1>Transformations</h1>
+<p class="lede">An isometry of the plane is one of four things: a translation, a rotation, a reflection or a glide reflection. With exact matrices the classification is a computation, and composing two maps and asking what you got is the quickest way to learn it.</p>
+<pre><code>const r = rotation([1, 1], "1/4");               // a quarter turn about (1, 1)
+String(r.apply([2, 1]));                         // "(1, 2)"
+const m = reflection(line([0, 0], [1, 1]));
+m.compose(reflection(line([0, 0], [1, 0]))).classify();   // a rotation by 90° about the origin
+glide(line([0, 0], [1, 0]), [3, 0]).classify();  // { kind: "glide reflection", axis, vector }
+dilation([0, 0], 2).compose(r).classify().kind;  // "spiral similarity"
+inversion(circle([0, 0], { radius: 1 })).apply(line([2, 0], [2, 1]));   // a circle through the centre</code></pre>
+<h2>Exact angles</h2>
+<p>A rotation matrix needs a cosine and a sine. Given as a fraction of a full turn, <code>rotation(c, "1/6")</code>, they are the exact algebraic values (\(\tfrac12\) and \(\tfrac{\sqrt3}{2}\) for a sixth of a turn). Or give any exact pair with \(\cos^2 + \sin^2 = 1\), such as <code>{ cos: "3/5", sin: "4/5" }</code>, which is checked. Rotating by a sixth of a turn six times gives back exactly the identity.</p>
+
+<h2>Classifying</h2>
+<p>Every map here is \(p \mapsto Mp + t\). <code>classify()</code> looks at M:</p>
+<ul>
+<li>\(M^{\mathsf T}M = I\): an isometry. With determinant +1 it is a translation (M = I) or a rotation, whose centre is the one fixed point. With determinant −1 it is a reflection if it has a line of fixed points, and otherwise a glide reflection: a reflection followed by a slide along the mirror.</li>
+<li>\(M^{\mathsf T}M = k^2 I\): a similarity with ratio k. It has exactly one fixed point, its centre: a dilation, a spiral similarity (dilation and rotation), or a dilative reflection.</li>
+<li>otherwise an affine map: lines stay lines and parallels stay parallel, but angles change; the determinant is the factor by which areas are multiplied.</li>
+</ul>
+<p><code>fixed()</code> returns the fixed points: a point, a line, the whole plane or none.</p>
+<p>Two facts worth trying: reflections in two lines that meet compose to a rotation about the meeting point through twice the angle between them, and in two parallel lines to a translation through twice the distance. So every isometry is a product of at most three reflections.</p>
+
+<h2>Inversion</h2>
+<p>Inversion in a circle with centre O and radius r sends p to the point p′ on the ray Op with \(|Op|\cdot|Op'| = r^2\). It swaps inside and outside, fixes the circle, and sends lines and circles to lines and circles: a line through O to itself, a line missing O to a circle through O, and a circle through O to a line. <code>inversion(c).apply(figure)</code> returns the image exactly.</p>
+
+<div class="tablewrap"><table class="ref">
+<tr><th>call</th><th>returns</th></tr>
+<tr><td>translation(v), rotation(centre, turn | { cos, sin }), reflection(line), glide(line, v), dilation(centre, k), affine(M, t), identity()</td><td>Transform</td></tr>
+<tr><td>T.apply(point | line | circle | triangle | points)</td><td>the image</td></tr>
+<tr><td>T.compose(U), T.inverse(), T.equals(U), T.determinant</td><td>T after U; the inverse</td></tr>
+<tr><td>T.isIsometry(), T.isSimilarity(), T.fixed(), T.classify()</td><td>{ kind, center, axis, vector, cos, sin, ratio, … }</td></tr>
+<tr><td>inversion(circle).apply(point | line | circle)</td><td>the image</td></tr>
+</table></div>
+<template data-runbox>
+const a = reflection(line([0, 0], [1, 0]));
+const b = reflection(line([0, 0], [1, "sqrt(3)"]));       // a mirror at 60° to the first
+const two = b.compose(a).classify();
+PRINT("two mirrors at 60°:", two.kind, "about", String(two.center), "by", two.degrees.toFixed(0) + "°");
+const par = reflection(line([0, 2], [1, 2])).compose(a).classify();
+PRINT("two parallel mirrors 2 apart:", par.kind, "by", String(par.vector));
+const three = reflection(line([0, 0], [0, 1])).compose(reflection(line([0, 2], [1, 2]))).compose(reflection(line([1, 0], [2, 1])));
+PRINT("three mirrors:", three.classify().kind, " axis", String(three.classify().axis), " glide", String(three.classify().vector));
+
+const r = rotation([0, 0], "1/6");
+let power = identity();
+for (let k = 0; k &lt; 6; k++) power = r.compose(power);
+PRINT("a sixth of a turn, six times, is exactly the identity:", power.equals(identity()));
+const spiral = dilation([1, 0], 2).compose(rotation([0, 0], "1/8")).classify();
+PRINT(spiral.kind, "ratio", N.text(spiral.ratio), "centre", String(spiral.center));
+
+const inv = inversion(circle([0, 0], { radius: 1 }));
+PRINT("the line x = 2 inverts to:", String(inv.apply(line([2, 0], [2, 1]))));
+String(inv.apply(circle([1, 0], { radius: 1 })))
+</template>
+</article>
+</main>
+</div>
+</body>
+</html>

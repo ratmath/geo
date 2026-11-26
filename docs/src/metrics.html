@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Taxicab geometry · RatMath Geo</title>
+<meta name="description" content="The taxicab and Chebyshev metrics: distances, circles that are squares, bisectors with corners, polygonal ellipses, and π = 4.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<script type="module" src="assets/site.js"></script>
+</head>
+<body>
+<div class="shell">
+<aside></aside>
+<main>
+<article>
+<div class="eyebrow">Topic</div>
+<h1>Other ways to measure distance</h1>
+<p class="lede">Change how distance is measured and the plane is the same set of points with a different geometry. In a city of square blocks the distance that matters is \(|dx| + |dy|\), and circles turn into squares.</p>
+<pre><code>const taxi = metric("taxicab");          // also "chebyshev" (max(|dx|, |dy|)) and "euclidean"
+taxi.distance([0, 0], [3, 4]);           // 7
+taxi.circle([0, 0], 2);                  // the corners (2,0), (0,2), (−2,0), (0,−2)
+taxi.pi;                                 // 4
+taxi.bisector([0, 0], [4, 2]);           // a bent line: { segments, rays, regions, kind }
+taxi.ellipse([0, 0], [4, 0], 6);         // six corners</code></pre>
+<h2>Circles and π</h2>
+<p>A circle is the set of points at a fixed distance from a centre. In the taxicab metric \(|x| + |y| = r\) is a square standing on a corner; in the Chebyshev metric \(\max(|x|, |y|) = r\) is a square with level sides. Measuring the circumference in the same metric and dividing by the diameter gives 4 in both, so "π = 4" there. The two metrics are in fact the same geometry turned by 45° and rescaled, and <code>ellipse</code> for the Chebyshev metric is computed through that change of coordinates.</p>
+
+<h2>Bisectors</h2>
+<p>The points equally far from P and Q form a straight line in Euclid's geometry. In taxicab geometry the middle part is a segment of slope ±1, and it continues from each end as a vertical ray (when P and Q are further apart sideways than up and down) or a horizontal one. When \(|dx| = |dy|\) something stranger happens: beyond each end of the diagonal segment an entire quarter of the plane is equidistant from the two points. <code>bisector</code> returns the segment, the rays and, in that case, the two regions by their corner and bounding directions.</p>
+<p>One consequence: the theorem that three points not on a line have exactly one point equidistant from all of them fails. Three such points can have none, or infinitely many.</p>
+
+<h2>Ellipses</h2>
+<p>The points whose distances to two foci add up to a constant form a hexagon or an octagon. <code>ellipse</code> returns its corners, found exactly: the sum of distances is a convex function that is linear between the vertical and horizontal lines through the foci, so the corners lie on those lines.</p>
+<h2>Side-angle-side fails</h2>
+<p>Congruence fails too. The triangle (0,0), (2,0), (0,2) and the triangle (0,0), (1,1), (1,−1) each have two sides of taxicab length 2 from the origin with a right angle between them, yet the third sides have taxicab lengths 4 and 2. Side-angle-side is not a theorem here, and taxicab geometry is the standard example of a geometry that satisfies Euclid's other axioms without it.</p>
+
+<div class="tablewrap"><table class="ref">
+<tr><th>call</th><th>returns</th></tr>
+<tr><td>metric(name).distance(p, q)</td><td>exact number</td></tr>
+<tr><td>.circle(centre, r)</td><td>the four corners</td></tr>
+<tr><td>.pi</td><td>circumference ÷ diameter in that metric</td></tr>
+<tr><td>.bisector(p, q) (taxicab)</td><td>{ segments, rays, regions, kind }</td></tr>
+<tr><td>.ellipse(f1, f2, sum)</td><td>the corners, counter-clockwise</td></tr>
+</table></div>
+<template data-runbox>
+const taxi = metric("taxicab");
+const cheb = metric("chebyshev");
+const eu = metric("euclidean");
+PRINT("from (0,0) to (3,4): taxicab", N.text(taxi.distance([0, 0], [3, 4])), " Chebyshev", N.text(cheb.distance([0, 0], [3, 4])), " Euclid", N.text(eu.distance([0, 0], [3, 4])));
+PRINT("taxicab circle:", taxi.circle([0, 0], 2).join(" "), "  π =", N.text(taxi.pi));
+const b = taxi.bisector([0, 0], [4, 2]);
+PRINT("bisector of (0,0) and (4,2):", b.kind + ":", "segment", b.segments[0].join(" to "), "then rays", b.rays.map((r) =&gt; `from ${r.from} towards ${r.direction}`).join(" and "));
+PRINT("bisector of (0,0) and (2,2):", taxi.bisector([0, 0], [2, 2]).kind);
+PRINT("ellipse, foci (0,0) and (4,0), sum 6:", taxi.ellipse([0, 0], [4, 0], 6).join(" "));
+PRINT("ellipse, foci (0,0) and (2,2), sum 6:", taxi.ellipse([0, 0], [2, 2], 6).join(" "));
+// side-angle-side fails: two triangles with a right angle between sides of taxicab length 2
+const d = (p, q) =&gt; N.text(taxi.distance(p, q));
+`third sides: ${d([2, 0], [0, 2])} and ${d([1, 1], [1, -1])}`
+</template>
+</article>
+</main>
+</div>
+</body>
+</html>

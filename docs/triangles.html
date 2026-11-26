@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Triangle centres · RatMath Geo</title>
+<meta property="og:title" content="Triangle centres · RatMath Geo">
+<meta property="og:description" content="Geometry for RatMath: Euclidean constructions and checked theorems, spherical, hyperbolic, projective and finite geometries, symmetry and tilings.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ratmath.com/geo/triangles.html">
+<meta name="description" content="The centres, circles and lines of a triangle with exact coordinates.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="https://ratmath.com/assets/katex/0.19.1/katex.min.css">
+<link rel="stylesheet" href="assets/style.css?v=a9b5e2630f">
+<script type="module" src="assets/site.js?v=a9b5e2630f"></script>
+</head>
+<body>
+<div class="shell">
+<aside></aside>
+<main>
+<article>
+<div class="eyebrow">Topic</div>
+<h1>Triangles and their centres</h1>
+<p class="lede">A triangle has a great many notable points. The classical ones are here with exact coordinates, along with the circles and lines that go with them.</p>
+<pre><code>const t = triangle([0, 0], [4, 0], [1, 3]);
+t.centroid; t.circumcenter; t.orthocenter; t.incenter; t.ninePointCenter; t.symmedian;
+t.circumcircle; t.incircle; t.excircles.A; t.ninePointCircle;
+t.eulerLine; t.medians.A; t.altitudes.B; t.bisectors.C;
+t.area; t.sides; t.cosines; t.classify();   // { angles: "acute", sides: "scalene" }
+t.barycentric(1, 2, 3);                     // any centre from its weights</code></pre>
+<h2>Barycentric weights</h2>
+<p>Every point of the plane is a weighted average of the vertices, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><mi>u</mi><mi>A</mi><mo>+</mo><mi>v</mi><mi>B</mi><mo>+</mo><mi>w</mi><mi>C</mi><mo stretchy="false">)</mo><mi mathvariant="normal">/</mi><mo stretchy="false">(</mo><mi>u</mi><mo>+</mo><mi>v</mi><mo>+</mo><mi>w</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(uA + vB + wC)/(u + v + w)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">u</span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mclose">)</span><span class="mord">/</span><span class="mopen">(</span><span class="mord mathnormal">u</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span><span class="mclose">)</span></span></span></span>, and each classical centre has simple weights in terms of the side lengths a, b, c (opposite A, B, C):</p>
+<div class="tablewrap"><table class="ref">
+<tr><th>centre</th><th>weights</th><th>is where</th></tr>
+<tr><td>centroid G</td><td>1 : 1 : 1</td><td>the medians meet</td></tr>
+<tr><td>incentre I</td><td>a : b : c</td><td>the angle bisectors meet; centre of the inscribed circle</td></tr>
+<tr><td>excentres</td><td>−a : b : c and so on</td><td>centres of the circles touching one side and two extensions</td></tr>
+<tr><td>symmedian point</td><td>a² : b² : c²</td><td>the reflections of the medians in the bisectors meet</td></tr>
+</table></div>
+<p>The circumcentre O (perpendicular bisectors) and orthocentre H (altitudes) are found as intersections of lines. For a triangle with rational vertices G, O, H, the nine-point centre and the symmedian point are rational. The incentre is not in general, because the side lengths are square roots: for the triangle above each coordinate has degree 4 or 8 over the rationals and is printed in digits, but it is held exactly, which is how <a href="theorems.html">Feuerbach's theorem</a> can be checked on it.</p>
+
+<h2>Measures</h2>
+<p><code>area</code> is half the cross product, rational for rational vertices. <code>sides</code> are exact lengths and <code>sides2</code> their squares. The angles are given by their cosines, which are exact algebraic numbers; <code>degrees</code> gives ordinary numbers for reading. <code>classify()</code> decides acute, right or obtuse from the sign of <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>a</mi><mn>2</mn></msup><mo>+</mo><msup><mi>b</mi><mn>2</mn></msup><mo>−</mo><msup><mi>c</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">a^2 + b^2 - c^2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8974em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8974em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord mathnormal">b</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord mathnormal">c</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span> for the longest side, exactly, so a triangle is "right" only when it is.</p>
+<p>The inradius is <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mo>⋅</mo><mtext>area</mtext><mi mathvariant="normal">/</mi><mtext>perimeter</mtext></mrow><annotation encoding="application/x-tex">2\cdot\text{area}/\text{perimeter}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">area</span></span><span class="mord">/</span><span class="mord text"><span class="mord">perimeter</span></span></span></span></span> and the circumradius the radius of the circle through the vertices; Euler's relation <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><msup><mi>I</mi><mn>2</mn></msup><mo>=</mo><mi>R</mi><mo stretchy="false">(</mo><mi>R</mi><mo>−</mo><mn>2</mn><mi>r</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">OI^2 = R(R - 2r)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0785em;">I</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mclose">)</span></span></span></span> connects them and can be tested with <code>N.eq</code>.</p>
+
+<div class="tablewrap"><table class="ref">
+<tr><th>property</th><th>value</th></tr>
+<tr><td>A, B, C, vertices, sides, sides2, area, perimeter, cosines, degrees</td><td>the figure and its measures</td></tr>
+<tr><td>centroid, circumcenter, orthocenter, incenter, excenters, ninePointCenter, symmedian, barycentric(u, v, w)</td><td>Points</td></tr>
+<tr><td>circumcircle, incircle, excircles, ninePointCircle, circumradius, inradius</td><td>Circles and radii</td></tr>
+<tr><td>medians, altitudes, bisectors, feet, eulerLine</td><td>Lines (by vertex) and Points</td></tr>
+<tr><td>classify()</td><td>{ angles, sides }</td></tr>
+</table></div>
+<section class="runbox" aria-label="Runnable code">
+  <div class="runbox-head"><strong>Try it</strong><span>Edit the code and run it with <code>@ratmath/geo</code> and Core's <code>Rational</code> in scope. The last line's value is shown; <code>PRINT(…)</code> adds lines, <code>TEX(…)</code> typesets math.</span></div>
+  <textarea spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Code">const t = triangle([0, 0], [4, 0], [1, 3]);
+for (const name of ["centroid", "circumcenter", "orthocenter", "ninePointCenter", "symmedian", "incenter"]) PRINT(name.padEnd(16), String(t[name]));
+PRINT("Euler line:", String(t.eulerLine));
+PRINT("sides:", Object.values(t.sides).map((s) =&gt; N.text(s)).join(", "), " area:", N.text(t.area));
+PRINT("cosines:", Object.values(t.cosines).map((s) =&gt; N.text(s)).join(", "), " degrees:", Object.values(t.degrees).map((d) =&gt; d.toFixed(3)).join(", "));
+const [O, I, R, r] = [t.circumcenter, t.incenter, t.circumradius, t.inradius];
+PRINT("Euler's relation OI² = R(R − 2r):", N.eq(distance2(O, I), N.mul(R, N.sub(R, N.mul(num(2), r)))));
+const right = triangle([0, 0], [4, 0], [0, 3]);
+PRINT("3-4-5:", JSON.stringify(right.classify()), " incircle:", String(right.incircle), " excentre:", String(right.excenters.A));
+triangle([0, 0], [2, 0], [1, "sqrt(3)"]).classify()</textarea>
+  <div class="runbox-bar"><button type="button" data-run>Run</button><button type="button" class="ghost" data-reset>Reset</button><span class="runbox-meta">Ctrl/⌘ + Enter runs</span></div>
+  <div class="runbox-out" aria-live="polite"></div>
+</section>
+<footer class="sitelinks"><a href="https://github.com/ratmath/geo">GitHub</a> · <a href="https://ratmath.com/">ratmath.com</a> · <a href="https://ratmath.com/shelf/">shelf</a> · <a href="https://ratmath.com/core/">core</a></footer>
+</article>
+</main>
+</div>
+</body>
+</html>

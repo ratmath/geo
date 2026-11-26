@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Computational geometry · RatMath Geo</title>
+<meta name="description" content="Convex hulls, polygons, triangulations, Delaunay and Voronoi diagrams with exact predicates.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<script type="module" src="assets/site.js"></script>
+</head>
+<body>
+<div class="shell">
+<aside></aside>
+<main>
+<article>
+<div class="eyebrow">Topic</div>
+<h1>Hulls, triangulations and Voronoi diagrams</h1>
+<p class="lede">The algorithms of computational geometry are built from two questions: is this a left turn, and is this point inside that circle? Asked in floating point they sometimes get the wrong answer, and the algorithm then loops or returns nonsense. Asked exactly they cannot.</p>
+<pre><code>convexHull(points);                       // counter-clockwise, edge points dropped
+const p = polygon([[0, 0], [4, 0], [4, 3], [2, 1], [0, 3]]);
+p.area; p.centroid; p.isSimple(); p.isConvex();
+p.locate([2, 1]);                         // "boundary": decided exactly
+p.triangulate();                          // [[1, 2, 3], [0, 1, 3], [0, 3, 4]]
+p.clip([[1, 1], [5, 1], [5, 5], [1, 5]]); // intersection with a convex polygon
+delaunay(points);                         // { points, triangles, edges, cocircular }
+voronoi(points);                          // { vertices, cells, edges }</code></pre>
+<h2>The two predicates</h2>
+<p><strong>Orientation.</strong> For points p, q, r the sign of the cross product \((q - p)\times(r - p)\) is +1 for a left turn, −1 for a right turn and 0 when the three are collinear. Convex hulls, segment intersection and point-in-polygon tests use nothing else.</p>
+<p><strong>In-circle.</strong> Whether d is inside the circle through a, b, c is the sign of a 3×3 determinant in the coordinates. Delaunay triangulations are defined by it: no point may lie inside the circle through the corners of any triangle.</p>
+<p>Both are signs of polynomials, and with rational coordinates they are computed without error. The value 0 (three points on a line, four on a circle) is a real answer here and is handled as a case: the hull drops points on its edges, <code>locate</code> answers <code>"boundary"</code>, and <code>delaunay</code> reports <code>cocircular: true</code> when the triangulation is not unique.</p>
+
+<h2>Polygons</h2>
+<p>The area is the shoelace formula and the centroid its companion, both exact. <code>isSimple()</code> tests every pair of edges for crossings. <code>triangulate()</code> clips ears: a corner whose triangle contains no other vertex is cut off, and this repeats. <code>clip(convex)</code> cuts the polygon by each edge of a convex polygon in turn (Sutherland and Hodgman's method); the new corners are intersections of lines with rational coefficients, so they are rational.</p>
+
+<h2>Delaunay and Voronoi</h2>
+<p><code>delaunay</code> adds the points one at a time: the triangles whose circles contain the new point are removed and the hole is re-triangulated from the new point (Bowyer and Watson's method). <code>voronoi</code> is the dual picture: each point's cell is the set of places nearer to it than to any other point, and its corners are the circumcentres of the Delaunay triangles around that point, which are rational when the points are. Cells of points on the hull are unbounded; their open edges are returned as rays.</p>
+
+<div class="tablewrap"><table class="ref">
+<tr><th>call</th><th>returns</th></tr>
+<tr><td>convexHull(points)</td><td>Point[]</td></tr>
+<tr><td>segmentIntersection(a, b, c, d), onSegment(a, b, p)</td><td>{ meets, kind, point }; boolean</td></tr>
+<tr><td>polygon(vertices)</td><td>Polygon: area, signedArea, perimeter, centroid, edges</td></tr>
+<tr><td>p.isSimple(), p.isConvex(), p.locate(q), p.contains(q)</td><td>"inside" | "boundary" | "outside"</td></tr>
+<tr><td>p.triangulate(), p.clip(convex)</td><td>index triples; Polygon or null</td></tr>
+<tr><td>inCircle(a, b, c, d)</td><td>1 inside, 0 on, −1 outside</td></tr>
+<tr><td>delaunay(points)</td><td>{ points, triangles, edges, cocircular }</td></tr>
+<tr><td>voronoi(points)</td><td>{ points, vertices, cells: [{ site, corners, bounded }], edges }</td></tr>
+<tr><td>closestPair(points)</td><td>{ points, distance, distance2 }</td></tr>
+</table></div>
+<template data-runbox>
+const pts = [[0, 0], [4, 0], [0, 3], [4, 3], [2, 1], [1, 2], [3, 5], [2, 0]];
+PRINT("hull:", convexHull(pts).join(" "));
+const d = delaunay(pts);
+PRINT("Delaunay triangles:", d.triangles.map((t) =&gt; t.join("-")).join("  "), " cocircular:", d.cocircular);
+const empty = d.triangles.every(([a, b, c]) =&gt; d.points.every((p, i) =&gt; [a, b, c].includes(i) || inCircle(d.points[a], d.points[b], d.points[c], p) &lt;= 0));
+PRINT("every circle is empty:", empty);
+const v = voronoi(pts);
+for (const cell of v.cells.filter((c) =&gt; c.bounded)) PRINT("cell of", String(cell.site), "has corners", cell.corners.join(" "));
+
+const p = polygon([[0, 0], [4, 0], [4, 3], [2, 1], [0, 3]]);
+PRINT("area", N.text(p.area), " centroid", String(p.centroid), " simple", p.isSimple(), " convex", p.isConvex());
+PRINT("(2, 1) is", p.locate([2, 1]), " (2, 2) is", p.locate([2, 2]), " (1, 1) is", p.locate([1, 1]));
+PRINT("triangles:", p.triangulate().map((t) =&gt; t.join("-")).join("  "));
+PRINT("a square's Delaunay triangulation is not unique:", delaunay([[0, 0], [1, 0], [0, 1], [1, 1]]).cocircular);
+String(p.clip([[1, 1], [5, 1], [5, 5], [1, 5]]))
+</template>
+</article>
+</main>
+</div>
+</body>
+</html>

@@ -1,18 +1,8 @@
 // What this package is planned to contain, phase by phase, from the RatMath
-// library roadmap. Nothing here is built yet; a phase is removed from this list
+// library roadmap. Phases 1 and 2 are built; a phase is removed from this list
 // when it ships, and the list goes away when it is empty.
 
 export const plan = Object.freeze([
-  {
-    "phase": 1,
-    "contents": "Euclidean plane: constructions, centres, transformations, checked theorems",
-    "estimate": "1,200"
-  },
-  {
-    "phase": 2,
-    "contents": "Exact computational and lattice geometry, other metrics",
-    "estimate": "1,100"
-  },
   {
     "phase": 3,
     "contents": "Spherical and hyperbolic models",

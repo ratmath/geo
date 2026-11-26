@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Constructions · RatMath Geo</title>
+<meta property="og:title" content="Constructions · RatMath Geo">
+<meta property="og:description" content="Geometry for RatMath: Euclidean constructions and checked theorems, spherical, hyperbolic, projective and finite geometries, symmetry and tilings.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ratmath.com/geo/constructions.html">
+<meta name="description" content="Points, lines and circles with exact coordinates, and ruler-and-compass constructions recorded step by step.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="https://ratmath.com/assets/katex/0.19.1/katex.min.css">
+<link rel="stylesheet" href="assets/style.css?v=a9b5e2630f">
+<script type="module" src="assets/site.js?v=a9b5e2630f"></script>
+</head>
+<body>
+<div class="shell">
+<aside></aside>
+<main>
+<article>
+<div class="eyebrow">Topic</div>
+<h1>Points, lines, circles and constructions</h1>
+<p class="lede">The Euclidean plane has three kinds of object and two tools. Everything the tools can make has coordinates that are exact numbers, and this page is about those.</p>
+<pre><code>const l = line([0, 0], [2, 1]);              // or line(a, b, c) for ax + by + c = 0
+const c = circle([0, 0], { radius: 1 });     // or circle(centre, pointOnIt)
+meet(l, c);                                  // 0, 1 or 2 points, exact
+perpendicularBisector([0, 0], [4, 0]);       // x − 2 = 0
+regularPolygon(5);                           // five exact vertices on the unit circle
+
+const k = construction({ A: [0, 0], B: [1, 0] });
+k.circle("a", "A", "B").circle("b", "B", "A").meet(["C", "D"], "a", "b").line("m", "C", "D");
+String(k.get("C"));                          // "(1/2, -√3/2)"</code></pre>
+<h2>What the tools add</h2>
+<p>A ruler draws the line through two known points; a compass draws the circle with a known centre through a known point. New points appear where these meet. Two lines meet where two linear equations hold, which needs only +, −, ×, ÷. A line and a circle, or two circles, meet where a quadratic equation holds, which needs one square root more. So starting from rational points, every constructible coordinate is built from rationals by the four operations and square roots, however deep the nesting. These are algebraic numbers, and <code>meet</code> returns them exactly: the vertex of the regular pentagon is <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo fence="true" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mrow><mo>−</mo><mn>1</mn><mo>+</mo><msqrt><mn>5</mn></msqrt></mrow><mn>4</mn></mfrac></mstyle><mo separator="true">,</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><msqrt><mrow><mn>10</mn><mo>+</mo><mn>2</mn><msqrt><mn>5</mn></msqrt></mrow></msqrt><mn>4</mn></mfrac></mstyle><mo fence="true" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow><annotation encoding="application/x-tex">\bigl(\tfrac{-1+\sqrt5}{4}, \tfrac{\sqrt{10+2\sqrt5}}{4}\bigr)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.6796em;vertical-align:-0.35em;"></span><span class="mopen"><span class="delimsizing size1">(</span></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.038em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">4</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.399em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">1</span><span class="mbin mtight">+</span><span class="mord sqrt mtight"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9128em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mtight" style="padding-left:0.833em;">5</span></span><span style="top:-2.8728em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail mtight" style="min-width:0.853em;height:1.08em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.08em" viewBox="0 0 400000 1080" preserveAspectRatio="xMinYMin slice"><path d="M95,702
+c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
+c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
+c44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10
+s173,378,173,378c0.7,0,35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429
+c69,-144,104.5,-217.7,106.5,-221
+l0 -0
+c5.3,-9.3,12,-14,20,-14
+H400000v40H845.2724
+s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
+c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
+M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1272em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3296em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">4</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.5038em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord sqrt mtight"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.1798em;"><span class="svg-align" style="top:-3.4286em;"><span class="pstrut" style="height:3.4286em;"></span><span class="mord mtight" style="padding-left:1.19em;"><span class="mord mtight">10</span><span class="mbin mtight">+</span><span class="mord mtight">2</span><span class="mord sqrt mtight"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9128em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mtight" style="padding-left:0.833em;">5</span></span><span style="top:-2.8728em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail mtight" style="min-width:0.853em;height:1.08em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.08em" viewBox="0 0 400000 1080" preserveAspectRatio="xMinYMin slice"><path d="M95,702
+c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
+c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
+c44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10
+s173,378,173,378c0.7,0,35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429
+c69,-144,104.5,-217.7,106.5,-221
+l0 -0
+c5.3,-9.3,12,-14,20,-14
+H400000v40H845.2724
+s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
+c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
+M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1272em;"><span></span></span></span></span></span></span></span><span style="top:-3.1518em;"><span class="pstrut" style="height:3.4286em;"></span><span class="hide-tail mtight" style="min-width:0.853em;height:1.5429em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.5429em" viewBox="0 0 400000 1080" preserveAspectRatio="xMinYMin slice"><path d="M95,702
+c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
+c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
+c44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10
+s173,378,173,378c0.7,0,35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429
+c69,-144,104.5,-217.7,106.5,-221
+l0 -0
+c5.3,-9.3,12,-14,20,-14
+H400000v40H845.2724
+s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
+c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
+M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2768em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mclose"><span class="delimsizing size1">)</span></span></span></span></span>.</p>
+<p>Two circles meet on their <em>radical axis</em>, the line left when one circle's equation is subtracted from the other's, so that case reduces to a line and a circle.</p>
+
+<h2>Predicates</h2>
+<p>Because the numbers are exact, so are the questions asked of them: <code>collinear</code>, <code>concyclic</code>, <code>concurrent</code>, <code>parallel</code>, <code>perpendicular</code>, <code>orientation</code> (left turn, right turn or straight), <code>circle.power(p)</code> (negative inside, zero on, positive outside). None of them takes a tolerance.</p>
+
+<h2>A construction as a list of steps</h2>
+<p><code>construction(given)</code> records a construction the way it is written in a textbook. Each step names what it makes: <code>line(name, P, Q)</code> uses the ruler, <code>circle(name, centre, through)</code> the compass (a third argument carries the radius |PQ| to another centre), and <code>meet(names, f, g)</code> marks intersections. <code>count</code> says how many times each tool was used, <code>String(k)</code> prints the steps, and <code>get(name)</code> returns any object with its exact coordinates.</p>
+
+<h2>Regular polygons</h2>
+<p><code>regularPolygon(n)</code> uses the exact values of <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>cos</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>2</mn><mi>π</mi><mi>k</mi><mi mathvariant="normal">/</mi><mi>n</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\cos(2\pi k/n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop">cos</span><span class="mopen">(</span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.0359em;">π</span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mord">/</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span> and <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>sin</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>2</mn><mi>π</mi><mi>k</mi><mi mathvariant="normal">/</mi><mi>n</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\sin(2\pi k/n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop">sin</span><span class="mopen">(</span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.0359em;">π</span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mord">/</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span>. For n = 3, 4, 5, 6, 8, 10, 12, 15, 17, … these are nested square roots, which is Gauss's theorem on which polygons are constructible. For n = 7 or 9 they are algebraic numbers of degree 3 that no nest of square roots expresses: still exact here, but out of the compass's reach.</p>
+
+<div class="tablewrap"><table class="ref">
+<tr><th>call</th><th>returns</th></tr>
+<tr><td>point(x, y), line(P, Q), line(a, b, c), circle(centre, through | { radius })</td><td>Point, Line, Circle</td></tr>
+<tr><td>meet(f, g)</td><td>Point or null (two lines); Point[] ordered by x then y</td></tr>
+<tr><td>distance, distance2, midpoint, foot(P, l), reflect(P, l)</td><td>exact numbers and Points</td></tr>
+<tr><td>parallelThrough(l, P), perpendicularThrough(l, P), perpendicularBisector(P, Q), angleBisector(A, V, B)</td><td>Line</td></tr>
+<tr><td>circumcircle(A, B, C), tangents(circle, P), regularPolygon(n, { center, vertex })</td><td>Circle, Line[], Point[]</td></tr>
+<tr><td>collinear, concyclic, concurrent, parallel, perpendicular, orientation</td><td>exact predicates</td></tr>
+<tr><td>construction(given).line(…).circle(…).meet(…)</td><td>Construction: get(name), steps, count</td></tr>
+</table></div>
+<section class="runbox" aria-label="Runnable code">
+  <div class="runbox-head"><strong>Try it</strong><span>Edit the code and run it with <code>@ratmath/geo</code> and Core's <code>Rational</code> in scope. The last line's value is shown; <code>PRINT(…)</code> adds lines, <code>TEX(…)</code> typesets math.</span></div>
+  <textarea spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Code">// Bisect a segment, the way Euclid does.
+const k = construction({ A: [0, 0], B: [1, 0] });
+k.circle("a", "A", "B").circle("b", "B", "A").meet(["C", "D"], "a", "b").line("m", "C", "D").line("AB", "A", "B").meet("M", "m", "AB");
+PRINT(String(k));
+PRINT("C =", String(k.get("C")), " M =", String(k.get("M")), " tools:", JSON.stringify(k.count));
+PRINT("ABC is equilateral:", N.eq(distance2(k.get("A"), k.get("C")), distance2(k.get("A"), k.get("B"))));
+
+PRINT("pentagon:", regularPolygon(5).join("  "));
+PRINT("a vertex of the heptagon:", String(regularPolygon(7)[1]), "(exact, but not a nest of square roots)");
+const c = circle([0, 0], { radius: 1 });
+PRINT("tangents from (2, 0):", tangents(c, [2, 0]).join("   and   "));
+concyclic([1, 0], [0, 1], [-1, 0], ["3/5", "-4/5"])</textarea>
+  <div class="runbox-bar"><button type="button" data-run>Run</button><button type="button" class="ghost" data-reset>Reset</button><span class="runbox-meta">Ctrl/⌘ + Enter runs</span></div>
+  <div class="runbox-out" aria-live="polite"></div>
+</section>
+<footer class="sitelinks"><a href="https://github.com/ratmath/geo">GitHub</a> · <a href="https://ratmath.com/">ratmath.com</a> · <a href="https://ratmath.com/shelf/">shelf</a> · <a href="https://ratmath.com/core/">core</a></footer>
+</article>
+</main>
+</div>
+</body>
+</html>
