@@ -38,7 +38,9 @@ N.text(metric("taxicab").pi);           // "4"
 | Finite geometries | `projectivePlane(q)`, `affinePlane(q)`, `fano()`, `incidence(lines)`: the axioms checked, design parameters, parallels, completion, collineations by search and `collineationGroup()` (PermGroup) |
 | Polyhedra | `solids` (Platonic and some Archimedean, coordinates in Q, Q(√2), Q(√5)), `polyhedron(points)` with faces proved exactly, `prism(n)`: Euler's formula, `volume`, `surfaceArea`, `dihedralCosines`, `dual()`, `symmetry()` as a PermGroup |
 | Plane symmetry | `figureSymmetry` (Cₙ or Dₙ), `friezeGroup` (the 7), `wallpaperGroup` (the 17, by the flowchart with its steps), `wallpaper.pattern` |
-| Tilings | `polygonAngle`, `vertexTypes` (the 21), `uniformTiling` (11 possible, a reason for the other 10), `regularTilings` |
+| Tilings | `polygonAngle`, `vertexTypes` (the 21), `uniformTiling` (11 possible, a reason for the other 10), `regularTilings`, `tilingPatch` (a patch grown from the vertex type and checked) |
+| Pictures | `tilingFigure`, `solidPicture`, `wallpaperFigure`, `incidenceFigure`, `constructionFrames`, `geoFigure`, drawn by `@ratmath/graphics` (`figureSVG` and the others are re-exported) |
+| The join with graphics | `toGraphics` and `fromGraphics` move points, lines, circles and polygons between geo's kernel (all real algebraic numbers) and graphics' (Q(√d)) exactly; `toSurd` |
 
 A checked theorem is a test of one figure, exactly; it is not a proof of the
 theorem. General proofs by elimination are phase 6.
@@ -49,7 +51,6 @@ theorem. General proofs by elimination are phase 6.
 |---|---|
 | 3 | Spherical and hyperbolic models |
 | 6 | General proofs of theorems by elimination |
-| 7 | Pictures |
 
 The plan is in the
 [library roadmap](https://github.com/ratmath/ratmath/blob/main/docs/design/library-roadmap.md#11-a-geometry-package-ratmathgeo).

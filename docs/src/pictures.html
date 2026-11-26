@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pictures of geometry · RatMath Geo</title>
+<meta name="description" content="Tilings grown from their vertex types, solids, wallpaper patterns, finite planes and constructions, drawn by RatMath Graphics; and the join between geo's exact plane and graphics'.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<script type="module" src="assets/site.js"></script>
+</head>
+<body>
+<body>
+<div class="shell">
+<aside></aside>
+<main>
+<article>
+<div class="eyebrow">Topic</div>
+<h1>Pictures of geometry</h1>
+<p class="lede">Geo computes; graphics draws. This page covers the pictures (tilings, solids, patterns, finite planes, constructions step by step) and how geo's exact plane meets graphics' exact plane.</p>
+<pre><code>tilingFigure("3.4.6.4");                 // a patch of the rhombitrihexagonal tiling
+tilingPatch("3.3.3.3.6", { radius: 6 }); // { ok, polygons, choices }: every inner vertex checked
+solidPicture(solids.icosahedron());      // lit faces under a camera
+wallpaperFigure(wallpaper.pattern("p6m", [["1/10", "1/5"]]));
+incidenceFigure(fano());                 // the Fano plane as its Levi graph
+constructionFrames(c);                   // frames: one step of a construction each
+toGraphics(point("1/2", "sqrt(3)/2"));   // the same point in graphics, exactly
+figureSVG(fig);                          // any of these as SVG (also PNG, PDF, TikZ, text)</code></pre>
+
+<h2>Growing a tiling from its vertex type</h2>
+<p>A vertex type such as 3.4.6.4 says which regular polygons meet at every vertex, in order round it. <code>tilingPatch(type)</code> starts with one vertex at the origin, the polygons of the type placed round it, and grows outward. At each open vertex it asks which rotations and reflections of the type fit the polygons already there, in their angles and order. If exactly one does, the missing polygons are placed. If no way fits, or a polygon would overlap another, there is no such tiling. When every open vertex allows more than one way, the nearest takes the first one, and <code>choices</code> counts these choices; the chirality of the snub tilings is one. At the end every vertex well inside the patch is checked to have exactly the type round it.</p>
+<p>Run over all 21 vertex types, growth succeeds for exactly the 11 that <a href="tilings.html">the parity argument</a> leaves, and fails for the other 10: two independent arguments that agree. Coordinates are floats (edges of length 1), so the picture is marked estimated; the combinatorics are what is checked.</p>
+
+<h2>Solids, patterns and finite planes</h2>
+<p><code>solidPicture(p)</code> draws a <a href="polyhedra.html">Polyhedron</a> with its faces lit and coloured by their number of sides, in a box that keeps its proportions. <code>wallpaperFigure(pattern)</code> builds a basis from the pattern's Gram matrix, repeats the cell and colours the points by label: the pictures behind <a href="symmetry.html">the 17 wallpaper groups</a>. <code>incidenceFigure(g)</code> draws a finite geometry as its Levi graph: points on one side, lines on the other, an edge for each incidence. A projective plane of order \(q\) has \(q^2 + q + 1\) of each and \(q + 1\) edges at every vertex.</p>
+
+<h2>Constructions step by step</h2>
+<p><code>constructionFrames(c)</code> turns a recorded <a href="constructions.html">construction</a> into frames: each frame adds what one step made, in the highlight colour, with the step's text as its note. <code>framesSVG</code> plays them. <code>geoFigure(items)</code> draws points, lines, circles, segments, polygons and triangles together; it is exact when every coordinate is rational and estimated otherwise (the objects stay exact in geo).</p>
+
+<h2>Joining the two kernels</h2>
+<p>Graphics has exact plane geometry with coordinates in \(\mathbb{Q}(\sqrt d)\): numbers \(a + b\sqrt d\). Geo works with all real algebraic numbers, which it needs: the incentre of a triangle with rational vertices involves several square roots. <code>toGraphics(x)</code> moves a point, line, circle, polygon or triangle across exactly when each number in it is rational or quadratic: a quadratic number is a root of \(c_0 + c_1 x + c_2 x^2\), so it is \(\frac{-c_1 \pm \sqrt{c_1^2 - 4c_0c_2}}{2c_2}\), with the sign that matches its value. Anything of higher degree is refused rather than rounded. <code>fromGraphics</code> goes the other way, so a figure can be built with graphics' tools and its theorems checked in geo.</p>
+
+<div class="tablewrap"><table class="ref">
+<tr><th>call</th><th>returns</th></tr>
+<tr><td>tilingPatch(type, { radius })</td><td>{ type, ok, polygons, vertices, choices, reason? }</td></tr>
+<tr><td>tilingFigure(type, { radius, view })</td><td>A figure of the patch, or a refusal with the reason</td></tr>
+<tr><td>solidPicture(polyhedron, { cam })</td><td>A figure of the solid</td></tr>
+<tr><td>wallpaperFigure(pattern, { cells })</td><td>A figure of the pattern over cells</td></tr>
+<tr><td>incidenceFigure(geometry)</td><td>The Levi graph as a figure</td></tr>
+<tr><td>constructionFrames(construction)</td><td>Frames, one per step</td></tr>
+<tr><td>geoFigure(items, { x, y })</td><td>Geo objects in one figure</td></tr>
+<tr><td>toSurd(x), toGraphics(x), fromGraphics(x)</td><td>The join with graphics' exact plane</td></tr>
+<tr><td>figureSVG, figurePNG, figurePDF, figureTikZ, figureASCII, framesSVG, framesPNG</td><td>Drawing, from @ratmath/graphics</td></tr>
+</table></div>
+<template data-runbox>
+const ok = vertexTypes().filter((t) =&gt; tilingPatch(t, { radius: 4 }).ok).map((t) =&gt; t.join("."));
+PRINT(ok.length, "types grow into a tiling:", ok.join(", "));
+const p = tilingPatch("3.3.3.3.6", { radius: 5 });
+PRINT("3.3.3.3.6:", p.polygons.length, "polygons,", p.choices, "choices (its handedness among them)");
+const t = triangle([0, 0], [4, 0], [1, 3]);
+PRINT("circumcentre in graphics:", String(toGraphics(t.circumcenter)));
+try { toGraphics(t.incenter); } catch (e) { PRINT("incentre:", e.message); }
+SHOW(figureSVG(tilingFigure("3.4.6.4", { radius: 6 }), { width: 360, height: 360 }));
+SHOW(figureSVG(solidPicture(solids.icosahedron()), { width: 300, height: 260 }));
+</template>
+</article>
+</main>
+</div>
+</body>
+</html>
