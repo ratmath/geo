@@ -345,3 +345,162 @@ export interface Metric {
   ellipse(f1: PointLike, f2: PointLike, sum: NumLike): Point[];
 }
 export function metric(name?: "taxicab" | "chebyshev" | "euclidean"): Metric;
+
+// ---- phase 4: the projective plane and finite geometries ----
+
+export class PPoint {
+  readonly coords: readonly [Num, Num, Num];
+  readonly key: string;
+  readonly atInfinity: boolean;
+  readonly dual: PLine;
+  equals(o: PPoint): boolean;
+  on(l: PLine): boolean;
+  toAffine(): Point | null;
+  toString(): string;
+}
+export class PLine {
+  readonly coords: readonly [Num, Num, Num];
+  readonly key: string;
+  readonly dual: PPoint;
+  readonly isAtInfinity: boolean;
+  equals(o: PLine): boolean;
+  contains(p: PPoint): boolean;
+  toString(): string;
+}
+export type PPointLike = PPoint | Point | [NumLike, NumLike] | [NumLike, NumLike, NumLike];
+export function ppoint(...coords: NumLike[] | [PPointLike]): PPoint;
+export function pline(...coords: NumLike[] | [[NumLike, NumLike, NumLike]]): PLine;
+export function lineAtInfinity(): PLine;
+export function join(p: PPointLike, q: PPointLike): PLine;
+export function meetLines(l: PLine | [NumLike, NumLike, NumLike], m: PLine | [NumLike, NumLike, NumLike]): PPoint;
+export function collinearP(p: PPointLike, q: PPointLike, r: PPointLike): boolean;
+export function concurrentP(l: PLine, m: PLine, n: PLine): boolean;
+export function crossRatio(a: PPointLike | PLine, b: PPointLike | PLine, c: PPointLike | PLine, d: PPointLike | PLine): Num | "infinity";
+export function harmonicConjugate(a: PPointLike, b: PPointLike, c: PPointLike): PPoint;
+export type Matrix3 = [[NumLike, NumLike, NumLike], [NumLike, NumLike, NumLike], [NumLike, NumLike, NumLike]];
+export class Projectivity {
+  constructor(matrix: Matrix3);
+  readonly matrix: readonly (readonly Num[])[];
+  readonly isAffine: boolean;
+  apply(x: PPointLike): PPoint;
+  apply(x: PLine): PLine;
+  compose(other: Projectivity): Projectivity;
+  inverse(): Projectivity;
+  equals(o: Projectivity): boolean;
+  toString(): string;
+}
+export function projectivity(matrix: Matrix3): Projectivity;
+export function projectivityFrom(from: PPointLike[], to: PPointLike[]): Projectivity;
+export class Conic {
+  constructor(matrix: Matrix3);
+  static fromCoefficients(c: [NumLike, NumLike, NumLike, NumLike, NumLike, NumLike]): Conic;
+  readonly matrix: readonly (readonly Num[])[];
+  readonly coefficients: Num[];
+  readonly determinant: Num;
+  readonly degenerate: boolean;
+  value(p: PPointLike): Num;
+  contains(p: PPointLike): boolean;
+  polar(p: PPointLike): PLine;
+  pole(l: PLine): PPoint;
+  tangentAt(p: PPointLike): PLine;
+  transform(T: Projectivity): Conic;
+  classify(): string;
+  toString(): string;
+}
+export function conicThrough(points: PPointLike[]): Conic;
+export function desargues(t1: PPointLike[], t2: PPointLike[]): { fromPoint: boolean; fromLine: boolean; holds: boolean; center: PPoint | null; axis: PLine | null; meets: PPoint[] };
+export function pappus(abc: PPointLike[], ABC: PPointLike[]): { holds: boolean; points: PPoint[]; line: PLine };
+export function pascal(points: PPointLike[], conic?: Conic | null): { holds: boolean; points: PPoint[]; line: PLine; conic: Conic };
+export function brianchon(conic: Conic, points: PPointLike[]): { holds: boolean; vertices: PPoint[]; center: PPoint | null };
+
+export interface PermGroupLike { degree: number; order: number; elements: number[][]; generators: number[][] }
+export class Incidence {
+  constructor(lines: number[][], options?: { points?: number | null; name?: string; labels?: string[] | null });
+  readonly v: number;
+  readonly b: number;
+  readonly lines: readonly (readonly number[])[];
+  readonly name: string;
+  readonly labels: readonly string[] | null;
+  readonly matrix: number[][];
+  readonly order: number | null;
+  linesThrough(p: number): number[];
+  lineThrough(p: number, q: number): number | number[] | null;
+  meet(i: number, j: number): number[];
+  parallels(p: number, line: number): number[];
+  projectiveAxioms(): { twoPointsOneLine: boolean; twoLinesOnePoint: boolean; fourPointsNoThreeCollinear: boolean; holds: boolean };
+  isProjectivePlane(): boolean;
+  affineAxioms(): { twoPointsOneLine: boolean; playfair: boolean; threeNonCollinear: boolean; holds: boolean };
+  isAffinePlane(): boolean;
+  hasQuadrangle(): boolean;
+  designParameters(): { v: number; b: number; k: number | null; r: number | null; lambda: number | null };
+  dual(): Incidence;
+  collineations(options?: { maxOrder?: number }): { order: number; group: PermGroupLike | null; elements: number[][] };
+  toString(): string;
+}
+export function incidence(lines: number[][], options?: { points?: number | null; name?: string; labels?: string[] | null }): Incidence;
+export class FiniteProjectivePlane extends Incidence {
+  constructor(q: number);
+  readonly q: number;
+  readonly coordinates: readonly (readonly number[])[];
+  pointAt(v: number[]): number;
+  collineationGroup(options?: { maxOrder?: number }): PermGroupLike;
+}
+export class FiniteAffinePlane extends Incidence {
+  constructor(q: number);
+  readonly q: number;
+  readonly parallelClasses: readonly (readonly number[])[];
+  completion(): Incidence;
+}
+export function projectivePlane(q: number): FiniteProjectivePlane;
+export function affinePlane(q: number): FiniteAffinePlane;
+export function fano(): FiniteProjectivePlane;
+
+// ---- phase 5: solids, symmetry, tilings ----
+
+export type Point3 = [NumLike, NumLike, NumLike];
+export interface SolidSymmetry { order: number; rotations: number; group: PermGroupLike; rotationGroup: PermGroupLike | null; name: string }
+export class Polyhedron {
+  constructor(vertices: Point3[], faces?: number[][] | null, options?: { name?: string; check?: boolean });
+  readonly vertices: readonly (readonly Num[])[];
+  readonly faces: readonly (readonly number[])[];
+  readonly center: readonly Num[];
+  readonly name: string;
+  readonly V: number;
+  readonly E: number;
+  readonly F: number;
+  readonly edges: [number, number][];
+  readonly euler: number;
+  readonly faceCounts: Record<number, number>;
+  readonly vertexConfigurations: string[];
+  readonly edgeLengths2: Num[];
+  readonly volume: Num;
+  readonly surfaceArea: Num;
+  readonly dihedralCosines: Num[];
+  vertexConfiguration(i: number): string;
+  faceArea(k: number): Num;
+  dual(options?: { name?: string | null }): Polyhedron;
+  symmetry(): SolidSymmetry;
+  toString(): string;
+}
+export function polyhedron(points: Point3[], options?: { name?: string }): Polyhedron;
+export const solids: Readonly<Record<"tetrahedron" | "cube" | "octahedron" | "dodecahedron" | "icosahedron" | "cuboctahedron" | "truncatedOctahedron" | "truncatedTetrahedron" | "truncatedCube", () => Polyhedron>>;
+export function prism(n: number, options?: { height?: NumLike }): Polyhedron;
+
+export function figureSymmetry(points: PointLike[], options?: { labels?: unknown[] | null }): { order: number; rotations: number; reflections: number; name: string; center?: Point; transforms: Transform[]; group: PermGroupLike | null };
+export type WallpaperName = "p1" | "p2" | "pm" | "pg" | "cm" | "pmm" | "pmg" | "pgg" | "cmm" | "p3" | "p3m1" | "p31m" | "p4" | "p4m" | "p4g" | "p6" | "p6m";
+export interface LatticePatternSpec { gram: [[NumLike, NumLike], [NumLike, NumLike]]; points: Array<[NumLike, NumLike]>; labels?: unknown[] | null }
+export function wallpaperGroup(pattern: LatticePatternSpec): { name: WallpaperName; orbifold: string; pointGroupOrder: number; symmetries: number; steps: string[] };
+export const wallpaper: {
+  readonly names: readonly WallpaperName[];
+  readonly orbifold: Readonly<Record<WallpaperName, string>>;
+  pattern(name: WallpaperName, seeds?: Array<[NumLike, NumLike]>): { gram: [[NumLike, NumLike], [NumLike, NumLike]]; points: Array<[Rational, Rational]>; labels: number[] };
+  classify(pattern: LatticePatternSpec): ReturnType<typeof wallpaperGroup>;
+};
+export type FriezeName = "p1" | "p11g" | "p1m1" | "p2" | "p2mg" | "p11m" | "p2mm";
+export function friezeGroup(spec: { points: Array<[NumLike, NumLike]>; period?: NumLike; labels?: unknown[] | null }): { name: FriezeName; conway: string; orbifold: string; horizontalMirror: boolean; verticalMirror: boolean; halfTurn: boolean; glide: boolean; mirrorAt: Rational | null; halfTurnAt: [Rational, Rational] | null; centreLine: Rational };
+export const friezes: Readonly<Record<FriezeName, { name: FriezeName; conway: string; orbifold: string }>>;
+
+export function polygonAngle(n: number): Rational;
+export function vertexTypes(): number[][];
+export function uniformTiling(type: string | number[]): { type: string; fits: boolean; uniform: boolean; reason: string };
+export function regularTilings(): Array<{ p: number; q: number; symbol: string; dual: string }>;

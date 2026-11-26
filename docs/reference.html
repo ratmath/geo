@@ -13,8 +13,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
 <link rel="stylesheet" href="https://ratmath.com/assets/katex/0.19.1/katex.min.css">
-<link rel="stylesheet" href="assets/style.css?v=a9b5e2630f">
-<script type="module" src="assets/site.js?v=a9b5e2630f"></script>
+<link rel="stylesheet" href="assets/style.css?v=e69cf58dbd">
+<script type="module" src="assets/site.js?v=e69cf58dbd"></script>
 </head>
 <body>
 <div class="shell">
@@ -95,6 +95,27 @@
 <tr><td>latticePointsOn(p, q), pick(vertices), isVisible(x, y), visiblePoints(n)</td><td>See <a href="lattice.html">Lattice geometry</a>.</td></tr>
 <tr><td>metric(name)</td><td>"taxicab", "chebyshev" or "euclidean": distance, circle, pi, bisector, ellipse. See <a href="metrics.html">Taxicab geometry</a>.</td></tr>
 <tr><td>plan</td><td>The phases still to come, each { phase, contents, estimate }.</td></tr>
+</table></div>
+<h2>Projective and finite geometry</h2>
+<div class="tablewrap"><table class="ref">
+<tr><th>Export</th><th>What it does</th></tr>
+<tr><td>ppoint, pline, lineAtInfinity, PPoint, PLine</td><td>Points and lines in homogeneous coordinates; <code>dual</code> swaps them. See <a href="projective.html">The projective plane</a>.</td></tr>
+<tr><td>join, meetLines, collinearP, concurrentP</td><td>Incidence, exactly.</td></tr>
+<tr><td>crossRatio, harmonicConjugate</td><td>The projective invariant of four collinear points.</td></tr>
+<tr><td>projectivity(matrix), projectivityFrom(from, to), Projectivity</td><td>Projective maps: apply, compose, inverse, isAffine.</td></tr>
+<tr><td>conicThrough(points), Conic</td><td>Conics: contains, polar, pole, tangentAt, transform, classify.</td></tr>
+<tr><td>desargues, pappus, pascal, brianchon</td><td>The classical theorems checked on a figure.</td></tr>
+<tr><td>projectivePlane(q), affinePlane(q), fano(), incidence(lines)</td><td>Finite planes and incidence structures: axioms, designParameters, parallels, completion, collineations, collineationGroup. See <a href="finite-geometries.html">Finite geometries</a>.</td></tr>
+</table></div>
+
+<h2>Solids, symmetry and tilings</h2>
+<div class="tablewrap"><table class="ref">
+<tr><th>Export</th><th>What it does</th></tr>
+<tr><td>polyhedron(points), Polyhedron, solids, prism(n)</td><td>Convex polyhedra with proved faces: euler, volume, surfaceArea, dihedralCosines, dual, symmetry. See <a href="polyhedra.html">Polyhedra</a>.</td></tr>
+<tr><td>figureSymmetry(points)</td><td>The rosette group Cₙ or Dₙ of a finite figure. See <a href="symmetry.html">Symmetry groups</a>.</td></tr>
+<tr><td>friezeGroup({ points, period }), friezes</td><td>One of the seven frieze groups.</td></tr>
+<tr><td>wallpaperGroup({ gram, points }), wallpaper</td><td>One of the seventeen wallpaper groups, with the flowchart's steps; patterns for each.</td></tr>
+<tr><td>polygonAngle, vertexTypes, uniformTiling, regularTilings</td><td>Tilings by regular polygons. See <a href="tilings.html">Tilings</a>.</td></tr>
 </table></div>
 <section class="runbox" aria-label="Runnable code">
   <div class="runbox-head"><strong>Try it</strong><span>Edit the code and run it with <code>@ratmath/geo</code> and Core's <code>Rational</code> in scope. The last line's value is shown; <code>PRINT(…)</code> adds lines, <code>TEX(…)</code> typesets math.</span></div>

@@ -6,6 +6,27 @@
   uses the program's own copy of Core instead of bringing its own, so Core 0.11
   works and there is never a second copy whose `Rational` is not the same class.
 
+## 0.2.0
+
+- Phase 4: the projective plane in homogeneous coordinates (`ppoint`,
+  `pline`, `join`, `meetLines`, duality, `crossRatio`, `harmonicConjugate`,
+  `projectivity`, `projectivityFrom`), conics (`conicThrough`, `Conic` with
+  polar, pole, tangent and classification) and the theorems of Desargues,
+  Pappus, Pascal and Brianchon checked on exact figures. Finite geometries:
+  `projectivePlane(q)`, `affinePlane(q)`, `fano()` over algebraic's finite
+  fields, and `incidence` for any incidence structure, with the axioms,
+  design parameters, parallels, projective completion, and collineation
+  groups by search and by matrices.
+- Phase 5: convex polyhedra with exact coordinates (`solids`, `polyhedron`,
+  `prism`): faces found in floats and proved exactly, Euler's formula,
+  volume, surface area, dihedral angles, duals and symmetry groups as
+  PermGroups with each generator checked exactly. Plane symmetry:
+  `figureSymmetry` (rosette groups), `friezeGroup` (the seven frieze groups),
+  `wallpaperGroup` and `wallpaper` (the seventeen wallpaper groups, by the
+  standard flowchart). Tilings by regular polygons: `vertexTypes`,
+  `uniformTiling`, `regularTilings`.
+- Docs: five new topic pages and two new explore panels.
+
 ## 0.1.0
 
 - The Euclidean plane (roadmap phase 1) with exact coordinates, rational or

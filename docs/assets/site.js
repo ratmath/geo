@@ -1,8 +1,8 @@
 // Shared page furniture for the geo docs: the contents column, the theme
 // switch and the code boxes. Add each topic page to PAGES as it is written.
 
-import * as A from "./geo.js?v=a9b5e2630f";
-import { mountRunboxes } from "./runbox.js?v=a9b5e2630f";
+import * as A from "./geo.js?v=e69cf58dbd";
+import { mountRunboxes } from "./runbox.js?v=e69cf58dbd";
 
 export { A };
 
@@ -19,6 +19,13 @@ export const PAGES = [
   { href: "computational.html", title: "Computational geometry", blurb: "Hulls, polygons, Delaunay and Voronoi with exact predicates" },
   { href: "lattice.html", title: "Lattice geometry", blurb: "Pick's theorem and visible points" },
   { href: "metrics.html", title: "Taxicab geometry", blurb: "Other metrics: square circles and bent bisectors" },
+  { group: "Projective and finite" },
+  { href: "projective.html", title: "The projective plane", blurb: "Duality, cross-ratio, projective maps, conics; Desargues to Brianchon" },
+  { href: "finite-geometries.html", title: "Finite geometries", blurb: "The Fano plane, PG(2, q), AG(2, q) and their collineations" },
+  { group: "Solids, symmetry, tilings" },
+  { href: "polyhedra.html", title: "Polyhedra", blurb: "Platonic and Archimedean solids: volumes, angles, duals, symmetry groups" },
+  { href: "symmetry.html", title: "Symmetry groups", blurb: "Rosettes, the 7 frieze groups and the 17 wallpaper groups" },
+  { href: "tilings.html", title: "Tilings", blurb: "The 21 vertex types and the 11 uniform tilings" },
 ];
 
 export const h = (tag, attrs = {}, ...kids) => {
