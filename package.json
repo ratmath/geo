@@ -44,7 +44,9 @@
     "url": "https://github.com/ratmath/geo/issues"
   },
   "dependencies": {
-    "@ratmath/algebraic": "^0.1.0"
+    "@ratmath/algebraic": "^0.1.0",
+    "@ratmath/graphics": "^0.1.0",
+    "@ratmath/analytic": "^0.1.0"
   },
   "peerDependencies": {
     "@ratmath/core": ">=0.10.0 <0.12.0"
@@ -62,6 +64,8 @@
     "access": "public"
   },
   "workspaces": [
-    "vendor/algebraic"
+    "vendor/algebraic",
+    "vendor/analytic",
+    "vendor/graphics"
   ]
 }

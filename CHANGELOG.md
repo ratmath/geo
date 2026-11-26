@@ -6,6 +6,16 @@
   uses the program's own copy of Core instead of bringing its own, so Core 0.11
   works and there is never a second copy whose `Rational` is not the same class.
 
+- Phase 7, pictures (roadmap step 14): `tilingPatch` grows a patch of the
+  tiling with a vertex type and checks every inner vertex; it succeeds for
+  exactly the 11 uniform types. `tilingFigure`, `solidPicture`,
+  `wallpaperFigure`, `incidenceFigure`, `constructionFrames` and `geoFigure`
+  draw with `@ratmath/graphics` (now a vendored dependency, with analytic),
+  and `figureSVG` and the other drawing functions are re-exported.
+  `toGraphics`, `fromGraphics` and `toSurd` join geo's plane kernel with
+  graphics' exactly. Docs: Pictures of geometry. The docs code box can show
+  pictures.
+
 ## 0.2.0
 
 - Phase 4: the projective plane in homogeneous coordinates (`ppoint`,
