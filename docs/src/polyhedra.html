@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Polyhedra · RatMath Geo</title>
+<meta name="description" content="Platonic and Archimedean solids with exact coordinates: faces proved, Euler's formula, volumes, dihedral angles, duals and symmetry groups.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<script type="module" src="assets/site.js"></script>
+</head>
+<body>
+<body>
+<div class="shell">
+<aside></aside>
+<main>
+<article>
+<div class="eyebrow">Topic</div>
+<h1>Polyhedra</h1>
+<p class="lede">The five Platonic solids and their relatives have coordinates in Q, Q(√2) or Q(√5), so their volumes, angles and symmetries can be found exactly.</p>
+<pre><code>const D = solids.dodecahedron();     // (±1, ±1, ±1) and cyclic shifts of (0, ±1/φ, ±φ)
+D.euler;                             // 20 − 30 + 12 = 2
+D.volume;                            // 10 + 2√5
+D.dihedralCosines;                   // [−√5/5]
+D.dual().faceCounts;                 // { 3: 20 }: the icosahedron
+D.symmetry();                        // { order: 120, rotations: 60, group: PermGroup, … }
+polyhedron([[0,0,0], [3,0,0], [0,2,0], [0,0,5], [2,2,2]]);   // the convex hull of any exact points</code></pre>
+
+<h2>Faces, found and proved</h2>
+<p><code>polyhedron(points)</code> builds the convex hull. The faces are found in floating point, by testing which planes through three points have every other point on one side. Then each face is proved exactly: all its vertices lie on its plane, every other vertex is strictly on the inner side, and every point given is a corner. A point inside the hull is refused rather than silently dropped. With faces known, edges and vertex configurations (the faces around a vertex, such as 3.4.3.4 for the cuboctahedron) follow by counting.</p>
+
+<h2>Exact measurements</h2>
+<p>The volume is a sum of tetrahedra from the centre, \(\tfrac16\det(a - c, b - c, d - c)\), exact in the field of the coordinates. The dodecahedron with these coordinates has edge \(\sqrt5 - 1\) and volume \(10 + 2\sqrt5\), which agrees with \(\tfrac{15 + 7\sqrt5}{4}a^3\). Areas need one more square root, which algebraic numbers handle: the icosahedron's surface is \(20\sqrt3\). The angle between two faces along an edge has cosine \(-\tfrac{n_1 \cdot n_2}{|n_1||n_2|}\) for outward normals, and these are exact too: \(\tfrac13\) for the tetrahedron, 0 for the cube, \(-\tfrac{\sqrt5}{5}\) for the dodecahedron.</p>
+
+<h2>Euler's formula and duals</h2>
+<p>For every convex polyhedron \(V - E + F = 2\). The dual swaps vertices and faces: reflecting each face's plane in a sphere about the centre gives a vertex, and each old vertex gives a face. The cube and octahedron are duals, as are the dodecahedron and icosahedron; the tetrahedron is its own dual; the cuboctahedron's dual is the rhombic dodecahedron, with twelve rhombic faces and two kinds of vertex.</p>
+
+<h2>Symmetry groups</h2>
+<p>A symmetry about the centre is a linear map, and it is fixed by where it sends one vertex and two of its neighbours. <code>symmetry()</code> tries every such image in floating point, with a wide margin, keeps the ones that send the vertices onto themselves, and checks each generator of the group exactly: \(M^{\mathsf T}M = I\) and every vertex goes to a vertex. The group comes back as a PermGroup on the vertices, with the rotations as a subgroup: order 24 (12 rotations) for the tetrahedron, 48 (24) for the cube and octahedron, 120 (60) for the dodecahedron and icosahedron. The rotation groups are A₄, S₄ and A₅.</p>
+
+<div class="tablewrap"><table class="ref">
+<tr><th>call</th><th>returns</th></tr>
+<tr><td>polyhedron(points, { name }), new Polyhedron(vertices, faces)</td><td>Polyhedron: vertices, faces, edges, V, E, F, euler, center</td></tr>
+<tr><td>faceCounts, vertexConfigurations, edgeLengths2</td><td>Combinatorics and the edge lengths that occur</td></tr>
+<tr><td>volume, surfaceArea, faceArea(k), dihedralCosines</td><td>Exact numbers</td></tr>
+<tr><td>dual(), symmetry()</td><td>A Polyhedron; { order, rotations, group, rotationGroup, name }</td></tr>
+<tr><td>solids, prism(n, { height })</td><td>tetrahedron, cube, octahedron, dodecahedron, icosahedron, cuboctahedron, truncatedTetrahedron, truncatedOctahedron, truncatedCube</td></tr>
+</table></div>
+<template data-runbox>
+for (const k of ["tetrahedron", "cube", "octahedron", "dodecahedron", "icosahedron"]) {
+  const P = solids[k]();
+  const s = P.symmetry();
+  PRINT(`${k.padEnd(13)} V ${P.V} E ${P.E} F ${P.F}  V−E+F = ${P.euler}  volume ${N.text(P.volume)}  edge² ${N.text(P.edgeLengths2[0])}  cos dihedral ${P.dihedralCosines.map((c) =&gt; N.text(c)).join(", ")}  symmetries ${s.order} (${s.rotations} rotations)`);
+}
+const C = solids.cuboctahedron();
+PRINT(String(C), C.vertexConfigurations, "dual:", JSON.stringify(C.dual().faceCounts));
+const H = polyhedron([[0, 0, 0], [3, 0, 0], [0, 2, 0], [0, 0, 5], [2, 2, 2], [1, -1, 3]], { name: "hull" });
+PRINT(String(H), " volume", N.text(H.volume), " faces", JSON.stringify(H.faceCounts));
+`icosahedron surface area: ${N.text(solids.icosahedron().surfaceArea)}`
+</template>
+</article>
+</main>
+</div>
+</body>
+</html>

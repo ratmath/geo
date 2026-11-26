@@ -1,6 +1,6 @@
 {
   "name": "@ratmath/geo",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Geometry for RatMath: Euclidean constructions and checked theorems, spherical, hyperbolic, projective and finite geometries, symmetry and tilings",
   "type": "module",
   "main": "index.js",

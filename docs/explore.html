@@ -12,8 +12,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
-<link rel="stylesheet" href="assets/style.css?v=a9b5e2630f">
-<script type="module" src="assets/site.js?v=a9b5e2630f"></script>
+<link rel="stylesheet" href="assets/style.css?v=e69cf58dbd">
+<script type="module" src="assets/site.js?v=e69cf58dbd"></script>
 </head>
 <body>
 <div class="shell">
@@ -22,7 +22,7 @@
 <article>
 <div class="eyebrow">Explore</div>
 <h1>Explore</h1>
-<p class="lede">Type the corners of a triangle, or a list of points. The pictures are drawn from exact coordinates, and the theorems are checked exactly for the figure you gave.</p>
+<p class="lede">Type the corners of a triangle, or a list of points. The pictures are drawn from exact coordinates, and the theorems are checked exactly for the figure you gave. Further down: a solid with its exact measurements and symmetry group, and a wallpaper pattern named by its group.</p>
 
 <h2>A triangle</h2>
 <div class="demo">
@@ -45,6 +45,29 @@
 <div id="ex-pts-out"></div>
 </div>
 <p>Points are separated by semicolons. The outline is the convex hull and the inner lines are the Delaunay triangulation; the two highlighted points are the closest pair.</p>
+
+<h2>A solid</h2>
+<div class="demo">
+<div class="demo-row">
+<label>Solid<select id="ex-solid"><option>tetrahedron</option><option selected>cube</option><option>octahedron</option><option>dodecahedron</option><option>icosahedron</option><option>cuboctahedron</option><option>truncatedTetrahedron</option><option>truncatedOctahedron</option><option>truncatedCube</option></select></label>
+<label><input id="ex-dual" type="checkbox"> its dual</label>
+<label>Turn<input id="ex-turn" type="range" min="0" max="360" value="25"></label>
+</div>
+<div id="ex-solid-pic"></div>
+<div id="ex-solid-out"></div>
+</div>
+<p>The solids with √5 in their coordinates take a moment, since every face is proved with exact algebraic numbers.</p>
+
+<h2>A wallpaper pattern</h2>
+<div class="demo">
+<div class="demo-row">
+<label>Group<select id="ex-wp"></select></label>
+<label>Seed point<input id="ex-seed" class="text" value="1/7, 2/11" size="10" spellcheck="false"></label>
+</div>
+<div id="ex-wp-pic"></div>
+<div id="ex-wp-out"></div>
+</div>
+<p>The pattern is made by applying the group's generators to the seed point and two companions of other colours, then classified again from scratch by the flowchart.</p>
 <section class="runbox" aria-label="Runnable code">
   <div class="runbox-head"><strong>Try it</strong><span>Edit the code and run it with <code>@ratmath/geo</code> and Core's <code>Rational</code> in scope. The last line's value is shown; <code>PRINT(…)</code> adds lines, <code>TEX(…)</code> typesets math.</span></div>
   <textarea spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Code">// The page above, as code.
@@ -63,7 +86,7 @@ delaunay(pts).triangles.length + " Delaunay triangles"</textarea>
 </main>
 </div>
 <script type="module">
-import { A as G, h } from "./assets/site.js?v=a9b5e2630f";
+import { A as G, h } from "./assets/site.js?v=e69cf58dbd";
 const $ = (id) => document.getElementById(id);
 const fail = (out, e) => out.replaceChildren(h("div", { class: "out err" }, e.message));
 const svg = (tag, attrs, ...kids) => {
@@ -189,6 +212,95 @@ for (const id of ["ex-a", "ex-b", "ex-c"]) $(id).addEventListener("input", trian
 $("ex-pts").addEventListener("input", pointsPanel);
 trianglePanel();
 pointsPanel();
+const svgEl = (tag, attrs) => {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+};
+const solidCache = new Map();
+function solidPanel() {
+  const out = $("ex-solid-out");
+  const pic = $("ex-solid-pic");
+  try {
+    const key = $("ex-solid").value + ($("ex-dual").checked ? "*" : "");
+    if (!solidCache.has(key)) {
+      const base = G.solids[$("ex-solid").value]();
+      const P = $("ex-dual").checked ? base.dual() : base;
+      const s = P.symmetry();
+      solidCache.set(key, { P, s, vol: G.N.text(P.volume), cos: P.dihedralCosines.map((c) => G.N.text(c)).join(", "), conf: P.vertexConfigurations.join(", ") });
+    }
+    const { P, s, vol, cos, conf } = solidCache.get(key);
+    const a = (Number($("ex-turn").value) * Math.PI) / 180;
+    const b = 0.45;
+    const V = P.vertices.map((v) => v.map((x) => G.N.toNumber(x)));
+    const c = V.reduce((s2, p) => s2.map((x, i) => x + p[i] / V.length), [0, 0, 0]);
+    const proj = (p) => {
+      const [x, y, z] = p.map((t, i) => t - c[i]);
+      const x1 = x * Math.cos(a) + y * Math.sin(a);
+      const y1 = -x * Math.sin(a) + y * Math.cos(a);
+      return [x1, z * Math.cos(b) - y1 * Math.sin(b), z * Math.sin(b) + y1 * Math.cos(b)];
+    };
+    const Q = V.map(proj);
+    const R = Math.max(...Q.map((p) => Math.hypot(p[0], p[1]))) * 1.1;
+    const W = 300;
+    const sx = (x) => W / 2 + (x / R) * (W / 2);
+    const sy = (y) => W / 2 - (y / R) * (W / 2);
+    const svg = svgEl("svg", { viewBox: `0 0 ${W} ${W}`, width: W, height: W, role: "img", "aria-label": P.name, style: "max-width:100%;height:auto" });
+    for (const [i, j] of P.edges) {
+      const depth = (Q[i][2] + Q[j][2]) / 2;
+      svg.append(svgEl("line", { x1: sx(Q[i][0]), y1: sy(Q[i][1]), x2: sx(Q[j][0]), y2: sy(Q[j][1]), stroke: depth < 0 ? "var(--accent, #c2410c)" : "currentColor", "stroke-opacity": depth < 0 ? "0.9" : "0.35", "stroke-width": depth < 0 ? "2" : "1.2" }));
+    }
+    pic.replaceChildren(svg);
+    out.replaceChildren(h("p", {}, `${P.name}: V ${P.V}, E ${P.E}, F ${P.F}, so V − E + F = ${P.euler}. Faces ${JSON.stringify(P.faceCounts)}, vertex type ${conf}. Volume ${vol}; cosine of the dihedral angle ${cos}. Symmetry group of order ${s.order} with ${s.rotations} rotations: ${s.name}.`));
+  } catch (e) {
+    fail(out, e);
+  }
+}
+const wpSelect = $("ex-wp");
+for (const n of G.wallpaper.names) wpSelect.append(h("option", { selected: n === "p4g" ? true : null }, n));
+const BASIS = { rect: [[1, 0], [0, Math.SQRT2]], rhomb: [[1, 2], [1, -2]], sq: [[1, 0], [0, 1]], hex: [[1, 0], [-0.5, Math.sqrt(3) / 2]] };
+function basisFor(gram) {
+  const g = gram.map((r) => r.map((x) => G.N.toNumber(G.num(x))));
+  if (g[0][1] === 0 && g[0][0] === g[1][1]) return BASIS.sq;
+  if (g[0][1] === 0) return BASIS.rect;
+  if (g[0][0] === 5) return BASIS.rhomb.map((v) => v.map((x) => x / Math.sqrt(5)));
+  if (g[0][1] === -0.5) return BASIS.hex;
+  const a = Math.sqrt(g[0][0]), bb = Math.sqrt(g[1][1]), cs = g[0][1] / (a * bb);
+  return [[a, 0], [bb * cs, bb * Math.sqrt(1 - cs * cs)]];
+}
+function wallpaperPanel() {
+  const out = $("ex-wp-out");
+  const pic = $("ex-wp-pic");
+  try {
+    const name = wpSelect.value;
+    const seed = $("ex-seed").value.split(",").map((t) => t.trim());
+    const pat = G.wallpaper.pattern(name, [seed, ["1/5", "3/13"], ["2/9", "1/17"]]);
+    const g = G.wallpaperGroup(pat);
+    const B = basisFor(pat.gram);
+    const W = 320;
+    const svg = svgEl("svg", { viewBox: `0 0 ${W} ${W}`, width: W, height: W, role: "img", "aria-label": `a pattern with group ${g.name}`, style: "max-width:100%;height:auto;border:1px solid #8884;border-radius:8px" });
+    const scale = W / 4.2;
+    const colours = ["var(--accent, #c2410c)", "currentColor", "#2563eb"];
+    for (let i = -3; i < 6; i++) for (let j = -3; j < 6; j++) {
+      pat.points.forEach(([x, y], k) => {
+        const u = x.toNumber() + i, v = y.toNumber() + j;
+        const X = u * B[0][0] + v * B[1][0], Y = u * B[0][1] + v * B[1][1];
+        const px = 10 + X * scale, py = W - 10 - Y * scale;
+        if (px > 0 && px < W && py > 0 && py < W) svg.append(svgEl("circle", { cx: px, cy: py, r: pat.labels[k] === 0 ? 3 : 2, fill: colours[pat.labels[k] % 3] }));
+      });
+    }
+    pic.replaceChildren(svg);
+    out.replaceChildren(h("p", {}, `Classified as ${g.name} (orbifold ${g.orbifold}): ${g.steps.join("; ")}. ${g.symmetries} symmetries modulo translations.`));
+  } catch (e) {
+    fail(out, e);
+  }
+}
+for (const id of ["ex-solid", "ex-dual"]) $(id).addEventListener("change", solidPanel);
+$("ex-turn").addEventListener("input", solidPanel);
+wpSelect.addEventListener("change", wallpaperPanel);
+$("ex-seed").addEventListener("input", wallpaperPanel);
+solidPanel();
+wallpaperPanel();
 </script>
 </body>
 </html>

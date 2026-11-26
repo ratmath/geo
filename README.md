@@ -34,6 +34,11 @@ N.text(metric("taxicab").pi);           // "4"
 | Computational geometry | `convexHull`, `segmentIntersection`, `polygon` (area, centroid, `locate`, `triangulate`, `clip`), `inCircle`, `delaunay`, `voronoi`, `closestPair`, all with exact predicates |
 | Lattice geometry | `pick`, `latticePointsOn`, `isVisible`, `visiblePoints` |
 | Other metrics | `metric("taxicab" \| "chebyshev" \| "euclidean")`: `distance`, `circle`, `pi`, `bisector`, `ellipse` |
+| Projective plane | `ppoint`, `pline`, `join`, `meetLines`, duality, `crossRatio`, `harmonicConjugate`, `projectivity`, `projectivityFrom` (four points to four), `conicThrough` and `Conic` (polar, pole, tangent, classify); `desargues`, `pappus`, `pascal`, `brianchon` checked on exact figures |
+| Finite geometries | `projectivePlane(q)`, `affinePlane(q)`, `fano()`, `incidence(lines)`: the axioms checked, design parameters, parallels, completion, collineations by search and `collineationGroup()` (PermGroup) |
+| Polyhedra | `solids` (Platonic and some Archimedean, coordinates in Q, Q(√2), Q(√5)), `polyhedron(points)` with faces proved exactly, `prism(n)`: Euler's formula, `volume`, `surfaceArea`, `dihedralCosines`, `dual()`, `symmetry()` as a PermGroup |
+| Plane symmetry | `figureSymmetry` (Cₙ or Dₙ), `friezeGroup` (the 7), `wallpaperGroup` (the 17, by the flowchart with its steps), `wallpaper.pattern` |
+| Tilings | `polygonAngle`, `vertexTypes` (the 21), `uniformTiling` (11 possible, a reason for the other 10), `regularTilings` |
 
 A checked theorem is a test of one figure, exactly; it is not a proof of the
 theorem. General proofs by elimination are phase 6.
@@ -43,8 +48,6 @@ theorem. General proofs by elimination are phase 6.
 | Phase | Contents |
 |---|---|
 | 3 | Spherical and hyperbolic models |
-| 4 | Projective and finite geometries |
-| 5 | Solids, symmetry groups, friezes, wallpaper groups, tilings |
 | 6 | General proofs of theorems by elimination |
 | 7 | Pictures |
 
@@ -54,7 +57,9 @@ The plan is in the
 ## Layout
 
 - `index.js`, `src/`: the library. `src/num.js` (exact numbers), `src/plane.js`
-  (the Euclidean plane), `src/theorems.js`, `src/discrete.js`, `src/plan.js`.
+  (the Euclidean plane), `src/theorems.js`, `src/discrete.js`,
+  `src/projective.js`, `src/finite.js`, `src/solids.js`, `src/symmetry.js`,
+  `src/tilings.js`, `src/plan.js`.
 - `vendor/algebraic`: `@ratmath/algebraic` as a git submodule (clone with
   `--recurse-submodules`).
 - `tests/`: `bun run test`.
