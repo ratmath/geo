@@ -3,17 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Geometry Explorer</title>
-<meta property="og:title" content="Geometry Explorer">
+<title>Explore · RatMath Geo</title>
+<meta property="og:title" content="Explore · RatMath Geo">
 <meta property="og:description" content="Geometry for RatMath: Euclidean constructions and checked theorems, spherical, hyperbolic, projective and finite geometries, symmetry and tilings.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://ratmath.com/geo/explore.html">
-<meta name="description" content="Try @ratmath/geo without writing a program.">
+<meta name="description" content="Try @ratmath/geo in the page: the centres and circles of a triangle you type, and the hull and Delaunay triangulation of a set of points.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
-<link rel="stylesheet" href="assets/style.css?v=1286a1dc61">
-<script type="module" src="assets/site.js?v=1286a1dc61"></script>
+<link rel="stylesheet" href="assets/style.css?v=a9b5e2630f">
+<script type="module" src="assets/site.js?v=a9b5e2630f"></script>
 </head>
 <body>
 <div class="shell">
@@ -22,18 +22,39 @@
 <article>
 <div class="eyebrow">Explore</div>
 <h1>Explore</h1>
-<p class="lede">This page will be a calculator for everything in the library: type an expression, see an exact answer, click an example to change it.</p>
-<p class="notice"><strong>Planned, not built yet.</strong> This site is the frame the package will grow into. The full plan is in the <a href="https://github.com/ratmath/ratmath/blob/main/docs/design/library-roadmap.md#11-a-geometry-package-ratmathgeo">library roadmap</a>, and the <a href="https://ratmath.com/shelf/">RatMath Shelf</a> page lists what exists across all the libraries.</p>
-<p>There is nothing to explore yet. The first phase is: <strong>Euclidean plane: constructions, centres, transformations, checked theorems</strong>. When it is built its operations appear here.</p>
-<p>In the meantime the code box below runs JavaScript with <code>@ratmath/core</code> in scope.</p>
+<p class="lede">Type the corners of a triangle, or a list of points. The pictures are drawn from exact coordinates, and the theorems are checked exactly for the figure you gave.</p>
+
+<h2>A triangle</h2>
+<div class="demo">
+<div class="demo-row">
+<label>A<input id="ex-a" class="text" value="0, 0" size="9" spellcheck="false"></label>
+<label>B<input id="ex-b" class="text" value="6, 0" size="9" spellcheck="false"></label>
+<label>C<input id="ex-c" class="text" value="1, 4" size="9" spellcheck="false"></label>
+</div>
+<div id="ex-tri"></div>
+<div id="ex-tri-out"></div>
+</div>
+<p>Each corner is two exact numbers separated by a comma: <code>1/2</code>, <code>0.35</code> and <code>sqrt(3)</code> all work. The picture shows the circumcircle, the incircle, the nine-point circle and the Euler line through O, G and H. Try <code>0, 0</code>, <code>2, 0</code>, <code>1, sqrt(3)</code>, where the centres coincide.</p>
+
+<h2>A set of points</h2>
+<div class="demo">
+<div class="demo-row">
+<label>Points<input id="ex-pts" class="text" value="0,0; 6,0; 7,4; 3,7; -1,4; 2,2; 4,3; 3,1" size="46" spellcheck="false"></label>
+</div>
+<div id="ex-pic"></div>
+<div id="ex-pts-out"></div>
+</div>
+<p>Points are separated by semicolons. The outline is the convex hull and the inner lines are the Delaunay triangulation; the two highlighted points are the closest pair.</p>
 <section class="runbox" aria-label="Runnable code">
   <div class="runbox-head"><strong>Try it</strong><span>Edit the code and run it with <code>@ratmath/geo</code> and Core's <code>Rational</code> in scope. The last line's value is shown; <code>PRINT(…)</code> adds lines, <code>TEX(…)</code> typesets math.</span></div>
-  <textarea spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Code">// Core's exact numbers are available here.
-const third = new Rational(1, 3);
-PRINT("1/3 + 1/6 =", third.add(new Rational(1, 6)).toString());
-PRINT("(2/3)^10 =", new Rational(2, 3).pow(10).toString());
-PRINT("0.1 + 0.2 in floating point:", 0.1 + 0.2, "  exactly:", new Rational(1, 10).add(new Rational(2, 10)).toString());
-plan[0].contents</textarea>
+  <textarea spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Code">// The page above, as code.
+const t = triangle([0, 0], [6, 0], [1, 4]);
+PRINT("O", String(t.circumcenter), " G", String(t.centroid), " H", String(t.orthocenter));
+PRINT("Euler line:", String(t.eulerLine), "  checked:", theorems.eulerLine(t).holds);
+const pts = [[0, 0], [6, 0], [7, 4], [3, 7], [-1, 4], [2, 2], [4, 3], [3, 1]];
+PRINT("hull:", convexHull(pts).join(" "));
+PRINT("closest pair:", closestPair(pts).points.join(" and "));
+delaunay(pts).triangles.length + " Delaunay triangles"</textarea>
   <div class="runbox-bar"><button type="button" data-run>Run</button><button type="button" class="ghost" data-reset>Reset</button><span class="runbox-meta">Ctrl/⌘ + Enter runs</span></div>
   <div class="runbox-out" aria-live="polite"></div>
 </section>
@@ -41,5 +62,133 @@ plan[0].contents</textarea>
 </article>
 </main>
 </div>
+<script type="module">
+import { A as G, h } from "./assets/site.js?v=a9b5e2630f";
+const $ = (id) => document.getElementById(id);
+const fail = (out, e) => out.replaceChildren(h("div", { class: "out err" }, e.message));
+const svg = (tag, attrs, ...kids) => {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  el.append(...kids);
+  return el;
+};
+// split "a, b" at the comma that is outside brackets
+const pair = (s) => {
+  let depth = 0;
+  for (let i = 0; i < s.length; i++) {
+    if (s[i] === "(") depth++;
+    else if (s[i] === ")") depth--;
+    else if (s[i] === "," && depth === 0) return G.point(s.slice(0, i).trim(), s.slice(i + 1).trim());
+  }
+  throw new Error(`"${s.trim()}" is not a point; write two numbers separated by a comma`);
+};
+const W = 340;
+// a frame mapping a box of the plane into the picture, y upward
+function frame(xs, ys) {
+  let [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
+  const span = Math.max(x1 - x0, y1 - y0, 1e-9) * 1.12;
+  const [cx, cy] = [(x0 + x1) / 2, (y0 + y1) / 2];
+  const X = (x) => ((x - cx) / span + 0.5) * W;
+  const Y = (y) => (0.5 - (y - cy) / span) * W;
+  return { X, Y, k: W / span };
+}
+const picture = (label, ...kids) => svg("svg", { viewBox: `0 0 ${W} ${W}`, width: W, height: W, role: "img", "aria-label": label, style: "max-width:100%;height:auto;border:1px solid var(--line, #8884);border-radius:8px" }, ...kids);
+const ACCENT = "var(--accent, #c2410c)";
+
+function trianglePanel() {
+  const out = $("ex-tri-out");
+  const pic = $("ex-tri");
+  try {
+    const t = G.triangle(pair($("ex-a").value), pair($("ex-b").value), pair($("ex-c").value));
+    const cc = t.circumcircle;
+    const [ox, oy] = cc.center.toNumbers();
+    const R = G.N.toNumber(cc.radius);
+    const ex = t.vertices.map((p) => p.toNumbers());
+    const f = frame([ox - R, ox + R, ...ex.map((p) => p[0])], [oy - R, oy + R, ...ex.map((p) => p[1])]);
+    const ring = (c, attrs) => {
+      const [x, y] = c.center.toNumbers();
+      return svg("circle", { cx: f.X(x), cy: f.Y(y), r: G.N.toNumber(c.radius) * f.k, fill: "none", ...attrs });
+    };
+    const dot = (p, name) => {
+      const [x, y] = p.toNumbers();
+      const label = svg("text", { x: f.X(x) + 5, y: f.Y(y) - 5, "font-size": "11", fill: "currentColor" });
+      label.textContent = name;
+      return [svg("circle", { cx: f.X(x), cy: f.Y(y), r: 2.6, fill: ACCENT }), label];
+    };
+    const [O, Gc, H] = [t.circumcenter, t.centroid, t.orthocenter];
+    const kids = [
+      ring(cc, { stroke: "currentColor", "stroke-opacity": "0.45", "stroke-width": "1" }),
+      ring(t.ninePointCircle, { stroke: ACCENT, "stroke-opacity": "0.7", "stroke-width": "1" }),
+      ring(t.incircle, { stroke: "currentColor", "stroke-opacity": "0.45", "stroke-width": "1", "stroke-dasharray": "4 3" }),
+      svg("polygon", { points: ex.map(([x, y]) => `${f.X(x).toFixed(1)},${f.Y(y).toFixed(1)}`).join(" "), fill: "none", stroke: "currentColor", "stroke-width": "1.6" }),
+    ];
+    if (!O.equals(H)) {
+      const [a, b] = [O.toNumbers(), H.toNumbers()];
+      kids.push(svg("line", { x1: f.X(a[0]), y1: f.Y(a[1]), x2: f.X(b[0]), y2: f.Y(b[1]), stroke: ACCENT, "stroke-width": "1.2" }));
+    }
+    kids.push(...dot(O, "O"), ...dot(Gc, "G"), ...dot(H, "H"), ...dot(t.incenter, "I"), ...dot(t.ninePointCenter, "N"));
+    pic.replaceChildren(picture("The triangle with its circles and Euler line", ...kids));
+    const kind = t.classify();
+    const row = (name, value) => h("tr", {}, h("td", {}, name), h("td", {}, value));
+    const checks = ["eulerLine", "ninePointCircle", "feuerbach", "napoleon", "heron"].map((name) => {
+      const r = G.theorems[name](t);
+      return `${r.theorem}: ${r.holds ? "holds" : "fails"}`;
+    });
+    out.replaceChildren(h("div", { class: "tablewrap" }, h("table", { class: "ref" },
+      row("kind", `${kind.angles}, ${kind.sides}`),
+      row("area", G.N.text(t.area)),
+      row("sides a, b, c", [t.sides.a, t.sides.b, t.sides.c].map((s) => G.N.text(s)).join(", ")),
+      row("circumcentre O", String(O)),
+      row("centroid G", String(Gc)),
+      row("orthocentre H", String(H)),
+      row("incentre I", String(t.incenter)),
+      row("nine-point centre N", String(t.ninePointCenter)),
+      row("Euler line", O.equals(H) ? "not defined: O, G and H coincide" : String(t.eulerLine)),
+      row("inradius, circumradius", `${G.N.text(t.inradius)}, ${G.N.text(t.circumradius)}`),
+      row("checked exactly", checks.join("; ")))));
+  } catch (e) {
+    pic.replaceChildren();
+    fail(out, e);
+  }
+}
+
+function pointsPanel() {
+  const out = $("ex-pts-out");
+  const pic = $("ex-pic");
+  try {
+    const pts = $("ex-pts").value.split(";").filter((s) => s.trim()).map(pair);
+    if (pts.length < 3) throw new Error("give at least three points");
+    if (pts.length > 40) throw new Error("at most 40 points in this panel");
+    const hull = G.convexHull(pts);
+    const d = G.delaunay(pts);
+    const near = G.closestPair(pts);
+    const xy = d.points.map((p) => p.toNumbers());
+    const f = frame(xy.map((p) => p[0]), xy.map((p) => p[1]));
+    const seg = (a, b, attrs) => svg("line", { x1: f.X(a[0]), y1: f.Y(a[1]), x2: f.X(b[0]), y2: f.Y(b[1]), ...attrs });
+    const kids = d.edges.map(([i, j]) => seg(xy[i], xy[j], { stroke: "currentColor", "stroke-opacity": "0.4", "stroke-width": "1" }));
+    kids.push(svg("polygon", { points: hull.map((p) => p.toNumbers()).map(([x, y]) => `${f.X(x).toFixed(1)},${f.Y(y).toFixed(1)}`).join(" "), fill: "none", stroke: "currentColor", "stroke-width": "1.6" }));
+    for (const p of d.points) {
+      const [x, y] = p.toNumbers();
+      const hot = near.points.some((q) => q.equals(p));
+      kids.push(svg("circle", { cx: f.X(x), cy: f.Y(y), r: hot ? 4 : 2.6, fill: hot ? ACCENT : "currentColor" }));
+    }
+    pic.replaceChildren(picture("The points with their convex hull and Delaunay triangulation", ...kids));
+    const poly = G.polygon(hull);
+    const row = (name, value) => h("tr", {}, h("td", {}, name), h("td", {}, value));
+    out.replaceChildren(h("div", { class: "tablewrap" }, h("table", { class: "ref" },
+      row("hull", hull.join(" ")),
+      row("hull area", G.N.text(poly.area)),
+      row("Delaunay triangles", `${d.triangles.length}${d.cocircular ? " (some four points are concyclic, so the triangulation is not unique)" : ""}`),
+      row("closest pair", `${near.points.join(" and ")}, distance ${G.N.text(near.distance)}`))));
+  } catch (e) {
+    pic.replaceChildren();
+    fail(out, e);
+  }
+}
+for (const id of ["ex-a", "ex-b", "ex-c"]) $(id).addEventListener("input", trianglePanel);
+$("ex-pts").addEventListener("input", pointsPanel);
+trianglePanel();
+pointsPanel();
+</script>
 </body>
 </html>

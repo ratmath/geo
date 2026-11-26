@@ -1,8 +1,8 @@
 // Shared page furniture for the geo docs: the contents column, the theme
 // switch and the code boxes. Add each topic page to PAGES as it is written.
 
-import * as A from "./geo.js?v=1286a1dc61";
-import { mountRunboxes } from "./runbox.js?v=1286a1dc61";
+import * as A from "./geo.js?v=a9b5e2630f";
+import { mountRunboxes } from "./runbox.js?v=a9b5e2630f";
 
 export { A };
 
@@ -10,8 +10,15 @@ export const PAGES = [
   { href: "index.html", title: "Overview" },
   { href: "reference.html", title: "Reference" },
   { href: "explore.html", title: "Explore" },
-  // { group: "Topics" },
-  // { href: "topic.html", title: "A topic", blurb: "One line about it" },
+  { group: "The Euclidean plane" },
+  { href: "constructions.html", title: "Constructions", blurb: "Points, lines, circles and recorded ruler-and-compass constructions" },
+  { href: "triangles.html", title: "Triangle centres", blurb: "Centres, circles and lines of a triangle, exactly" },
+  { href: "transformations.html", title: "Transformations", blurb: "Isometries, similarities, affine maps and inversion, classified" },
+  { href: "theorems.html", title: "Checked theorems", blurb: "Classical theorems tested exactly on your figure" },
+  { group: "Discrete and other geometries" },
+  { href: "computational.html", title: "Computational geometry", blurb: "Hulls, polygons, Delaunay and Voronoi with exact predicates" },
+  { href: "lattice.html", title: "Lattice geometry", blurb: "Pick's theorem and visible points" },
+  { href: "metrics.html", title: "Taxicab geometry", blurb: "Other metrics: square circles and bent bisectors" },
 ];
 
 export const h = (tag, attrs = {}, ...kids) => {

@@ -3,17 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>RatMath Geometry</title>
-<meta property="og:title" content="RatMath Geometry">
+<title>RatMath Geo</title>
+<meta property="og:title" content="RatMath Geo">
 <meta property="og:description" content="Geometry for RatMath: Euclidean constructions and checked theorems, spherical, hyperbolic, projective and finite geometries, symmetry and tilings.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://ratmath.com/geo/">
-<meta name="description" content="Geometry for RatMath: Euclidean constructions and checked theorems, spherical, hyperbolic, projective and finite geometries, symmetry and tilings.">
+<meta name="description" content="Geometry for RatMath: the Euclidean plane with exact coordinates, constructions, triangle centres, transformations, theorems checked on exact figures, exact computational and lattice geometry, and taxicab geometry.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
-<link rel="stylesheet" href="assets/style.css?v=1286a1dc61">
-<script type="module" src="assets/site.js?v=1286a1dc61"></script>
+<link rel="stylesheet" href="https://ratmath.com/assets/katex/0.19.1/katex.min.css">
+<link rel="stylesheet" href="assets/style.css?v=a9b5e2630f">
+<script type="module" src="assets/site.js?v=a9b5e2630f"></script>
 </head>
 <body>
 <div class="shell">
@@ -21,52 +22,50 @@
 <main>
 <article>
 <div class="eyebrow">@ratmath/geo</div>
-<h1>Many geometries, each with exact coordinates</h1>
-<p class="lede">A library for exploring geometries, continuous and discrete: the Euclidean plane with constructions and checked theorems, the sphere and the hyperbolic plane, projective and finite geometries, lattices, symmetry groups and tilings.</p>
-<p class="notice"><strong>Planned, not built yet.</strong> This site is the frame the package will grow into. The full plan is in the <a href="https://github.com/ratmath/ratmath/blob/main/docs/design/library-roadmap.md#11-a-geometry-package-ratmathgeo">library roadmap</a>, and the <a href="https://ratmath.com/shelf/">RatMath Shelf</a> page lists what exists across all the libraries.</p>
+<h1>Geometry where equal means equal</h1>
+<p class="lede">Three points are on a line or they are not, and a floating-point test can only say "nearly". Here coordinates are exact: fractions, or algebraic numbers such as <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msqrt><mn>3</mn></msqrt><mi mathvariant="normal">/</mi><mn>2</mn></mrow><annotation encoding="application/x-tex">\sqrt3/2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.1572em;vertical-align:-0.25em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9072em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord" style="padding-left:0.833em;">3</span></span><span style="top:-2.8672em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail" style="min-width:0.853em;height:1.08em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.08em" viewBox="0 0 400000 1080" preserveAspectRatio="xMinYMin slice"><path d="M95,702
+c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
+c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
+c44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10
+s173,378,173,378c0.7,0,35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429
+c69,-144,104.5,-217.7,106.5,-221
+l0 -0
+c5.3,-9.3,12,-14,20,-14
+H400000v40H845.2724
+s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
+c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
+M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1328em;"><span></span></span></span></span></span><span class="mord">/2</span></span></span></span> when a compass has been used. So collinear, concyclic and tangent are decided, and a theorem checked on a figure is checked.</p>
 
-<h2>What it will cover</h2>
-<ul>
-  <li>The Euclidean plane: constructions, triangle centres, transformations, theorems checked exactly.</li>
-  <li>Exact computational geometry and lattice geometry (Pick's theorem, convex hulls), and other metrics.</li>
-  <li>Spherical geometry and the models of the hyperbolic plane.</li>
-  <li>Projective planes and finite geometries.</li>
-  <li>Solids, symmetry groups, friezes, wallpaper groups and tilings.</li>
-  <li>General proofs of theorems by elimination.</li>
-</ul>
-
-<h2>The order of work</h2>
-<p>The phases below come from the roadmap. Sizes are rough estimates in lines of source.</p>
-<div class="tablewrap"><table class="plan">
-<tr><th>Phase</th><th>Contents</th><th>Estimate</th></tr>
-<tr><td>1</td><td>Euclidean plane: constructions, centres, transformations, checked theorems</td><td>1,200</td></tr>
-<tr><td>2</td><td>Exact computational and lattice geometry, other metrics</td><td>1,100</td></tr>
-<tr><td>3</td><td>Spherical and hyperbolic models</td><td>1,400</td></tr>
-<tr><td>4</td><td>Projective and finite geometries</td><td>1,000</td></tr>
-<tr><td>5</td><td>Solids, symmetry groups, friezes, wallpaper groups, tilings</td><td>1,300</td></tr>
-<tr><td>6</td><td>General proofs of theorems by elimination</td><td>800</td></tr>
-<tr><td>7</td><td>Pictures</td><td>1,000 in graphics</td></tr>
-</table></div>
-<p>It will build on: Core, graphics (the plane kernel and drawing), algebraic and linalg; structures for symmetry groups and proofs, complex for the hyperbolic models, analytic for enclosures.</p>
-
-<h2>How the docs will be laid out</h2>
-<p>Like every library on the Shelf: this overview, an <a href="explore.html">Explore</a> page for trying things without writing code, a <a href="reference.html">Reference</a> listing every function, and one page per topic that explains the usage and the mathematics. Every page ends with a box of code you can edit and run.</p>
+<h2>What is here</h2>
 <div class="cards" id="cards"></div>
 
-<h2>Until then</h2>
-<p>The box below already runs, with <code>@ratmath/core</code> in scope. It shows the kind of exactness the package is built on, done by hand.</p>
+<h2>A first program</h2>
+<pre><code>import { triangle, circle, line, meet, rotation, theorems, delaunay, pick, metric } from "@ratmath/geo";
+
+const t = triangle([0, 0], [4, 0], [1, 3]);
+String(t.orthocenter);                      // "(1, 1)"
+String(t.incenter);                         // exact, with nested square roots
+theorems.feuerbach(t).holds;                // true: the nine-point circle touches the incircle
+meet(circle([0, 0], [1, 0]), circle([1, 0], [0, 0])).map(String);   // ["(1/2, -√3/2)", "(1/2, √3/2)"]
+String(rotation([0, 0], "1/6").apply([1, 0]));                      // "(1/2, √3/2)"
+delaunay([[0, 0], [1, 0], [0, 1], [1, 1]]).cocircular;              // true: decided, not guessed
+pick([[0, 0], [5, 0], [0, 5]]);             // { area: 25/2, interior: 6, boundary: 15, holds: true }
+metric("taxicab").pi;                       // 4</code></pre>
+
+<h2>Numbers</h2>
+<p>A coordinate is a Core <code>Rational</code> whenever it is rational, and otherwise an algebraic number from <code>@ratmath/algebraic</code>, which keeps its minimal polynomial and so can be added, compared and tested for zero exactly. Everything a ruler and compass can construct is such a number, and so are the vertices of every regular polygon. Inputs are whole numbers, fractions <code>"7/2"</code>, decimals <code>"0.35"</code> (meaning 7/20) and square roots <code>"sqrt(3)/2"</code>. A JavaScript number that is not whole is refused. <code>N</code> exports the arithmetic (<code>N.add</code>, <code>N.sqrt</code>, <code>N.cmp</code>, <code>N.text</code>…).</p>
+<p>Rational figures stay rational and fast. Figures with square roots are slower, since each comparison works with minimal polynomials; a triangle's incentre and the circles around it take a fraction of a second.</p>
+
+<h2>Still to come</h2>
+<p>Spherical and hyperbolic models; projective and finite geometries; solids, symmetry groups, friezes, wallpaper groups and tilings; general proofs of theorems by elimination; pictures in graphics. The <code>plan</code> export lists the phases, from the <a href="https://github.com/ratmath/ratmath/blob/main/docs/design/library-roadmap.md#11-a-geometry-package-ratmathgeo">library roadmap</a>, and the <a href="https://ratmath.com/shelf/">RatMath Shelf</a> page lists what exists across all the libraries.</p>
 <section class="runbox" aria-label="Runnable code">
   <div class="runbox-head"><strong>Try it</strong><span>Edit the code and run it with <code>@ratmath/geo</code> and Core's <code>Rational</code> in scope. The last line's value is shown; <code>PRINT(…)</code> adds lines, <code>TEX(…)</code> typesets math.</span></div>
-  <textarea spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Code">// Exact coordinates make theorems checkable. The medians of a triangle meet at one point:
-const P = (x, y) =&gt; ({ x: new Rational(x), y: new Rational(y) });
-const mid = (a, b) =&gt; ({ x: a.x.add(b.x).divide(new Rational(2)), y: a.y.add(b.y).divide(new Rational(2)) });
-// the signed area of a triangle is zero exactly when its corners are on one line
-const area2 = (a, b, c) =&gt; b.x.subtract(a.x).multiply(c.y.subtract(a.y)).subtract(c.x.subtract(a.x).multiply(b.y.subtract(a.y)));
-const [A, B, C] = [P("1/3", 2), P(7, "-5/2"), P("22/7", 9)];
-const G = { x: A.x.add(B.x).add(C.x).divide(new Rational(3)), y: A.y.add(B.y).add(C.y).divide(new Rational(3)) };
-PRINT("centroid:", `(${G.x}, ${G.y})`);
-for (const [v, m, name] of [[A, mid(B, C), "A"], [B, mid(A, C), "B"], [C, mid(A, B), "C"]]) PRINT(`median from ${name} passes through it:`, area2(v, m, G).equals(new Rational(0)));
-PRINT("area of the triangle:", area2(A, B, C).divide(new Rational(2)).abs().toString());
+  <textarea spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Code">const t = triangle([0, 0], [4, 0], [1, 3]);
+PRINT("centroid", String(t.centroid), " circumcentre", String(t.circumcenter), " orthocentre", String(t.orthocenter));
+PRINT("incentre", String(t.incenter));
+PRINT("area", N.text(t.area), " circumradius", N.text(t.circumradius), " cos A", N.text(t.cosines.A));
+for (const name of ["eulerLine", "ninePointCircle", "feuerbach", "napoleon"]) PRINT(theorems[name](t).theorem + ":", theorems[name](t).statement, "→", theorems[name](t).holds);
+PRINT("two unit circles meet at", meet(circle([0, 0], [1, 0]), circle([1, 0], [0, 0])).join(" and "));
 plan.map((p) =&gt; `${p.phase}. ${p.contents}`)</textarea>
   <div class="runbox-bar"><button type="button" data-run>Run</button><button type="button" class="ghost" data-reset>Reset</button><span class="runbox-meta">Ctrl/⌘ + Enter runs</span></div>
   <div class="runbox-out" aria-live="polite"></div>
@@ -76,7 +75,7 @@ plan.map((p) =&gt; `${p.phase}. ${p.contents}`)</textarea>
 </main>
 </div>
 <script type="module">
-import { topicCards } from "./assets/site.js?v=1286a1dc61";
+import { topicCards } from "./assets/site.js?v=a9b5e2630f";
 topicCards(document.getElementById("cards"));
 </script>
 </body>

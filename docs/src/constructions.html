@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Constructions · RatMath Geo</title>
+<meta name="description" content="Points, lines and circles with exact coordinates, and ruler-and-compass constructions recorded step by step.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<script type="module" src="assets/site.js"></script>
+</head>
+<body>
+<div class="shell">
+<aside></aside>
+<main>
+<article>
+<div class="eyebrow">Topic</div>
+<h1>Points, lines, circles and constructions</h1>
+<p class="lede">The Euclidean plane has three kinds of object and two tools. Everything the tools can make has coordinates that are exact numbers, and this page is about those.</p>
+<pre><code>const l = line([0, 0], [2, 1]);              // or line(a, b, c) for ax + by + c = 0
+const c = circle([0, 0], { radius: 1 });     // or circle(centre, pointOnIt)
+meet(l, c);                                  // 0, 1 or 2 points, exact
+perpendicularBisector([0, 0], [4, 0]);       // x − 2 = 0
+regularPolygon(5);                           // five exact vertices on the unit circle
+
+const k = construction({ A: [0, 0], B: [1, 0] });
+k.circle("a", "A", "B").circle("b", "B", "A").meet(["C", "D"], "a", "b").line("m", "C", "D");
+String(k.get("C"));                          // "(1/2, -√3/2)"</code></pre>
+<h2>What the tools add</h2>
+<p>A ruler draws the line through two known points; a compass draws the circle with a known centre through a known point. New points appear where these meet. Two lines meet where two linear equations hold, which needs only +, −, ×, ÷. A line and a circle, or two circles, meet where a quadratic equation holds, which needs one square root more. So starting from rational points, every constructible coordinate is built from rationals by the four operations and square roots, however deep the nesting. These are algebraic numbers, and <code>meet</code> returns them exactly: the vertex of the regular pentagon is \(\bigl(\tfrac{-1+\sqrt5}{4}, \tfrac{\sqrt{10+2\sqrt5}}{4}\bigr)\).</p>
+<p>Two circles meet on their <em>radical axis</em>, the line left when one circle's equation is subtracted from the other's, so that case reduces to a line and a circle.</p>
+
+<h2>Predicates</h2>
+<p>Because the numbers are exact, so are the questions asked of them: <code>collinear</code>, <code>concyclic</code>, <code>concurrent</code>, <code>parallel</code>, <code>perpendicular</code>, <code>orientation</code> (left turn, right turn or straight), <code>circle.power(p)</code> (negative inside, zero on, positive outside). None of them takes a tolerance.</p>
+
+<h2>A construction as a list of steps</h2>
+<p><code>construction(given)</code> records a construction the way it is written in a textbook. Each step names what it makes: <code>line(name, P, Q)</code> uses the ruler, <code>circle(name, centre, through)</code> the compass (a third argument carries the radius |PQ| to another centre), and <code>meet(names, f, g)</code> marks intersections. <code>count</code> says how many times each tool was used, <code>String(k)</code> prints the steps, and <code>get(name)</code> returns any object with its exact coordinates.</p>
+
+<h2>Regular polygons</h2>
+<p><code>regularPolygon(n)</code> uses the exact values of \(\cos(2\pi k/n)\) and \(\sin(2\pi k/n)\). For n = 3, 4, 5, 6, 8, 10, 12, 15, 17, … these are nested square roots, which is Gauss's theorem on which polygons are constructible. For n = 7 or 9 they are algebraic numbers of degree 3 that no nest of square roots expresses: still exact here, but out of the compass's reach.</p>
+
+<div class="tablewrap"><table class="ref">
+<tr><th>call</th><th>returns</th></tr>
+<tr><td>point(x, y), line(P, Q), line(a, b, c), circle(centre, through | { radius })</td><td>Point, Line, Circle</td></tr>
+<tr><td>meet(f, g)</td><td>Point or null (two lines); Point[] ordered by x then y</td></tr>
+<tr><td>distance, distance2, midpoint, foot(P, l), reflect(P, l)</td><td>exact numbers and Points</td></tr>
+<tr><td>parallelThrough(l, P), perpendicularThrough(l, P), perpendicularBisector(P, Q), angleBisector(A, V, B)</td><td>Line</td></tr>
+<tr><td>circumcircle(A, B, C), tangents(circle, P), regularPolygon(n, { center, vertex })</td><td>Circle, Line[], Point[]</td></tr>
+<tr><td>collinear, concyclic, concurrent, parallel, perpendicular, orientation</td><td>exact predicates</td></tr>
+<tr><td>construction(given).line(…).circle(…).meet(…)</td><td>Construction: get(name), steps, count</td></tr>
+</table></div>
+<template data-runbox>
+// Bisect a segment, the way Euclid does.
+const k = construction({ A: [0, 0], B: [1, 0] });
+k.circle("a", "A", "B").circle("b", "B", "A").meet(["C", "D"], "a", "b").line("m", "C", "D").line("AB", "A", "B").meet("M", "m", "AB");
+PRINT(String(k));
+PRINT("C =", String(k.get("C")), " M =", String(k.get("M")), " tools:", JSON.stringify(k.count));
+PRINT("ABC is equilateral:", N.eq(distance2(k.get("A"), k.get("C")), distance2(k.get("A"), k.get("B"))));
+
+PRINT("pentagon:", regularPolygon(5).join("  "));
+PRINT("a vertex of the heptagon:", String(regularPolygon(7)[1]), "(exact, but not a nest of square roots)");
+const c = circle([0, 0], { radius: 1 });
+PRINT("tangents from (2, 0):", tangents(c, [2, 0]).join("   and   "));
+concyclic([1, 0], [0, 1], [-1, 0], ["3/5", "-4/5"])
+</template>
+</article>
+</main>
+</div>
+</body>
+</html>

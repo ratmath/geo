@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lattice geometry · RatMath Geo</title>
+<meta name="description" content="Pick&#x27;s theorem, lattice points on segments and points visible from the origin.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<script type="module" src="assets/site.js"></script>
+</head>
+<body>
+<div class="shell">
+<aside></aside>
+<main>
+<article>
+<div class="eyebrow">Topic</div>
+<h1>Lattice points and Pick's theorem</h1>
+<p class="lede">The points with whole-number coordinates form a lattice, and polygons with corners on it have areas that can be found by counting.</p>
+<pre><code>pick([[0, 0], [5, 0], [0, 5]]);     // { area: 25/2, interior: 6, boundary: 15, formula: 25/2, holds: true }
+latticePointsOn([0, 0], [6, 4]);    // 3: the ends and (3, 2)
+isVisible(3, 5);                    // true: gcd(3, 5) = 1
+visiblePoints(100);                 // { count: 6087, share: 6087/10000, … }</code></pre>
+<h2>Pick's theorem</h2>
+<p>For a polygon whose corners are lattice points and whose edges do not cross, with I lattice points strictly inside and B on the boundary,</p>
+\[ \text{area} = I + \frac{B}{2} - 1 . \]
+<p><code>pick</code> finds the three quantities independently, so that <code>holds</code> is a check and not a restatement. The area comes from the shoelace formula. B comes from the edges: the segment from (0, 0) to (a, b) passes through gcd(a, b) + 1 lattice points, since the first one after the origin is (a/g, b/g). I is counted by testing every lattice point of the bounding box with the exact point-in-polygon test.</p>
+<p>The theorem fails for polygons with holes and has no analogue in three dimensions: a tetrahedron with corners (0,0,0), (1,0,0), (0,1,0), (1,1,n) contains no other lattice points, yet its volume n/6 can be as large as you like.</p>
+
+<h2>Visible points</h2>
+<p>From the origin, the lattice point (x, y) is visible when no other lattice point lies on the segment to it, which is when gcd(x, y) = 1. The share of visible points in a large square tends to</p>
+\[ \frac{1}{\zeta(2)} = \frac{6}{\pi^2} \approx 0.6079, \]
+<p>because two numbers avoid sharing the prime factor p with probability \(1 - 1/p^2\), and the product of these over all primes is \(1/\zeta(2)\). <code>visiblePoints(n)</code> gives the exact count in the n by n square and its share as a fraction; that the share approaches \(6/\pi^2\) is a limit it illustrates and does not prove.</p>
+
+<div class="tablewrap"><table class="ref">
+<tr><th>call</th><th>returns</th></tr>
+<tr><td>pick(vertices | polygon)</td><td>{ area, interior, boundary, formula, holds }</td></tr>
+<tr><td>latticePointsOn(p, q)</td><td>number of lattice points on the closed segment</td></tr>
+<tr><td>isVisible(x, y)</td><td>boolean</td></tr>
+<tr><td>visiblePoints(n)</td><td>{ n, count, share, limit }</td></tr>
+</table></div>
+<template data-runbox>
+for (const v of [[[0, 0], [5, 0], [0, 5]], [[0, 0], [4, 0], [4, 3], [2, 1], [0, 3]], [[0, 0], [7, 1], [9, 6], [3, 8], [-2, 4]]]) {
+  const r = pick(v);
+  PRINT(`area ${N.text(r.area)} = ${r.interior} + ${r.boundary}/2 − 1 = ${N.text(r.formula)}  → ${r.holds}`);
+}
+PRINT("lattice points from (0,0) to (12, 18):", latticePointsOn([0, 0], [12, 18]));
+for (const n of [10, 100, 1000]) {
+  const v = visiblePoints(n);
+  PRINT(`n = ${n}: ${v.count} visible, share ${v.share.toNumber().toFixed(4)}`);
+}
+"6/π² = " + (6 / Math.PI ** 2).toFixed(6)
+</template>
+</article>
+</main>
+</div>
+</body>
+</html>

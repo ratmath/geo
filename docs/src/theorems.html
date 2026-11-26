@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Checked theorems · RatMath Geo</title>
+<meta name="description" content="Classical theorems of plane geometry checked exactly on the figure you give: Euler line, nine-point circle, Feuerbach, Ceva, Menelaus, Ptolemy, Napoleon and more.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<script type="module" src="assets/site.js"></script>
+</head>
+<body>
+<div class="shell">
+<aside></aside>
+<main>
+<article>
+<div class="eyebrow">Topic</div>
+<h1>Theorems, checked on exact figures</h1>
+<p class="lede">Each function here takes a figure, builds what a theorem talks about, and tests the conclusion with exact arithmetic. <code>holds: true</code> means the statement is true of this figure, with no tolerance involved.</p>
+<pre><code>const t = triangle([0, 0], [4, 0], [1, 3]);
+theorems.eulerLine(t);        // { theorem, statement, holds: true, O, G, H, … }
+theorems.feuerbach(t);        // tangent to the incircle and the three excircles
+theorems.ceva(t, D, E, F);    // concurrent exactly when the product of ratios is 1
+theorems.ptolemy(A, B, C, D); // equality exactly when the four points are concyclic</code></pre>
+<h2>What a check is, and is not</h2>
+<p>A check on one triangle is not a proof for all triangles. It is still worth more than a drawing or a floating-point test, for two reasons. First, the conclusion is an exact equality, so a false statement fails rather than passing within a tolerance. Second, a statement that is an identity between polynomials or algebraic functions of the coordinates and holds at a "generic" exact point is very unlikely to be false. General proofs by elimination, where hypotheses and conclusion become polynomials and the proof is a certificate, are a later phase of this package.</p>
+<p>Several of the functions test both directions. <code>ceva</code> reports the product of the ratios and whether the lines are concurrent, and <code>holds</code> says these agree, so it is as informative on a figure where the lines miss as on one where they meet. <code>ptolemy</code>, <code>simson</code> and <code>thales</code> work the same way.</p>
+
+<div class="tablewrap"><table class="ref">
+<tr><th>theorems.…</th><th>statement checked</th></tr>
+<tr><td>pythagoras(t)</td><td>a² + b² = c² exactly when the triangle is right-angled</td></tr>
+<tr><td>heron(t)</td><td>area² = s(s − a)(s − b)(s − c)</td></tr>
+<tr><td>concurrency(t)</td><td>medians, altitudes and bisectors each meet in a point; G divides the medians 2 : 1</td></tr>
+<tr><td>eulerLine(t)</td><td>O, G, H are collinear with GH = 2·OG</td></tr>
+<tr><td>ninePointCircle(t)</td><td>nine points on one circle of half the circumradius</td></tr>
+<tr><td>feuerbach(t)</td><td>the nine-point circle touches the incircle and each excircle</td></tr>
+<tr><td>napoleon(t)</td><td>centres of the outer equilateral triangles form an equilateral triangle</td></tr>
+<tr><td>ceva(t, D, E, F), menelaus(t, D, E, F)</td><td>product of signed ratios is 1 (concurrent) or −1 (collinear)</td></tr>
+<tr><td>simson(t, P)</td><td>the feet from P are collinear exactly when P is on the circumcircle</td></tr>
+<tr><td>ptolemy(A, B, C, D)</td><td>AC·BD = AB·CD + BC·DA exactly for cyclic quadrilaterals, ≤ otherwise</td></tr>
+<tr><td>thales(circle, A, B, P)</td><td>angle APB is right exactly when AB is a diameter</td></tr>
+<tr><td>powerOfPoint(circle, P, l1, l2)</td><td>PA·PB is the same on every secant and equals |PO|² − r²</td></tr>
+<tr><td>varignon(A, B, C, D)</td><td>midpoints of a quadrilateral form a parallelogram of half the area</td></tr>
+<tr><td>pentagon()</td><td>diagonal : side of the regular pentagon is the golden ratio</td></tr>
+</table></div>
+
+<h2>Why Feuerbach's theorem is the hard one</h2>
+<p>Two circles touch when the distance between their centres equals the sum or the difference of their radii. The nine-point circle of a rational triangle is rational, but the incentre and inradius involve the three side lengths, each a square root, so the distance is a square root of an expression in three square roots, and the test is whether that equals a difference of two more such numbers. In floating point one sees agreement to fifteen digits. Here the two sides are algebraic numbers and the equality is decided from their minimal polynomials.</p>
+<template data-runbox>
+const t = triangle([0, 0], [4, 0], [1, 3]);
+for (const name of ["pythagoras", "heron", "concurrency", "eulerLine", "ninePointCircle", "feuerbach", "napoleon"]) {
+  const r = theorems[name](t);
+  PRINT(`${r.theorem}: ${r.statement} → ${r.holds}`);
+}
+const mids = [midpoint(t.B, t.C), midpoint(t.C, t.A), midpoint(t.A, t.B)];
+const ceva = theorems.ceva(t, ...mids);
+PRINT("Ceva with the midpoints: product", N.text(ceva.product), "concurrent", ceva.concurrent);
+const off = theorems.ceva(t, [3, 1], mids[1], [1, 0]);
+PRINT("Ceva with other points: product", N.text(off.product), "concurrent", off.concurrent, "→ the theorem still holds:", off.holds);
+
+const cut = line([-1, 1], [5, 2]);
+const men = theorems.menelaus(t, meet(cut, line(t.B, t.C)), meet(cut, line(t.C, t.A)), meet(cut, line(t.A, t.B)));
+PRINT("Menelaus for a line across the triangle: product", N.text(men.product));
+PRINT("Ptolemy, square:", theorems.ptolemy([1, 0], [0, 1], [-1, 0], [0, -1]).equal, " kite off the circle:", theorems.ptolemy([1, 0], [0, 1], [-1, 0], [0, -2]).equal);
+const g = theorems.pentagon();
+`${g.statement}: ${N.text(g.ratio)}`
+</template>
+</article>
+</main>
+</div>
+</body>
+</html>

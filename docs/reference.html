@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Geometry Reference</title>
-<meta property="og:title" content="Geometry Reference">
+<title>Geo Reference</title>
+<meta property="og:title" content="Geo Reference">
 <meta property="og:description" content="Geometry for RatMath: Euclidean constructions and checked theorems, spherical, hyperbolic, projective and finite geometries, symmetry and tilings.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://ratmath.com/geo/reference.html">
@@ -12,8 +12,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
-<link rel="stylesheet" href="assets/style.css?v=1286a1dc61">
-<script type="module" src="assets/site.js?v=1286a1dc61"></script>
+<link rel="stylesheet" href="https://ratmath.com/assets/katex/0.19.1/katex.min.css">
+<link rel="stylesheet" href="assets/style.css?v=a9b5e2630f">
+<script type="module" src="assets/site.js?v=a9b5e2630f"></script>
 </head>
 <body>
 <div class="shell">
@@ -22,17 +23,89 @@
 <article>
 <div class="eyebrow">Reference</div>
 <h1>Everything in the library</h1>
-<p class="lede">Every export of <code>@ratmath/geo</code> will be listed here with what it takes and what it returns.</p>
-<p class="notice"><strong>Planned, not built yet.</strong> This site is the frame the package will grow into. The full plan is in the <a href="https://github.com/ratmath/ratmath/blob/main/docs/design/library-roadmap.md#11-a-geometry-package-ratmathgeo">library roadmap</a>, and the <a href="https://ratmath.com/shelf/">RatMath Shelf</a> page lists what exists across all the libraries.</p>
-<div class="tablewrap"><table class="ref" id="ref">
+<p class="lede">Every export of <code>@ratmath/geo</code>, with what it takes and what it returns. A point goes in as <code>[x, y]</code> or a <code>Point</code>; a coordinate is a whole number, a fraction or decimal string, a string such as <code>"sqrt(3)/2"</code>, a Core <code>Rational</code> or an algebraic number. A JavaScript number that is not whole is refused.</p>
+
+<h2>Numbers</h2>
+<div class="tablewrap"><table class="ref">
 <tr><th>Export</th><th>What it does</th></tr>
-<tr><td>plan</td><td>The list of planned phases, each { phase, contents, estimate }. It is here so the package has something to load while it is empty, and it shrinks as phases are built.</td></tr>
+<tr><td>num(x)</td><td>An exact number from any of the forms above: a <code>Rational</code> when rational, otherwise an algebraic number.</td></tr>
+<tr><td>N</td><td>Arithmetic on those numbers: add, sub, mul, div, neg, sq, sqrt, sign, isZero, cmp, eq, abs, min, max, sum, isRational, toNumber, text(a, digits), enclose(a, bits), cosPi(q), sinPi(q).</td></tr>
+<tr><td>GeoError</td><td>What the library throws, with a <code>code</code>: inexact, bad-number, bad-figure, division, sqrt and others.</td></tr>
+</table></div>
+
+<h2>Points, lines, circles</h2>
+<div class="tablewrap"><table class="ref">
+<tr><th>Export</th><th>What it does</th></tr>
+<tr><td>point(x, y), Point</td><td>A point. Methods: equals, plus, minus, times(k), toNumbers().</td></tr>
+<tr><td>line(p, q), line(a, b, c), Line</td><td>The line through two points, or <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mi>x</mi><mo>+</mo><mi>b</mi><mi>y</mi><mo>+</mo><mi>c</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">ax + by + c = 0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">a</span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">b</span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>. Methods: contains(p), at(p), equals; fields a, b, c, direction.</td></tr>
+<tr><td>circle(centre, through), Circle</td><td>The circle with a centre through a point. Fields: center, radius, radius2. Methods: contains(p), power(p), equals.</td></tr>
+<tr><td>distance(p, q), distance2(p, q), midpoint(p, q)</td><td>Exact distance, its square, and the midpoint.</td></tr>
+<tr><td>dot(u, v), cross(u, v), orientation(p, q, r)</td><td>Products of vectors; +1 for a left turn, −1 for a right turn, 0 on a line.</td></tr>
+<tr><td>collinear(...points), concyclic(...points)</td><td>Exact tests.</td></tr>
+<tr><td>parallel(l, m), perpendicular(l, m), concurrent(l, m, n)</td><td>Exact tests on lines.</td></tr>
+<tr><td>parallelThrough(l, p), perpendicularThrough(l, p), perpendicularBisector(p, q)</td><td>Lines.</td></tr>
+<tr><td>angleBisector(a, v, b, { external })</td><td>The bisector of the angle at v.</td></tr>
+<tr><td>foot(p, l), reflect(p, l)</td><td>Foot of the perpendicular, and mirror image.</td></tr>
+<tr><td>meet(f, g)</td><td>The points common to two lines, a line and a circle, or two circles, as an array.</td></tr>
+<tr><td>tangents(c, p), circumcircle(a, b, c)</td><td>Tangent lines from a point; the circle through three points.</td></tr>
+<tr><td>regularPolygon(n, { center, vertex })</td><td>The vertices, exact for every n.</td></tr>
+<tr><td>construction(given), Construction</td><td>A recorded ruler-and-compass construction: line, circle, meet, get, count. See <a href="constructions.html">Constructions</a>.</td></tr>
+</table></div>
+
+<h2>Triangles</h2>
+<div class="tablewrap"><table class="ref">
+<tr><th>Member of triangle(a, b, c)</th><th>What it is</th></tr>
+<tr><td>sides, sides2, area, perimeter, cosines, degrees, classify()</td><td>Measurements. Side a is opposite vertex A.</td></tr>
+<tr><td>centroid, circumcenter, orthocenter, incenter, excenters, ninePointCenter, symmedian</td><td>Centres. See <a href="triangles.html">Triangle centres</a>.</td></tr>
+<tr><td>barycentric(u, v, w)</td><td>The point with those weights on A, B, C.</td></tr>
+<tr><td>circumcircle, incircle, excircles, ninePointCircle, inradius, circumradius</td><td>Circles.</td></tr>
+<tr><td>medians, altitudes, feet, bisectors, eulerLine</td><td>Lines and feet of altitudes.</td></tr>
+</table></div>
+
+<h2>Transformations</h2>
+<div class="tablewrap"><table class="ref">
+<tr><th>Export</th><th>What it does</th></tr>
+<tr><td>identity(), translation(v), rotation(centre, turn), reflection(l), glide(l, v), dilation(centre, k), affine(matrix, vector)</td><td>A <code>Transform</code>. A rotation's turn is a fraction of a full turn, as a string.</td></tr>
+<tr><td>Transform</td><td>apply(figure), compose(other), inverse(), equals, determinant, isSimilarity(), isIsometry(), fixed(), classify().</td></tr>
+<tr><td>inversion(c)</td><td>Inversion in a circle: apply to a point, a line or a circle.</td></tr>
+</table></div>
+
+<h2>Checked theorems</h2>
+<div class="tablewrap"><table class="ref">
+<tr><th>theorems.…</th><th>Takes</th></tr>
+<tr><td>pythagoras, eulerLine, ninePointCircle, feuerbach, napoleon, concurrency, heron</td><td>a triangle</td></tr>
+<tr><td>ceva, menelaus</td><td>a triangle and points D, E, F on BC, CA, AB</td></tr>
+<tr><td>simson</td><td>a triangle and a point</td></tr>
+<tr><td>ptolemy, varignon</td><td>four points</td></tr>
+<tr><td>thales</td><td>a circle and three points on it</td></tr>
+<tr><td>powerOfPoint</td><td>a circle, a point and two lines through it</td></tr>
+<tr><td>pentagon</td><td>nothing</td></tr>
+</table></div>
+<p>Each returns { theorem, statement, holds } and the quantities it compared. See <a href="theorems.html">Checked theorems</a>.</p>
+
+<h2>Discrete and other geometries</h2>
+<div class="tablewrap"><table class="ref">
+<tr><th>Export</th><th>What it does</th></tr>
+<tr><td>convexHull(points)</td><td>The hull, counter-clockwise, without points inside edges.</td></tr>
+<tr><td>onSegment(a, b, p), segmentIntersection(a, b, c, d)</td><td>An exact test, and { meets, kind, point }: kind is "none", "cross", "touch" or "overlap" (then with from and to).</td></tr>
+<tr><td>polygon(vertices), Polygon</td><td>area, signedArea, perimeter, centroid, edges, isConvex(), isSimple(), locate(p), contains(p), triangulate(), clip(convex).</td></tr>
+<tr><td>inCircle(a, b, c, d)</td><td>The sign of d against the circle through a, b, c.</td></tr>
+<tr><td>delaunay(points), voronoi(points)</td><td>{ points, triangles, edges, cocircular } and { points, vertices, cells, edges, cocircular }. See <a href="computational.html">Computational geometry</a>.</td></tr>
+<tr><td>closestPair(points)</td><td>{ points, distance2, distance }.</td></tr>
+<tr><td>latticePointsOn(p, q), pick(vertices), isVisible(x, y), visiblePoints(n)</td><td>See <a href="lattice.html">Lattice geometry</a>.</td></tr>
+<tr><td>metric(name)</td><td>"taxicab", "chebyshev" or "euclidean": distance, circle, pi, bisector, ellipse. See <a href="metrics.html">Taxicab geometry</a>.</td></tr>
+<tr><td>plan</td><td>The phases still to come, each { phase, contents, estimate }.</td></tr>
 </table></div>
 <section class="runbox" aria-label="Runnable code">
   <div class="runbox-head"><strong>Try it</strong><span>Edit the code and run it with <code>@ratmath/geo</code> and Core's <code>Rational</code> in scope. The last line's value is shown; <code>PRINT(…)</code> adds lines, <code>TEX(…)</code> typesets math.</span></div>
-  <textarea spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Code">// The one export so far.
-for (const p of plan) PRINT(`phase ${p.phase}:`, p.contents, `(${p.estimate} lines)`);
-plan.length</textarea>
+  <textarea spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Code">// A little of each part.
+const t = triangle([0, 0], [4, 0], [1, 3]);
+PRINT("area", N.text(t.area), " incentre", String(t.incenter), " Euler line", String(t.eulerLine));
+PRINT("rotation by a sixth of a turn sends (1, 0) to", String(rotation([0, 0], "1/6").apply(point(1, 0))));
+PRINT("Feuerbach holds:", theorems.feuerbach(t).holds);
+PRINT("hull:", convexHull([[0, 0], [4, 0], [5, 3], [2, 5], [-1, 3], [2, 2]]).join(" "));
+PRINT("taxicab π =", N.text(metric("taxicab").pi));
+plan.map((p) =&gt; p.phase)</textarea>
   <div class="runbox-bar"><button type="button" data-run>Run</button><button type="button" class="ghost" data-reset>Reset</button><span class="runbox-meta">Ctrl/⌘ + Enter runs</span></div>
   <div class="runbox-out" aria-live="polite"></div>
 </section>
