@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Symmetry groups · RatMath Geo</title>
+<meta name="description" content="Rosette, frieze and wallpaper groups of exact patterns, identified by the standard flowchart with each symmetry checked exactly.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<script type="module" src="assets/site.js"></script>
+</head>
+<body>
+<body>
+<div class="shell">
+<aside></aside>
+<main>
+<article>
+<div class="eyebrow">Topic</div>
+<h1>Symmetry groups in the plane</h1>
+<p class="lede">A finite figure can only have rotations about one point and mirrors through it; a strip pattern has one of seven frieze groups; a pattern repeated in two directions has one of seventeen wallpaper groups. Give a pattern exactly and the library finds its group.</p>
+<pre><code>figureSymmetry(regularPolygon(5)).name;          // "D5": 5 rotations, 5 mirrors
+friezeGroup({ points, period: 1 });              // { name: "p2mg", conway: "spinning sidle", … }
+wallpaperGroup({ gram: [[1, 0], [0, 1]], points });   // { name: "p4g", orbifold: "4*2", steps }
+wallpaper.pattern("p31m", [["1/7", "2/11"]]);    // a pattern with that group</code></pre>
+
+<h2>Rosettes</h2>
+<p>Every symmetry of a finite figure fixes its centroid, so the symmetry group is finite and, as Leonardo da Vinci noticed, is either cyclic, \(C_n\) (n rotations), or dihedral, \(D_n\) (n rotations and n mirrors). <code>figureSymmetry(points)</code> tries the rotation and the reflection that take one point to each other point at the same distance from the centre, keeps those that map the whole figure to itself exactly, and returns them as Transforms and as a PermGroup on the points. Labels keep points of different kinds apart.</p>
+
+<h2>Friezes</h2>
+<p>A frieze is a pattern repeated along a line by one translation. Its symmetries keep the strip, so they can only be: a mirror along the centre line, mirrors across it, half-turns about points of it, and a glide reflection (reflect in the centre line and move half a period). Which of these occur decides the group, one of seven, given here in crystallographic notation with Conway's names: p1 hop, p11g step, p1m1 sidle, p2 spinning hop, p2mg spinning sidle, p11m jump, p2mm spinning jump. Give the points of one period; the centre line is the middle of their heights, and the candidate mirrors and centres come from pairs of points, so the search is finite and exact.</p>
+
+<h2>Wallpaper groups</h2>
+<p>A wallpaper pattern is repeated by a lattice of translations. Write its points in lattice coordinates (fractions of the two basis vectors) and give the shape of the lattice by its Gram matrix \(\begin{pmatrix} a\cdot a &amp; a\cdot b \\ a\cdot b &amp; b\cdot b\end{pmatrix}\). The hexagonal lattice has Gram matrix \(\begin{pmatrix}1 &amp; -\tfrac12\\ -\tfrac12 &amp; 1\end{pmatrix}\), rational although the vectors are not, so everything stays in rationals.</p>
+<p>A symmetry is \(x \mapsto Mx + t\) where M is an integer matrix that keeps the Gram matrix (a rotation or reflection of the lattice) and t is found by sending one point to another. By the crystallographic restriction, rotations have order 1, 2, 3, 4 or 6. The group is then named by the usual flowchart:</p>
+<ul>
+<li>the highest order of rotation;</li>
+<li>whether there are mirrors, and in how many directions;</li>
+<li>whether some glide reflection has an axis that is not a mirror, which happens when its glide vector \(\tfrac12(t + Mt)\) is not a lattice vector;</li>
+<li>whether the centres of rotation lie on mirrors, where a centre c is on a mirror when some reflection fixes it: \((I - M)c - t\) is a lattice vector.</li>
+</ul>
+<p>The answer comes with each step of the flowchart and with Conway's orbifold symbol. <code>wallpaper.pattern(name, seeds)</code> goes the other way: it applies the standard generators of a group to a few points and returns a pattern. The tests run all seventeen round the circle, and check that moving the origin or changing the lattice basis does not change the answer.</p>
+
+<div class="tablewrap"><table class="ref">
+<tr><th>call</th><th>returns</th></tr>
+<tr><td>figureSymmetry(points, { labels })</td><td>{ name, order, rotations, reflections, center, transforms, group }</td></tr>
+<tr><td>friezeGroup({ points, period, labels })</td><td>{ name, conway, orbifold, horizontalMirror, verticalMirror, halfTurn, glide, … }</td></tr>
+<tr><td>wallpaperGroup({ gram, points, labels })</td><td>{ name, orbifold, pointGroupOrder, symmetries, steps }</td></tr>
+<tr><td>wallpaper.names, wallpaper.pattern(name, seeds), friezes</td><td>The seventeen and the seven</td></tr>
+</table></div>
+<template data-runbox>
+for (const n of [3, 4, 6]) PRINT(`regular ${n}-gon:`, figureSymmetry(regularPolygon(n)).name);
+PRINT("pinwheel:", figureSymmetry([[2, 0], [0, 2], [-2, 0], [0, -2], [2, 1], [-1, 2], [-2, -1], [1, -2]]).name);
+const seeds = [["1/7", "2/11"], ["1/5", "3/13"], ["2/9", "1/17"]];
+for (const name of wallpaper.names) {
+  const g = wallpaperGroup(wallpaper.pattern(name, seeds));
+  PRINT(`${name.padEnd(5)} → ${g.name.padEnd(5)} ${g.orbifold.padEnd(6)} ${g.steps.join("; ")}`);
+}
+// a frieze: a motif and its mirror image across a vertical line, shifted half a period and flipped
+const m = [["1/10", "1/5"], ["3/20", "1/2"], ["1/5", "3/10"], ["2/5", "0"], ["9/20", "1"]];
+const pts = [];
+for (const [x, y] of m) {
+  const X = num(x), Y = num(y);
+  pts.push([X, Y], [N.neg(X), Y], [N.add(X, num("1/2")), N.sub(num(1), Y)], [N.sub(num("1/2"), X), N.sub(num(1), Y)]);
+}
+const f = friezeGroup({ points: pts });
+`frieze: ${f.name} (${f.conway}), mirrors at x = ${String(f.mirrorAt)} + k/2`
+</template>
+</article>
+</main>
+</div>
+</body>
+</html>

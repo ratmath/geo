@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Finite geometries · RatMath Geo</title>
+<meta name="description" content="Finite projective and affine planes over finite fields, the Fano plane, incidence structures and their collineation groups.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<script type="module" src="assets/site.js"></script>
+</head>
+<body>
+<body>
+<div class="shell">
+<aside></aside>
+<main>
+<article>
+<div class="eyebrow">Topic</div>
+<h1>Finite geometries</h1>
+<p class="lede">A geometry can have finitely many points. The smallest projective plane, the Fano plane, has seven points and seven lines, three points on each line and three lines through each point, and its 168 symmetries form a famous simple group.</p>
+<pre><code>const F = fano();                    // PG(2, 2)
+F.projectiveAxioms();                // { twoPointsOneLine: true, twoLinesOnePoint: true, … }
+F.collineations().order;             // 168, by searching all permutations
+projectivePlane(4).collineationGroup().order;   // 120960 = 2 · |PGL(3, 4)|
+affinePlane(3).isAffinePlane();      // true: Playfair's axiom holds
+affinePlane(3).completion();         // add points at infinity: a projective plane of order 3</code></pre>
+
+<h2>Planes over finite fields</h2>
+<p>Replace the real numbers by a finite field with q elements (q a prime or a prime power, from algebraic's <code>galoisField</code>) and the definitions still work. The projective plane PG(2, q) has a point for each triple [x : y : z] up to non-zero multiples, which makes \(q^2 + q + 1\) points; lines are triples too, with the same count, and each line has q + 1 points. The affine plane AG(2, q) has the \(q^2\) pairs (x, y) as points and the lines y = mx + c and x = c, in q + 1 parallel classes of q lines each.</p>
+<p>The incidence matrix N of a projective plane of order n (rows lines, columns points) satisfies \(NN^{\mathsf T} = nI + J\): two lines meet in exactly one point. The tests check this for every q up to 9.</p>
+
+<h2>The axioms, checked</h2>
+<p><code>incidence(lines)</code> takes any family of lines as lists of points. <code>projectiveAxioms()</code> checks that two points lie on exactly one line, two lines meet in exactly one point, and there are four points with no three collinear. <code>affineAxioms()</code> checks the first and Playfair's axiom: through a point off a line there is exactly one parallel. In a projective plane there are no parallels at all (<code>parallels(p, ℓ)</code> is empty), and adding a point at infinity for each parallel class of an affine plane, plus one line through them, gives a projective plane. That is <code>completion()</code>.</p>
+<p>Every plane here is also a block design: a projective plane of order n is a 2-(n² + n + 1, n + 1, 1) design. <code>designParameters()</code> returns v, b, k, r and λ, and the lines can be handed to the discrete package's <code>blockDesign</code>.</p>
+
+<h2>Collineations</h2>
+<p>A collineation is a permutation of the points that sends lines to lines. For PG(2, q) the invertible matrices give them, and for q = pᵏ with k &gt; 1 so do the field automorphisms. <code>collineationGroup()</code> generates this group as a PermGroup on the points, of order \(k\,q^3(q^3-1)(q^2-1)\): 168 for the Fano plane, 5616 for q = 3, 120960 for q = 4. For small structures <code>collineations()</code> finds every collineation by a backtracking search, which needs no algebra at all, and for the Fano plane it also finds 168.</p>
+<p>Not every projective plane comes from a field. Planes of order 9 that are not PG(2, 9) exist, no plane of order 6 exists (Bruck–Ryser), none of order 10 (Lam's computer search, 1989), and order 12 is open.</p>
+
+<div class="tablewrap"><table class="ref">
+<tr><th>call</th><th>returns</th></tr>
+<tr><td>projectivePlane(q), affinePlane(q), fano()</td><td>FiniteProjectivePlane (coordinates, pointAt, collineationGroup) and FiniteAffinePlane (parallelClasses, completion)</td></tr>
+<tr><td>incidence(lines, { points, name, labels })</td><td>Incidence: v, b, lines, matrix, linesThrough, lineThrough, meet, parallels, dual</td></tr>
+<tr><td>projectiveAxioms(), affineAxioms(), order, designParameters()</td><td>The checks, each named</td></tr>
+<tr><td>collineations()</td><td>{ order, group, elements } by search</td></tr>
+</table></div>
+<template data-runbox>
+const F = fano();
+PRINT(String(F));
+F.lines.forEach((l, i) =&gt; PRINT(`line ${i}:`, l.map((p) =&gt; F.labels[p]).join(" ")));
+PRINT("axioms:", JSON.stringify(F.projectiveAxioms()));
+PRINT("as a design:", JSON.stringify(F.designParameters()));
+PRINT("collineations found by search:", F.collineations().order, "  by matrices:", F.collineationGroup().order);
+for (const q of [3, 4, 5, 7]) {
+  const P = projectivePlane(q);
+  PRINT(`${P.name}: ${P.v} points, order ${P.order}`);
+}
+const A = affinePlane(3);
+PRINT(String(A), "parallel classes:", A.parallelClasses.length, " Playfair:", A.affineAxioms().playfair);
+`the completion is a projective plane: ${A.completion().isProjectivePlane()}`
+</template>
+</article>
+</main>
+</div>
+</body>
+</html>

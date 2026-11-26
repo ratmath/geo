@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The projective plane · RatMath Geo</title>
+<meta name="description" content="Homogeneous coordinates, duality, the cross-ratio, projective maps, conics, and the theorems of Desargues, Pappus, Pascal and Brianchon checked exactly.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<script type="module" src="assets/site.js"></script>
+</head>
+<body>
+<body>
+<div class="shell">
+<aside></aside>
+<main>
+<article>
+<div class="eyebrow">Topic</div>
+<h1>The projective plane</h1>
+<p class="lede">Add to the plane one point at infinity for each direction, and a line through them all. Then any two lines meet, any two points lie on one line, and points and lines can trade places in every statement.</p>
+<pre><code>const A = ppoint(0, 0), B = ppoint(1, 0);    // [0 : 0 : 1], [1 : 0 : 1]
+join(A, B);                                    // the line [0 : 1 : 0], that is y = 0
+meetLines(join([0, 0], [1, 1]), join([0, 1], [1, 2]));   // [1 : 1 : 0], at infinity
+crossRatio([0, 0], [1, 0], [2, 0], [5, 0]);    // 8/5
+projectivityFrom(fourPoints, fourImages);      // the one projective map that does it
+conicThrough([[5, 0], [3, 4], [-4, 3], [0, -5], [4, -3]]).classify();   // "circle"
+pascal(sixPointsOnAConic).holds;               // true</code></pre>
+
+<h2>Homogeneous coordinates</h2>
+<p>The point (x, y) is written [x : y : 1], and any non-zero multiple [λx : λy : λ] is the same point. Triples with last coordinate 0 are the points at infinity: [a : b : 0] is where all lines with direction (a, b) meet. A line \(ax + by + c = 0\) is the triple [a : b : c], and the point [x : y : z] is on it exactly when \(ax + by + cz = 0\).</p>
+<p>The line through two points is their cross product, and so is the point on two lines. This is <em>duality</em>: every true statement about points and lines stays true when the words are swapped, and <code>p.dual</code> turns one into the other. Two parallel lines are no exception: they meet at a point of the line at infinity, <code>lineAtInfinity()</code>.</p>
+
+<h2>The cross-ratio</h2>
+<p>Lengths and angles do not survive a projective map, but one number does. For four points on a line,</p>
+\[ (A, B; C, D) = \frac{[AC]\,[BD]}{[AD]\,[BC]}, \]
+<p>where [PQ] is a 2 × 2 determinant of the homogeneous coordinates, and for ordinary points it is the ratio of signed lengths \(\tfrac{AC \cdot BD}{AD \cdot BC}\). With exact coordinates it comes out as an exact rational, and it is the same after any projective map. When it is −1 the four points are <em>harmonic</em>; <code>harmonicConjugate(A, B, C)</code> finds the fourth.</p>
+
+<h2>Projective maps</h2>
+<p>An invertible 3 × 3 matrix acts on homogeneous coordinates and sends lines to lines. Two matrices that differ by a factor are the same map, so the library scales each to a standard form. The fundamental theorem says four points in general position (no three on a line) can be sent to any other four by exactly one projective map; <code>projectivityFrom</code> builds it, by sending the standard frame [1:0:0], [0:1:0], [0:0:1], [1:1:1] to each set.</p>
+
+<h2>Conics</h2>
+<p>A conic is \(x^{\mathsf T} C x = 0\) for a symmetric matrix C, and five points with no four on a line fix exactly one. <code>conicThrough</code> solves the linear system exactly. The polar of a point p is the line Cp, which for p on the conic is the tangent; the pole of a line is \(C^{-1}\ell\). In the projective plane every non-degenerate real conic is the same, and the affine kinds differ only in how they meet the line at infinity: an ellipse misses it, a parabola touches it, a hyperbola crosses it. <code>classify</code> reads this from the signs of two determinants.</p>
+
+<h2>Four theorems, checked on exact figures</h2>
+<ul>
+<li><strong>Desargues.</strong> Two triangles are in perspective from a point exactly when they are in perspective from a line.</li>
+<li><strong>Pappus.</strong> With A, B, C on one line and a, b, c on another, the points Ab·aB, Ac·aC, Bc·bC are collinear.</li>
+<li><strong>Pascal.</strong> For a hexagon inscribed in a conic, the three meets of opposite sides are collinear. Pappus is the case of a conic that is two lines.</li>
+<li><strong>Brianchon.</strong> For a hexagon circumscribed about a conic, the three main diagonals meet in a point: Pascal's dual.</li>
+</ul>
+<p>Each function takes a figure, builds the lines and points exactly, and reports whether the conclusion holds together with the points it found. These are checks on one figure; proofs in general are the elimination phase still to come.</p>
+
+<div class="tablewrap"><table class="ref">
+<tr><th>call</th><th>returns</th></tr>
+<tr><td>ppoint(x, y) or ppoint(x, y, z), pline(a, b, c), lineAtInfinity()</td><td>PPoint, PLine: coords, equals, dual, atInfinity, toAffine()</td></tr>
+<tr><td>join(p, q), meetLines(l, m), collinearP, concurrentP</td><td>The line through two points, the point on two lines</td></tr>
+<tr><td>crossRatio(a, b, c, d), harmonicConjugate(a, b, c)</td><td>An exact number (or "infinity"); a PPoint</td></tr>
+<tr><td>projectivity(matrix), projectivityFrom(from, to)</td><td>Projectivity: apply (points and lines), compose, inverse, isAffine</td></tr>
+<tr><td>conicThrough(points), Conic.fromCoefficients([a, b, c, d, e, f])</td><td>Conic: contains, polar, pole, tangentAt, transform, classify</td></tr>
+<tr><td>desargues(t1, t2), pappus(abc, ABC), pascal(six), brianchon(conic, six)</td><td>{ holds, … the points and lines found }</td></tr>
+</table></div>
+<template data-runbox>
+PRINT("cross-ratio (0, 1; 2, 5) on the x-axis:", String(crossRatio([0, 0], [1, 0], [2, 0], [5, 0])));
+const T = projectivityFrom([[0, 0], [1, 0], [0, 1], [1, 1]], [[1, 2], [3, "1/2"], [-1, 4], [5, 7]]);
+PRINT(String(T));
+const pts = [[0, 0], [1, 0], [2, 0], [5, 0]].map((p) =&gt; T.apply(p));
+PRINT("their images:", pts.map(String).join(" "), "  cross-ratio", String(crossRatio(...pts)));
+PRINT("harmonic conjugate of 2 for 0 and 6:", String(harmonicConjugate([0, 0], [6, 0], [2, 0])));
+// Pascal on six rational points of the unit circle
+const onCircle = (t) =&gt; [`${1 - t * t}/${1 + t * t}`, `${2 * t}/${1 + t * t}`];
+const six = [0, 1, 2, 3, -1, -4].map(onCircle);
+const p = pascal(six);
+PRINT("conic:", String(p.conic), "→", p.conic.classify());
+PRINT("Pascal line through", p.points.map(String).join(", "), "→", p.holds);
+PRINT("Brianchon:", brianchon(p.conic, six).holds);
+const d = desargues([[1, 0], [4, 1], [0, 4]], [[3, 0], [8, 2], [0, 12]]);   // A′ = 3A, B′ = 2B, C′ = 3C: in perspective from the origin
+`Desargues: perspective from ${d.center} and from the line ${d.axis}: ${d.holds}`
+</template>
+</article>
+</main>
+</div>
+</body>
+</html>

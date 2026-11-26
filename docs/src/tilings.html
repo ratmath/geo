@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tilings · RatMath Geo</title>
+<meta name="description" content="Tilings by regular polygons: the 21 ways polygons fit round a point, the three regular tilings, and why only 11 vertex types give uniform tilings.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<script type="module" src="assets/site.js"></script>
+</head>
+<body>
+<body>
+<div class="shell">
+<aside></aside>
+<main>
+<article>
+<div class="eyebrow">Topic</div>
+<h1>Tilings by regular polygons</h1>
+<p class="lede">Regular polygons fit together round a point in exactly 21 ways. Only 11 of them can be the pattern at every vertex of a tiling, and for the other 10 there is a short reason, which the library gives.</p>
+<pre><code>polygonAngle(6);              // 1/3 of a full turn
+vertexTypes();                // 21 cyclic sequences: [3, 7, 42], …, [3, 3, 3, 3, 3, 3]
+uniformTiling("3.4.6.4");     // { uniform: true, … }
+uniformTiling("5.5.10");      // { uniform: false, reason: "round a 5-gon …" }
+regularTilings();             // {3, 6}, {4, 4}, {6, 3}</code></pre>
+
+<h2>Fitting round a point</h2>
+<p>The interior angle of a regular n-gon is \(\tfrac{n-2}{2n}\) of a full turn. Polygons with \(n_1, \dots, n_k\) sides fit round a point exactly when</p>
+\[ \sum_{i=1}^{k} \frac{n_i - 2}{2n_i} = 1 , \]
+<p>an equation in rationals. Each angle is at least \(\tfrac16\) and less than \(\tfrac12\), so there are 3 to 6 polygons, and a search over increasing n with exact fractions finds 17 sets of polygons and 21 cyclic orders, from 3.7.42 (a triangle, a heptagon and a 42-gon) to six triangles.</p>
+
+<h2>Regular tilings</h2>
+<p>If q copies of the regular p-gon meet at each vertex, the equation becomes \(q\tfrac{p-2}{2p} = 1\), which is \((p - 2)(q - 2) = 4\). Its only solutions are {3, 6}, {4, 4} and {6, 3}: triangles, squares and hexagons. The triangle and hexagon tilings are dual to each other, and the square tiling is its own dual.</p>
+
+<h2>Uniform tilings</h2>
+<p>In a uniform (Archimedean) tiling every vertex has the same type. Consider an n-gon of the tiling with n odd. At each of its corners, the polygons on its two edges are the neighbours of that n-gon in the vertex type. If those two neighbours are always different kinds, the polygons round the n-gon must alternate between two kinds, which is impossible round an odd number of edges. The library carries out this argument in its general form: it asks whether the allowed pairs of neighbours can be chained round a cycle of length n. That rules out exactly 10 of the 21 types, among them 3.7.42, 5.5.10 and 3.4.4.6. The other 11 are realized by the three regular tilings and the eight semiregular ones, known since Kepler's <em>Harmonices Mundi</em> (1619). Drawing them belongs to the pictures phase.</p>
+
+<div class="tablewrap"><table class="ref">
+<tr><th>call</th><th>returns</th></tr>
+<tr><td>polygonAngle(n)</td><td>A Rational: the fraction of a full turn</td></tr>
+<tr><td>vertexTypes()</td><td>The 21 types as arrays</td></tr>
+<tr><td>uniformTiling(type)</td><td>{ type, fits, uniform, reason }</td></tr>
+<tr><td>regularTilings()</td><td>[{ p, q, symbol, dual }]</td></tr>
+</table></div>
+<template data-runbox>
+const types = vertexTypes();
+PRINT(types.length, "vertex types");
+for (const t of types) {
+  const u = uniformTiling(t);
+  PRINT(`${u.type.padEnd(12)} ${u.uniform ? "tiles" : "no   "}  ${u.reason}`);
+}
+PRINT("angles of the 3.12.12 type:", [3, 12, 12].map((n) =&gt; String(polygonAngle(n))).join(" + "), "= 1");
+regularTilings().map((t) =&gt; `${t.symbol} (dual ${t.dual})`)
+</template>
+</article>
+</main>
+</div>
+</body>
+</html>
