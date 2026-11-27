@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- `dot` and `cross` were declared in `index.d.ts` but not exported. They are
+  exported now and take points or `[x, y]` pairs. A test checks that
+  everything `index.d.ts` declares is exported. Found by the Course Test
+  (ratmath/shelf#7).
+
 ## 0.4.0
 
 - Phase 6, general proofs. `configuration()` states a theorem in

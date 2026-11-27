@@ -40,8 +40,10 @@ export function point(x, y) {
   return new Point(x, y);
 }
 const P = point;
-export const dot = (u, v) => N.add(N.mul(u.x, v.x), N.mul(u.y, v.y));
-export const cross = (u, v) => N.sub(N.mul(u.x, v.y), N.mul(u.y, v.x));
+/** u·v for vectors given as points or [x, y]. */
+export const dot = (u, v) => ((u = P(u)), (v = P(v)), N.add(N.mul(u.x, v.x), N.mul(u.y, v.y)));
+/** The scalar cross product u_x·v_y − u_y·v_x (twice the signed area of the triangle 0, u, v). */
+export const cross = (u, v) => ((u = P(u)), (v = P(v)), N.sub(N.mul(u.x, v.y), N.mul(u.y, v.x)));
 
 /** The line a·x + b·y + c = 0. */
 export class Line {

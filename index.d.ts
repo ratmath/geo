@@ -101,8 +101,10 @@ export class Circle {
 /** The circle with a centre through a point. */
 export function circle(center: PointLike, through: PointLike): Circle;
 
-export function dot(u: Point, v: Point): Num;
-export function cross(u: Point, v: Point): Num;
+/** u·v for vectors given as points or [x, y]. */
+export function dot(u: PointLike, v: PointLike): Num;
+/** The scalar cross product u_x·v_y − u_y·v_x. */
+export function cross(u: PointLike, v: PointLike): Num;
 export function distance(p: PointLike, q: PointLike): Num;
 export function distance2(p: PointLike, q: PointLike): Num;
 export function midpoint(p: PointLike, q: PointLike): Point;
