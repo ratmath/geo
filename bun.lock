@@ -8,7 +8,7 @@
         "@ratmath/algebraic": "^0.1.0",
         "@ratmath/analytic": "^0.1.0",
         "@ratmath/graphics": "^0.1.0",
-        "@ratmath/structures": "^0.3.0",
+        "@ratmath/structures": "^0.4.0",
       },
       "devDependencies": {
         "@ratmath/core": "^0.11.0",
@@ -57,7 +57,7 @@
     },
     "vendor/structures": {
       "name": "@ratmath/structures",
-      "version": "0.3.0",
+      "version": "0.4.0",
       "dependencies": {
         "@ratmath/algebraic": "^0.1.0",
       },

@@ -1,8 +1,8 @@
 // Shared page furniture for the geo docs: the contents column, the theme
 // switch and the code boxes. Add each topic page to PAGES as it is written.
 
-import * as A from "./geo.js?v=b4680a2985";
-import { mountRunboxes } from "./runbox.js?v=b4680a2985";
+import * as A from "./geo.js?v=a1cd962778";
+import { mountRunboxes } from "./runbox.js?v=a1cd962778";
 
 export { A };
 
