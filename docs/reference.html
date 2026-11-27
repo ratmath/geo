@@ -13,8 +13,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
 <link rel="stylesheet" href="https://ratmath.com/assets/katex/0.19.1/katex.min.css">
-<link rel="stylesheet" href="assets/style.css?v=356fa44d42">
-<script type="module" src="assets/site.js?v=356fa44d42"></script>
+<link rel="stylesheet" href="assets/style.css?v=b4680a2985">
+<script type="module" src="assets/site.js?v=b4680a2985"></script>
 </head>
 <body>
 <div class="shell">
@@ -82,6 +82,24 @@
 <tr><td>pentagon</td><td>nothing</td></tr>
 </table></div>
 <p>Each returns { theorem, statement, holds } and the quantities it compared. See <a href="theorems.html">Checked theorems</a>.</p>
+<h2>General proofs</h2>
+<div class="tablewrap"><table class="ref">
+<tr><th>Name</th><th>What it is</th></tr>
+<tr><td>configuration(name)</td><td>A figure in coordinates, to state a theorem about. Its methods make points, give the polynomials of geometric properties, and prove.</td></tr>
+<tr><td>T.at(name, x, y), T.free(name), T.parameter(name)</td><td>A point with given coordinates (numbers, parameter names, or expressions); a point with two free coordinates; a free number.</td></tr>
+<tr><td>T.on(name, P =&gt; condition, { free }), T.where(name, P =&gt; [c1, c2]), T.unknown(name, v =&gt; condition)</td><td>A point with one free coordinate and one condition; a point fixed by two conditions; a number fixed by an equation.</td></tr>
+<tr><td>T.midpoint, intersection, foot, reflection, parallelogram, circumcenter, orthocenter, centroid, tritangentCenter, onLine, onCircumcircle, otherIntersection</td><td>Constructions. Lines are pairs of points: T.intersection(&quot;P&quot;, [A, B], [C, D]).</td></tr>
+<tr><td>T.collinear, parallel, perpendicular, equidistant, equalLength, onCircle, concyclic, concurrent, rightAngle, equalAngle, tangent, isMidpoint, equal</td><td>Predicates: the polynomial (GeoExpr) that vanishes when the property holds.</td></tr>
+<tr><td>T.distance2, area2, dot, cross, number; e.add, sub, mul, neg, pow</td><td>Quantities, and arithmetic on expressions.</td></tr>
+<tr><td>T.prove(conclusion, { method, timeLimit, maxPairs, instance })</td><td>A Proof. method is &quot;wu&quot;, &quot;groebner&quot; or &quot;auto&quot;. A list of conclusions gives a Proof with parts.</td></tr>
+<tr><td>T.instance(conclusion), T.describe(), T.parameters, T.unknowns, T.hypotheses, T.points</td><td>One figure tried: { parameters, solutions, holdsAt }; the figure as text; the variables and hypotheses.</td></tr>
+<tr><td>proof.proved, proof.method, proof.replay()</td><td>Whether an identity was found and multiplied out; by which method; multiply it out again.</td></tr>
+<tr><td>proof.identity</td><td>{ ring, multiplier, power, cofactors, hypotheses, conclusion } with multiplier · conclusion^power = Σ cofactors[i] · hypotheses[i], as polynomials of @ratmath/structures.</td></tr>
+<tr><td>proof.conditions</td><td>The degenerate cases: [{ polynomial, text, meaning }]. The proof covers every figure at which none vanishes.</td></tr>
+<tr><td>proof.explain({ cofactors }), proof.parts, proof.instance, proof.size, proof.ms</td><td>The proof as text; one proof per conclusion; the figure tried when not proved; size of the certificate; time taken.</td></tr>
+<tr><td>provable, proofs.&lt;id&gt;(options), proofs.all(options), proofs.setup(id)</td><td>The classical theorems proved in general: thales, pythagoras, isosceles, midline, medians, altitudes, bisectors, eulerLine, ninePointCircle, orthocentreReflection, tritangent, varignon, parallelogram, inscribedAngle, chords, simson, butterfly, pappus, desargues, gaussLine, napoleon.</td></tr>
+</table></div>
+<p>See <a href="proofs.html">General proofs</a>.</p>
 
 <h2>Discrete and other geometries</h2>
 <div class="tablewrap"><table class="ref">

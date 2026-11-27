@@ -858,3 +858,166 @@ export function hyperbolicTiling(p: number, q: number): HyperbolicTiling;
 export function parallelPostulate(options?: { q?: number }): Array<{ geometry: string; parallels: "exactly one" | "none" | "infinitely many"; count: number; example: Record<string, unknown>; checked: boolean }>;
 export function hyperbolicFigure(items: unknown[], options?: { model?: "disc" | "klein" | "halfPlane"; title?: string; x?: [number, number]; y?: [number, number] }): Figure;
 export function hyperbolicTilingFigure(p: number, q: number, options?: { layers?: number; model?: "disc" | "klein"; title?: string }): Figure;
+
+// ---- general proofs ---------------------------------------------------------------
+
+import type { MPoly, PolyRing } from "@ratmath/structures";
+
+/** A polynomial expression in the coordinates of a configuration. */
+export class GeoExpr {
+  /** The polynomial, in a ring that has all the variables. */
+  in(R: PolyRing): MPoly;
+  add(o: GeoExpr | Scalar): GeoExpr;
+  sub(o: GeoExpr | Scalar): GeoExpr;
+  mul(o: GeoExpr | Scalar): GeoExpr;
+  neg(): GeoExpr;
+  pow(n: number): GeoExpr;
+  /** What the polynomial says, when it came from a predicate. */
+  label?: string;
+}
+
+/** A number, or a fraction written as text ("3/2"). */
+export type Scalar = number | bigint | string | Rational;
+/** A coordinate: a number, the name of a parameter, or an expression. */
+export type Coordinate = Scalar | GeoExpr;
+
+export class GeoPoint {
+  readonly name: string;
+  readonly x: GeoExpr;
+  readonly y: GeoExpr;
+  readonly kind: "fixed" | "free" | "on" | "dependent";
+  toString(): string;
+}
+
+export type GeoLine = [GeoPoint, GeoPoint];
+
+export interface ProveOptions {
+  /** "wu", "groebner", or "auto" (Wu's method first; the default). */
+  method?: "auto" | "wu" | "groebner";
+  label?: string;
+  /** Try one figure when no proof is found (default true). */
+  instance?: boolean;
+  maxPairs?: number;
+  /** Milliseconds allowed to the Gröbner method (default 20000). */
+  timeLimit?: number;
+}
+
+export interface ProofInstance {
+  /** The parameter values tried, or null when no usable figure was found. */
+  parameters: Record<string, number> | null;
+  /** Solutions of the hypotheses for those parameters, with multiplicity, over the complex numbers. */
+  solutions: number;
+  /** At how many of them the conclusion holds. */
+  holdsAt: number;
+}
+
+export interface ProofIdentity {
+  ring: PolyRing;
+  /** multiplier · conclusion^power = Σ cofactors[i] · hypotheses[i] */
+  multiplier: MPoly;
+  power: number;
+  cofactors: MPoly[];
+  hypotheses: MPoly[];
+  conclusion: MPoly;
+}
+
+export interface ProofCondition {
+  polynomial: MPoly;
+  /** "… ≠ 0" */
+  text: string;
+  /** A geometric reading ("A, B, C are not collinear"), when it is one of the standard ones. */
+  meaning: string | null;
+}
+
+export class Proof {
+  readonly configuration: Configuration;
+  readonly theorem: string;
+  statement: string;
+  readonly proved: boolean;
+  /** The method that found the identity, or null. */
+  readonly method: "wu" | "groebner" | string | null;
+  readonly identity: ProofIdentity | null;
+  /** One proof for each conclusion, when a list was given. */
+  readonly parts?: Proof[];
+  /** One figure tried, when no proof was found. */
+  instance: ProofInstance | null;
+  /** Why the Gröbner method stopped, when it ran out of time or pairs. */
+  readonly gaveUp: string | null;
+  readonly ms: number;
+  /** Multiply the certificate out again and compare both sides. */
+  replay(): boolean;
+  /** The degenerate cases: the proof covers every figure at which none of these polynomials vanishes. */
+  readonly conditions: ProofCondition[];
+  readonly size: { multiplierTerms: number; cofactorTerms: number; power: number } | Array<{ multiplierTerms: number; cofactorTerms: number; power: number }> | null;
+  explain(options?: { cofactors?: boolean; limit?: number }): string;
+  toString(): string;
+}
+
+export class Configuration {
+  constructor(name?: string);
+  readonly name: string;
+  readonly points: Map<string, GeoPoint>;
+  /** The free coordinates. */
+  readonly parameters: string[];
+  /** The coordinates tied down by hypotheses. */
+  readonly unknowns: string[];
+  readonly hypotheses: Array<{ label: string; expr: GeoExpr; step: number }>;
+
+  parameter(name: string): GeoExpr;
+  unknown(name: string, condition: (v: GeoExpr) => GeoExpr): GeoExpr;
+  free(name: string): GeoPoint;
+  at(name: string, x?: Coordinate, y?: Coordinate): GeoPoint;
+  on(name: string, condition: (P: GeoPoint) => GeoExpr, options?: { free?: "x" | "y" }): GeoPoint;
+  where(name: string, conditions: (P: GeoPoint) => GeoExpr | Array<GeoExpr | GeoExpr[]>, what?: string): GeoPoint;
+
+  midpoint(name: string, A: GeoPoint, B: GeoPoint): GeoPoint;
+  intersection(name: string, l1: GeoLine, l2: GeoLine): GeoPoint;
+  foot(name: string, P: GeoPoint, l: GeoLine): GeoPoint;
+  reflection(name: string, P: GeoPoint, l: GeoLine): GeoPoint;
+  circumcenter(name: string, A: GeoPoint, B: GeoPoint, C: GeoPoint): GeoPoint;
+  orthocenter(name: string, A: GeoPoint, B: GeoPoint, C: GeoPoint): GeoPoint;
+  centroid(name: string, A: GeoPoint, B: GeoPoint, C: GeoPoint): GeoPoint;
+  parallelogram(name: string, A: GeoPoint, B: GeoPoint, C: GeoPoint): GeoPoint;
+  otherIntersection(name: string, A: GeoPoint, Q: GeoPoint, O: GeoPoint): GeoPoint;
+  onLine(name: string, A: GeoPoint, B: GeoPoint, options?: { free?: "x" | "y" }): GeoPoint;
+  onCircumcircle(name: string, A: GeoPoint, B: GeoPoint, C: GeoPoint, options?: { free?: "x" | "y" }): GeoPoint;
+  tritangentCenter(name: string, A: GeoPoint, B: GeoPoint, C: GeoPoint): GeoPoint;
+
+  distance2(A: GeoPoint, B: GeoPoint): GeoExpr;
+  area2(A: GeoPoint, B: GeoPoint, C: GeoPoint): GeoExpr;
+  dot(A: GeoPoint, B: GeoPoint, C: GeoPoint, D: GeoPoint): GeoExpr;
+  cross(A: GeoPoint, B: GeoPoint, C: GeoPoint, D: GeoPoint): GeoExpr;
+  number(c: Scalar): GeoExpr;
+
+  collinear(A: GeoPoint, B: GeoPoint, C: GeoPoint): GeoExpr;
+  parallel(A: GeoPoint, B: GeoPoint, C: GeoPoint, D: GeoPoint): GeoExpr;
+  perpendicular(A: GeoPoint, B: GeoPoint, C: GeoPoint, D: GeoPoint): GeoExpr;
+  equidistant(P: GeoPoint, A: GeoPoint, B: GeoPoint): GeoExpr;
+  equalLength(A: GeoPoint, B: GeoPoint, C: GeoPoint, D: GeoPoint): GeoExpr;
+  onCircle(P: GeoPoint, O: GeoPoint, A: GeoPoint): GeoExpr;
+  isMidpoint(M: GeoPoint, A: GeoPoint, B: GeoPoint): [GeoExpr, GeoExpr];
+  concyclic(A: GeoPoint, B: GeoPoint, C: GeoPoint, D: GeoPoint): GeoExpr;
+  concurrent(l1: GeoLine, l2: GeoLine, l3: GeoLine): GeoExpr;
+  rightAngle(A: GeoPoint, B: GeoPoint, C: GeoPoint): GeoExpr;
+  equalAngle(A: GeoPoint, B: GeoPoint, C: GeoPoint, D: GeoPoint, E: GeoPoint, F: GeoPoint): GeoExpr;
+  tangent(l: GeoLine, O: GeoPoint, P: GeoPoint): GeoExpr;
+  equal(a: GeoExpr | Scalar, b: GeoExpr | Scalar, label?: string): GeoExpr;
+
+  prove(conclusion: GeoExpr | Array<GeoExpr | GeoExpr[]>, options?: ProveOptions): Proof;
+  instance(conclusion: GeoExpr, options?: { seed?: number; tries?: number }): ProofInstance;
+  describe(): string;
+}
+
+export function configuration(name?: string): Configuration;
+
+export type ProvableId =
+  | "thales" | "pythagoras" | "isosceles" | "midline" | "medians" | "altitudes" | "bisectors" | "eulerLine"
+  | "ninePointCircle" | "orthocentreReflection" | "tritangent" | "varignon" | "parallelogram" | "inscribedAngle"
+  | "chords" | "simson" | "butterfly" | "pappus" | "desargues" | "gaussLine" | "napoleon";
+
+export const provable: ReadonlyArray<{ readonly id: ProvableId; readonly name: string; readonly statement: string }>;
+
+export const proofs: { readonly [K in ProvableId]: (options?: ProveOptions) => Proof } & {
+  all(options?: ProveOptions): Array<{ id: ProvableId; name: string; statement: string; proof: Proof }>;
+  setup(id: ProvableId): { configuration: Configuration; conclusion: GeoExpr | Array<GeoExpr | GeoExpr[]> };
+};

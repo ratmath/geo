@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.4.0
+
+- Phase 6, general proofs. `configuration()` states a theorem in
+  coordinates: points that are fixed, free, or tied to earlier ones by
+  conditions, with predicates (`collinear`, `parallel`, `perpendicular`,
+  `equidistant`, `concyclic`, `concurrent`, `equalAngle`, `tangent`, …) that
+  give the polynomial of a property, and constructions (`midpoint`,
+  `intersection`, `foot`, `reflection`, `circumcenter`, `orthocenter`,
+  `centroid`, `otherIntersection`, …).
+- `prove(conclusion)` finds an identity d·gᵏ = Σ cᵢhᵢ between the conclusion
+  and the hypotheses, by Wu's method (pseudo-division down the construction)
+  or by a Gröbner basis over the field of the parameters (Kapur's method),
+  and multiplies it out before reporting `proved`. The `Proof` has the
+  `identity`, `replay()`, `conditions` (the degenerate cases, with a
+  geometric reading where one is recognised) and `explain()`. A statement
+  that is not proved comes with one figure and the number of its solutions
+  at which the conclusion holds.
+- `proofs` and `provable`: 21 classical theorems proved for every figure,
+  among them the Euler line, the nine-point circle, Simson's line, the
+  butterfly theorem, Pappus, Desargues, the Newton–Gauss line and Napoleon's
+  theorem.
+- `@ratmath/structures` (0.3) is a new dependency, vendored like the others.
+- Docs: a new topic page, General proofs.
+
 ## 0.3.0
 
 - Phase 3, the sphere: `spoint`, `greatCircle`, `striangle`, `scircle`,

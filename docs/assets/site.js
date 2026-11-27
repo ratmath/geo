@@ -1,8 +1,8 @@
 // Shared page furniture for the geo docs: the contents column, the theme
 // switch and the code boxes. Add each topic page to PAGES as it is written.
 
-import * as A from "./geo.js?v=356fa44d42";
-import { mountRunboxes } from "./runbox.js?v=356fa44d42";
+import * as A from "./geo.js?v=b4680a2985";
+import { mountRunboxes } from "./runbox.js?v=b4680a2985";
 
 export { A };
 
@@ -15,6 +15,7 @@ export const PAGES = [
   { href: "triangles.html", title: "Triangle centres", blurb: "Centres, circles and lines of a triangle, exactly" },
   { href: "transformations.html", title: "Transformations", blurb: "Isometries, similarities, affine maps and inversion, classified" },
   { href: "theorems.html", title: "Checked theorems", blurb: "Classical theorems tested exactly on your figure" },
+  { href: "proofs.html", title: "General proofs", blurb: "Theorems proved for every figure, with a certificate you can multiply out" },
   { group: "Discrete and other geometries" },
   { href: "computational.html", title: "Computational geometry", blurb: "Hulls, polygons, Delaunay and Voronoi with exact predicates" },
   { href: "lattice.html", title: "Lattice geometry", blurb: "Pick's theorem and visible points" },

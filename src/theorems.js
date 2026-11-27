@@ -2,8 +2,8 @@
 // a figure, builds what the theorem talks about, and tests the conclusion
 // with exact arithmetic: { theorem, statement, holds, … }. `holds: true`
 // means the conclusion is true for this figure, exactly. It is a check of
-// one instance, not a proof of the theorem; general proofs by elimination
-// are a later phase.
+// one instance, not a proof of the theorem; general proofs, with free
+// parameters and a certificate, are in prove.js and proofs.js.
 import { N, refuse, ONE, TWO, Q } from "./num.js";
 import { Point, point, line, Triangle, triangle, Circle, distance, distance2, midpoint, collinear, concurrent, concyclic, foot, meet, cross, dot, orientation, regularPolygon, rotation } from "./plane.js";
 

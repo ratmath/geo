@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RatMath Geo</title>
-<meta name="description" content="Geometry for RatMath: the Euclidean plane with exact coordinates, constructions, triangle centres, transformations, theorems checked on exact figures, exact computational and lattice geometry, taxicab geometry, the sphere and the hyperbolic plane.">
+<meta name="description" content="Geometry for RatMath: the Euclidean plane with exact coordinates, constructions, triangle centres, transformations, theorems checked on exact figures and proved in general, exact computational and lattice geometry, taxicab geometry, the sphere and the hyperbolic plane.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
@@ -46,8 +46,15 @@ metric("taxicab").pi;                       // 4</code></pre>
 <h2>The sphere and the hyperbolic plane</h2>
 <p>On the <a href="spherical.html">sphere</a> a triangle's angles add up to more than π, and in the <a href="hyperbolic.html">hyperbolic plane</a> to less; in both, the difference is the area. Points have exact coordinates, distances keep their exact cosine or cosh, and whether an angle is a rational multiple of π is decided, so the octant triangle covers exactly one eighth of the sphere and a triangle with three ideal vertices has area exactly π. The hyperbolic plane is one object seen in four models, with its <a href="hyperbolic-triangles.html">isometries classified and its regular tilings</a> sized exactly. <a href="parallel-postulate.html">The parallel postulate</a> is then a count that comes out differently in each geometry.</p>
 
-<h2>Still to come</h2>
-<p>General proofs of theorems by elimination. The <code>plan</code> export lists the phases, from the <a href="https://github.com/ratmath/ratmath/blob/main/docs/design/library-roadmap.md#11-a-geometry-package-ratmathgeo">library roadmap</a>, and the <a href="https://ratmath.com/shelf/">RatMath Shelf</a> page lists what exists across all the libraries.</p>
+<h2>Proofs for every figure</h2>
+<p>A check tests one figure. <a href="proofs.html">General proofs</a> cover all of them: the coordinates are letters, the hypotheses and conclusion are polynomials, and the proof is one polynomial identity found by Wu's method or a Gröbner basis and then multiplied out to confirm. The Euler line, the nine-point circle, Simson's line, the butterfly theorem, Pappus and Desargues are among the twenty-one proved, each with its degenerate cases listed.</p>
+<pre><code>import { proofs, configuration } from "@ratmath/geo";
+
+const p = proofs.eulerLine();
+p.proved;                                  // true, for every triangle
+p.conditions.map((c) =&gt; c.meaning);       // ["A, B, C are not collinear"]
+p.replay();                                // true: the certificate multiplies out</code></pre>
+<p>Every phase of the <a href="https://github.com/ratmath/ratmath/blob/main/docs/design/library-roadmap.md#11-a-geometry-package-ratmathgeo">roadmap for this package</a> is now built. The <a href="https://ratmath.com/shelf/">RatMath Shelf</a> page lists what exists across all the libraries.</p>
 <template data-runbox>
 const t = triangle([0, 0], [4, 0], [1, 3]);
 PRINT("centroid", String(t.centroid), " circumcentre", String(t.circumcenter), " orthocentre", String(t.orthocenter));

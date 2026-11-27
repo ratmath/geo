@@ -31,6 +31,7 @@ N.text(metric("taxicab").pi);           // "4"
 | Triangles | `triangle(a, b, c)`: centroid, circumcentre, orthocentre, incentre, excentres, nine-point centre, symmedian point, the circles, medians, altitudes, bisectors, Euler line, `classify()` |
 | Transformations | `translation`, `rotation`, `reflection`, `glide`, `dilation`, `affine`, with `compose`, `inverse`, `fixed()` and `classify()`; `inversion` in a circle |
 | Checked theorems | `theorems.pythagoras`, `eulerLine`, `ninePointCircle`, `feuerbach`, `ceva`, `menelaus`, `ptolemy`, `napoleon`, `simson`, `thales`, `powerOfPoint`, `varignon`, `concurrency`, `pentagon`, `heron` |
+| General proofs | `configuration` (points fixed, free or tied down by conditions; predicates such as `collinear`, `perpendicular`, `concyclic`, `equalAngle`), `prove` by Wu's method or a Gröbner basis, `Proof` with `identity`, `replay()`, `conditions` (the degenerate cases) and `explain()`; `proofs` and `provable`: 21 classical theorems proved for every figure |
 | Computational geometry | `convexHull`, `segmentIntersection`, `polygon` (area, centroid, `locate`, `triangulate`, `clip`), `inCircle`, `delaunay`, `voronoi`, `closestPair`, all with exact predicates |
 | Lattice geometry | `pick`, `latticePointsOn`, `isVisible`, `visiblePoints` |
 | Other metrics | `metric("taxicab" \| "chebyshev" \| "euclidean")`: `distance`, `circle`, `pi`, `bisector`, `ellipse` |
@@ -46,17 +47,15 @@ N.text(metric("taxicab").pi);           // "4"
 | Pictures | `hyperbolicFigure`, `hyperbolicTilingFigure`, `tilingFigure`, `solidPicture`, `wallpaperFigure`, `incidenceFigure`, `constructionFrames`, `geoFigure`, drawn by `@ratmath/graphics` (`figureSVG` and the others are re-exported) |
 | The join with graphics | `toGraphics` and `fromGraphics` move points, lines, circles and polygons between geo's kernel (all real algebraic numbers) and graphics' (Q(√d)) exactly; `toSurd` |
 
-A checked theorem is a test of one figure, exactly; it is not a proof of the
-theorem. General proofs by elimination are phase 6.
+A checked theorem is a test of one figure, exactly. A general proof
+(`proofs.eulerLine()`, or your own statement through `configuration`) covers
+every figure: it is a polynomial identity d·gᵏ = Σ cᵢhᵢ between the
+conclusion g and the hypotheses hᵢ, found by Wu's method or a Gröbner basis
+and multiplied out before it is believed.
 
-## Still planned
-
-| Phase | Contents |
-|---|---|
-| 6 | General proofs of theorems by elimination |
-
-The plan is in the
-[library roadmap](https://github.com/ratmath/ratmath/blob/main/docs/design/library-roadmap.md#11-a-geometry-package-ratmathgeo).
+Every phase of the plan in the
+[library roadmap](https://github.com/ratmath/ratmath/blob/main/docs/design/library-roadmap.md#11-a-geometry-package-ratmathgeo)
+is built.
 
 ## Layout
 
@@ -64,9 +63,10 @@ The plan is in the
   (the Euclidean plane), `src/theorems.js`, `src/discrete.js`,
   `src/projective.js`, `src/finite.js`, `src/solids.js`, `src/symmetry.js`,
   `src/tilings.js`, `src/angle.js`, `src/sphere.js`, `src/hyperbolic.js`,
-  `src/postulate.js`, `src/plan.js`.
-- `vendor/algebraic`: `@ratmath/algebraic` as a git submodule (clone with
-  `--recurse-submodules`).
+  `src/postulate.js`, `src/prove.js`, `src/proofs.js`, `src/plan.js`.
+- `vendor/algebraic`, `vendor/analytic`, `vendor/graphics`,
+  `vendor/structures`: the RatMath packages this one uses, as git submodules
+  (clone with `--recurse-submodules`).
 - `tests/`: `bun run test`.
 - `docs/src/*.html`: the docs pages. `bun run docs:build` writes `docs/`,
   typesets the mathematics and runs the code box at the end of every page.
