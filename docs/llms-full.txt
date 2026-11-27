@@ -1,0 +1,1848 @@
+# @ratmath/geo 0.4.0: full documentation
+
+> Geometry for RatMath: Euclidean constructions, theorems checked on exact figures and proved in general, spherical, hyperbolic, projective and finite geometries, symmetry and tilings. From https://ratmath.com/geo/, commit 138ca0c. Each page ends with a runnable example; in it, PRINT(...) prints.
+
+
+---
+
+Page: https://ratmath.com/geo/index.html
+
+@ratmath/geo
+
+## Geometry where equal means equal
+
+Three points are on a line or they are not, and a floating-point test can only say "nearly". Here coordinates are exact: fractions, or algebraic numbers such as 3​/2 when a compass has been used. So collinear, concyclic and tangent are decided, and a theorem checked on a figure is checked.
+
+### What is here
+
+### A first program
+
+```js
+import { triangle, circle, line, meet, rotation, theorems, delaunay, pick, metric } from "@ratmath/geo";
+
+const t = triangle([0, 0], [4, 0], [1, 3]);
+String(t.orthocenter);                      // "(1, 1)"
+String(t.incenter);                         // exact, with nested square roots
+theorems.feuerbach(t).holds;                // true: the nine-point circle touches the incircle
+meet(circle([0, 0], [1, 0]), circle([1, 0], [0, 0])).map(String);   // ["(1/2, -√3/2)", "(1/2, √3/2)"]
+String(rotation([0, 0], "1/6").apply([1, 0]));                      // "(1/2, √3/2)"
+delaunay([[0, 0], [1, 0], [0, 1], [1, 1]]).cocircular;              // true: decided, not guessed
+pick([[0, 0], [5, 0], [0, 5]]);             // { area: 25/2, interior: 6, boundary: 15, holds: true }
+metric("taxicab").pi;                       // 4
+```
+
+### Numbers
+
+A coordinate is a Core `Rational` whenever it is rational, and otherwise an algebraic number from `@ratmath/algebraic`, which keeps its minimal polynomial and so can be added, compared and tested for zero exactly. Everything a ruler and compass can construct is such a number, and so are the vertices of every regular polygon. Inputs are whole numbers, fractions `"7/2"`, decimals `"0.35"` (meaning 7/20) and square roots `"sqrt(3)/2"`. A JavaScript number that is not whole is refused. `N` exports the arithmetic (`N.add`, `N.sqrt`, `N.cmp`, `N.text`…).
+
+Rational figures stay rational and fast. Figures with square roots are slower, since each comparison works with minimal polynomials; a triangle's incentre and the circles around it take a fraction of a second.
+
+### Projective, finite, solid and symmetric
+
+The [projective plane](https://ratmath.com/geo/projective.html) works in homogeneous coordinates, where cross-ratios and projective maps are exact and Desargues, Pappus, Pascal and Brianchon can be checked on any exact figure. [Finite geometries](https://ratmath.com/geo/finite-geometries.html) are built over algebraic's finite fields, from the seven-point Fano plane up, with their collineation groups. [Polyhedra](https://ratmath.com/geo/polyhedra.html) have exact coordinates in Q(√2) or Q(√5): volumes, dihedral angles, duals and symmetry groups. Plane patterns get their [rosette, frieze or wallpaper group](https://ratmath.com/geo/symmetry.html), and the [tilings page](https://ratmath.com/geo/tilings.html) shows why only 11 of the 21 vertex types of regular polygons tile uniformly. [Pictures of geometry](https://ratmath.com/geo/pictures.html) grows and draws those 11 tilings, draws solids, patterns, finite planes and constructions with RatMath Graphics, and joins geo's exact plane with graphics'.
+
+### The sphere and the hyperbolic plane
+
+On the [sphere](https://ratmath.com/geo/spherical.html) a triangle's angles add up to more than π, and in the [hyperbolic plane](https://ratmath.com/geo/hyperbolic.html) to less; in both, the difference is the area. Points have exact coordinates, distances keep their exact cosine or cosh, and whether an angle is a rational multiple of π is decided, so the octant triangle covers exactly one eighth of the sphere and a triangle with three ideal vertices has area exactly π. The hyperbolic plane is one object seen in four models, with its [isometries classified and its regular tilings](https://ratmath.com/geo/hyperbolic-triangles.html) sized exactly. [The parallel postulate](https://ratmath.com/geo/parallel-postulate.html) is then a count that comes out differently in each geometry.
+
+### Proofs for every figure
+
+A check tests one figure. [General proofs](https://ratmath.com/geo/proofs.html) cover all of them: the coordinates are letters, the hypotheses and conclusion are polynomials, and the proof is one polynomial identity found by Wu's method or a Gröbner basis and then multiplied out to confirm. The Euler line, the nine-point circle, Simson's line, the butterfly theorem, Pappus and Desargues are among the twenty-one proved, each with its degenerate cases listed.
+
+```js
+import { proofs, configuration } from "@ratmath/geo";
+
+const p = proofs.eulerLine();
+p.proved;                                  // true, for every triangle
+p.conditions.map((c) => c.meaning);       // ["A, B, C are not collinear"]
+p.replay();                                // true: the certificate multiplies out
+```
+
+Every phase of the [roadmap for this package](https://github.com/ratmath/ratmath/blob/main/docs/design/library-roadmap.md#11-a-geometry-package-ratmathgeo) is now built. The [RatMath Shelf](https://ratmath.com/shelf/) page lists what exists across all the libraries.
+
+### Try it
+
+```js
+const t = triangle([0, 0], [4, 0], [1, 3]);
+PRINT("centroid", String(t.centroid), " circumcentre", String(t.circumcenter), " orthocentre", String(t.orthocenter));
+PRINT("incentre", String(t.incenter));
+PRINT("area", N.text(t.area), " circumradius", N.text(t.circumradius), " cos A", N.text(t.cosines.A));
+for (const name of ["eulerLine", "ninePointCircle", "feuerbach", "napoleon"]) PRINT(theorems[name](t).theorem + ":", theorems[name](t).statement, "→", theorems[name](t).holds);
+PRINT("two unit circles meet at", meet(circle([0, 0], [1, 0]), circle([1, 0], [0, 0])).join(" and "));
+PRINT("octant triangle: excess", striangle([1, 0, 0], [0, 1, 0], [0, 0, 1]).excess.text, "  ideal hyperbolic triangle: area", htriangle(ideal(1, 0), ideal(0, 1), ideal(-1, 0)).area.text);
+plan.map((p) => `${p.phase}. ${p.contents}`)
+```
+
+---
+
+Page: https://ratmath.com/geo/reference.html
+
+Reference
+
+## Everything in the library
+
+Every export of `@ratmath/geo`, with what it takes and what it returns. A point goes in as `[x, y]` or a `Point`; a coordinate is a whole number, a fraction or decimal string, a string such as `"sqrt(3)/2"`, a Core `Rational` or an algebraic number. A JavaScript number that is not whole is refused.
+
+### Numbers
+
+| Export | What it does |
+
+| num(x) | An exact number from any of the forms above: a Rational when rational, otherwise an algebraic number. |
+
+| N | Arithmetic on those numbers: add, sub, mul, div, neg, sq, sqrt, sign, isZero, cmp, eq, abs, min, max, sum, isRational, toNumber, text(a, digits), enclose(a, bits), cosPi(q), sinPi(q). |
+
+| GeoError | What the library throws, with a code: inexact, bad-number, bad-figure, division, sqrt and others. |
+
+### Points, lines, circles
+
+| Export | What it does |
+
+| point(x, y), Point | A point. Methods: equals, plus, minus, times(k), toNumbers(). |
+
+| line(p, q), line(a, b, c), Line | The line through two points, or ax+by+c=0. Methods: contains(p), at(p), equals; fields a, b, c, direction. |
+
+| circle(centre, through), Circle | The circle with a centre through a point. Fields: center, radius, radius2. Methods: contains(p), power(p), equals. |
+
+| distance(p, q), distance2(p, q), midpoint(p, q) | Exact distance, its square, and the midpoint. |
+
+| dot(u, v), cross(u, v), orientation(p, q, r) | Products of vectors; +1 for a left turn, −1 for a right turn, 0 on a line. |
+
+| collinear(...points), concyclic(...points) | Exact tests. |
+
+| parallel(l, m), perpendicular(l, m), concurrent(l, m, n) | Exact tests on lines. |
+
+| parallelThrough(l, p), perpendicularThrough(l, p), perpendicularBisector(p, q) | Lines. |
+
+| angleBisector(a, v, b, { external }) | The bisector of the angle at v. |
+
+| foot(p, l), reflect(p, l) | Foot of the perpendicular, and mirror image. |
+
+| meet(f, g) | The points common to two lines, a line and a circle, or two circles, as an array. |
+
+| tangents(c, p), circumcircle(a, b, c) | Tangent lines from a point; the circle through three points. |
+
+| regularPolygon(n, { center, vertex }) | The vertices, exact for every n. |
+
+| construction(given), Construction | A recorded ruler-and-compass construction: line, circle, meet, get, count. See Constructions. |
+
+### Triangles
+
+| Member of triangle(a, b, c) | What it is |
+
+| sides, sides2, area, perimeter, cosines, degrees, classify() | Measurements. Side a is opposite vertex A. |
+
+| centroid, circumcenter, orthocenter, incenter, excenters, ninePointCenter, symmedian | Centres. See Triangle centres. |
+
+| barycentric(u, v, w) | The point with those weights on A, B, C. |
+
+| circumcircle, incircle, excircles, ninePointCircle, inradius, circumradius | Circles. |
+
+| medians, altitudes, feet, bisectors, eulerLine | Lines and feet of altitudes. |
+
+### Transformations
+
+| Export | What it does |
+
+| identity(), translation(v), rotation(centre, turn), reflection(l), glide(l, v), dilation(centre, k), affine(matrix, vector) | A Transform. A rotation's turn is a fraction of a full turn, as a string. |
+
+| Transform | apply(figure), compose(other), inverse(), equals, determinant, isSimilarity(), isIsometry(), fixed(), classify(). |
+
+| inversion(c) | Inversion in a circle: apply to a point, a line or a circle. |
+
+### Checked theorems
+
+| theorems.… | Takes |
+
+| pythagoras, eulerLine, ninePointCircle, feuerbach, napoleon, concurrency, heron | a triangle |
+
+| ceva, menelaus | a triangle and points D, E, F on BC, CA, AB |
+
+| simson | a triangle and a point |
+
+| ptolemy, varignon | four points |
+
+| thales | a circle and three points on it |
+
+| powerOfPoint | a circle, a point and two lines through it |
+
+| pentagon | nothing |
+
+Each returns { theorem, statement, holds } and the quantities it compared. See [Checked theorems](https://ratmath.com/geo/theorems.html).
+
+### General proofs
+
+| Name | What it is |
+
+| configuration(name) | A figure in coordinates, to state a theorem about. Its methods make points, give the polynomials of geometric properties, and prove. |
+
+| T.at(name, x, y), T.free(name), T.parameter(name) | A point with given coordinates (numbers, parameter names, or expressions); a point with two free coordinates; a free number. |
+
+| T.on(name, P => condition, { free }), T.where(name, P => [c1, c2]), T.unknown(name, v => condition) | A point with one free coordinate and one condition; a point fixed by two conditions; a number fixed by an equation. |
+
+| T.midpoint, intersection, foot, reflection, parallelogram, circumcenter, orthocenter, centroid, tritangentCenter, onLine, onCircumcircle, otherIntersection | Constructions. Lines are pairs of points: T.intersection("P", [A, B], [C, D]). |
+
+| T.collinear, parallel, perpendicular, equidistant, equalLength, onCircle, concyclic, concurrent, rightAngle, equalAngle, tangent, isMidpoint, equal | Predicates: the polynomial (GeoExpr) that vanishes when the property holds. |
+
+| T.distance2, area2, dot, cross, number; e.add, sub, mul, neg, pow | Quantities, and arithmetic on expressions. |
+
+| T.prove(conclusion, { method, timeLimit, maxPairs, instance }) | A Proof. method is "wu", "groebner" or "auto". A list of conclusions gives a Proof with parts. |
+
+| T.instance(conclusion), T.describe(), T.parameters, T.unknowns, T.hypotheses, T.points | One figure tried: { parameters, solutions, holdsAt }; the figure as text; the variables and hypotheses. |
+
+| proof.proved, proof.method, proof.replay() | Whether an identity was found and multiplied out; by which method; multiply it out again. |
+
+| proof.identity | { ring, multiplier, power, cofactors, hypotheses, conclusion } with multiplier · conclusion^power = Σ cofactors[i] · hypotheses[i], as polynomials of @ratmath/structures. |
+
+| proof.conditions | The degenerate cases: [{ polynomial, text, meaning }]. The proof covers every figure at which none vanishes. |
+
+| proof.explain({ cofactors }), proof.parts, proof.instance, proof.size, proof.ms | The proof as text; one proof per conclusion; the figure tried when not proved; size of the certificate; time taken. |
+
+| provable, proofs.(options), proofs.all(options), proofs.setup(id) | The classical theorems proved in general: thales, pythagoras, isosceles, midline, medians, altitudes, bisectors, eulerLine, ninePointCircle, orthocentreReflection, tritangent, varignon, parallelogram, inscribedAngle, chords, simson, butterfly, pappus, desargues, gaussLine, napoleon. |
+
+See [General proofs](https://ratmath.com/geo/proofs.html).
+
+### Discrete and other geometries
+
+| Export | What it does |
+
+| convexHull(points) | The hull, counter-clockwise, without points inside edges. |
+
+| onSegment(a, b, p), segmentIntersection(a, b, c, d) | An exact test, and { meets, kind, point }: kind is "none", "cross", "touch" or "overlap" (then with from and to). |
+
+| polygon(vertices), Polygon | area, signedArea, perimeter, centroid, edges, isConvex(), isSimple(), locate(p), contains(p), triangulate(), clip(convex). |
+
+| inCircle(a, b, c, d) | The sign of d against the circle through a, b, c. |
+
+| delaunay(points), voronoi(points) | { points, triangles, edges, cocircular } and { points, vertices, cells, edges, cocircular }. See Computational geometry. |
+
+| closestPair(points) | { points, distance2, distance }. |
+
+| latticePointsOn(p, q), pick(vertices), isVisible(x, y), visiblePoints(n) | See Lattice geometry. |
+
+| metric(name) | "taxicab", "chebyshev" or "euclidean": distance, circle, pi, bisector, ellipse. See Taxicab geometry. |
+
+| plan | The phases still to come, each { phase, contents, estimate }. |
+
+### Projective and finite geometry
+
+| Export | What it does |
+
+| ppoint, pline, lineAtInfinity, PPoint, PLine | Points and lines in homogeneous coordinates; dual swaps them. See The projective plane. |
+
+| join, meetLines, collinearP, concurrentP | Incidence, exactly. |
+
+| crossRatio, harmonicConjugate | The projective invariant of four collinear points. |
+
+| projectivity(matrix), projectivityFrom(from, to), Projectivity | Projective maps: apply, compose, inverse, isAffine. |
+
+| conicThrough(points), Conic | Conics: contains, polar, pole, tangentAt, transform, classify. |
+
+| desargues, pappus, pascal, brianchon | The classical theorems checked on a figure. |
+
+| projectivePlane(q), affinePlane(q), fano(), incidence(lines) | Finite planes and incidence structures: axioms, designParameters, parallels, completion, collineations, collineationGroup. See Finite geometries. |
+
+### The sphere and the hyperbolic plane
+
+| Export | What it does |
+
+| angle(x), Angle, turnsOfCos(c), piTimes(k) | Angles with exact cosine and sine; turns is the fraction of a full turn or null, decided exactly; value(digits) encloses the radians. See Spherical geometry. |
+
+| Length | A hyperbolic length by its exact cosh and sinh: exp, text, value(digits), add, double, half. |
+
+| spoint, latLon, fromStereographic, northPole, SPoint | Points of the unit sphere: antipode, distanceTo, latLon, stereographic. |
+
+| greatCircle(P, Q), equator(), GreatCircle | contains, poles, meet, angleWith, perpendicularThrough, distanceTo, reflection, parallelsThrough. |
+
+| striangle(A, B, C), STriangle, lune | sides, angles, excess, area, fractionOfSphere, polar, classify(), checks(). |
+
+| scircle(centre, through), SCircle | radius, circumference and area as multiples of π. |
+
+| srotation(axis, turns), antipodalMap(), SIsometry | apply, then, inverse, classify(): rotation, reflection or rotary reflection. |
+
+| hpoint(x, y), fromKlein, fromHalfPlane, fromHyperboloid, horigin, HPoint | A point of the hyperbolic plane: disc, klein, halfPlane, hyperboloid, distanceTo. See The hyperbolic plane. |
+
+| ideal(x, y), HIdeal | A point at infinity. |
+
+| hline(a, b), hbisector, hmidpoint, HLine | ends, disc, klein, halfPlane, distanceTo, foot, perpendicularThrough, relation, reflection, parallelsThrough. |
+
+| hcircle(centre, through), horocycle(ideal, p), HCircle | radius, circumference, area, and the Euclidean circle in the disc. |
+
+| htriangle(A, B, C), HTriangle | sides, angles, defect, area, checks(); vertices may be ideal. See Hyperbolic triangles, motions, tilings. |
+
+| hreflection, hrotation, hhalfTurn, htranslation, HIsometry | apply, then, inverse, classify(), toMobius(). |
+
+| schlafli(p, q), hyperbolicTiling(p, q) | The regular tiling {p, q}: its geometry and exact tile; a patch of tiles. |
+
+| parallelPostulate({ q }) | Playfair's postulate counted in five geometries. See The parallel postulate. |
+
+| hyperbolicFigure(items, { model }), hyperbolicTilingFigure(p, q, { layers, model }) | Figures in the Poincaré disc, the Klein disc or the half-plane. |
+
+### Solids, symmetry and tilings
+
+| Export | What it does |
+
+| polyhedron(points), Polyhedron, solids, prism(n) | Convex polyhedra with proved faces: euler, volume, surfaceArea, dihedralCosines, dual, symmetry. See Polyhedra. |
+
+| figureSymmetry(points) | The rosette group Cₙ or Dₙ of a finite figure. See Symmetry groups. |
+
+| friezeGroup({ points, period }), friezes | One of the seven frieze groups. |
+
+| wallpaperGroup({ gram, points }), wallpaper | One of the seventeen wallpaper groups, with the flowchart's steps; patterns for each. |
+
+| polygonAngle, vertexTypes, uniformTiling, regularTilings | Tilings by regular polygons. See Tilings. |
+
+### Try it
+
+```js
+// A little of each part.
+const t = triangle([0, 0], [4, 0], [1, 3]);
+PRINT("area", N.text(t.area), " incentre", String(t.incenter), " Euler line", String(t.eulerLine));
+PRINT("rotation by a sixth of a turn sends (1, 0) to", String(rotation([0, 0], "1/6").apply(point(1, 0))));
+PRINT("Feuerbach holds:", theorems.feuerbach(t).holds);
+PRINT("hull:", convexHull([[0, 0], [4, 0], [5, 3], [2, 5], [-1, 3], [2, 2]]).join(" "));
+PRINT("taxicab π =", N.text(metric("taxicab").pi));
+PRINT("sphere:", striangle([1, 0, 0], [1, 1, 0], [1, 1, 1]).excess.text, " hyperbolic:", horigin().distanceTo(hpoint("1/2", 0)).text);
+plan.map((p) => p.phase)
+```
+
+---
+
+Page: https://ratmath.com/geo/explore.html
+
+Explore
+
+## Explore
+
+Type the corners of a triangle, or a list of points. The pictures are drawn from exact coordinates, and the theorems are checked exactly for the figure you gave. Further down: a solid with its exact measurements and symmetry group, and a wallpaper pattern named by its group.
+
+### A triangle
+
+A
+B
+C
+
+Each corner is two exact numbers separated by a comma: `1/2`, `0.35` and `sqrt(3)` all work. The picture shows the circumcircle, the incircle, the nine-point circle and the Euler line through O, G and H. Try `0, 0`, `2, 0`, `1, sqrt(3)`, where the centres coincide.
+
+### A set of points
+
+Points
+
+Points are separated by semicolons. The outline is the convex hull and the inner lines are the Delaunay triangulation; the two highlighted points are the closest pair.
+
+### A solid
+
+Solid
+its dual
+Turn
+
+The solids with √5 in their coordinates take a moment, since every face is proved with exact algebraic numbers.
+
+### A wallpaper pattern
+
+Group
+Seed point
+
+The pattern is made by applying the group's generators to the seed point and two companions of other colours, then classified again from scratch by the flowchart.
+
+### A hyperbolic triangle
+
+A
+B
+C
+Model
+
+The points are given in the Poincaré disc (inside the unit circle) and shown in the model chosen. The angles have exact cosines; the defect, π minus their sum, is the area.
+
+### A regular tiling {p, q}
+
+p
+q
+Steps
+
+Regular p-gons, q at each corner. The page says which geometry the tiling lives in; a hyperbolic one is drawn in the Poincaré disc, from floats, with the tile's exact size beside it.
+
+### Try it
+
+```js
+// The page above, as code.
+const t = triangle([0, 0], [6, 0], [1, 4]);
+PRINT("O", String(t.circumcenter), " G", String(t.centroid), " H", String(t.orthocenter));
+PRINT("Euler line:", String(t.eulerLine), "  checked:", theorems.eulerLine(t).holds);
+const pts = [[0, 0], [6, 0], [7, 4], [3, 7], [-1, 4], [2, 2], [4, 3], [3, 1]];
+PRINT("hull:", convexHull(pts).join(" "));
+PRINT("closest pair:", closestPair(pts).points.join(" and "));
+PRINT(delaunay(pts).triangles.length, "Delaunay triangles");
+const ht = htriangle([0, 0], ["1/2", 0], ["1/4", "1/2"]);
+PRINT("hyperbolic triangle: angles", ht.angles.A.text, ht.angles.B.text, ht.angles.C.text, " area", ht.area.text);
+const s73 = schlafli(7, 3);
+`{7, 3} is ${s73.geometry}: tile area ${s73.tileArea.text}, edge ${s73.edge.text}`
+```
+
+---
+
+Page: https://ratmath.com/geo/constructions.html
+
+Topic
+
+## Points, lines, circles and constructions
+
+The Euclidean plane has three kinds of object and two tools. Everything the tools can make has coordinates that are exact numbers, and this page is about those.
+
+```js
+const l = line([0, 0], [2, 1]);              // or line(a, b, c) for ax + by + c = 0
+const c = circle([0, 0], { radius: 1 });     // or circle(centre, pointOnIt)
+meet(l, c);                                  // 0, 1 or 2 points, exact
+perpendicularBisector([0, 0], [4, 0]);       // x − 2 = 0
+regularPolygon(5);                           // five exact vertices on the unit circle
+
+const k = construction({ A: [0, 0], B: [1, 0] });
+k.circle("a", "A", "B").circle("b", "B", "A").meet(["C", "D"], "a", "b").line("m", "C", "D");
+String(k.get("C"));                          // "(1/2, -√3/2)"
+```
+
+### What the tools add
+
+A ruler draws the line through two known points; a compass draws the circle with a known centre through a known point. New points appear where these meet. Two lines meet where two linear equations hold, which needs only +, −, ×, ÷. A line and a circle, or two circles, meet where a quadratic equation holds, which needs one square root more. So starting from rational points, every constructible coordinate is built from rationals by the four operations and square roots, however deep the nesting. These are algebraic numbers, and `meet` returns them exactly: the vertex of the regular pentagon is (4−1+5​​,410+25​​​).
+
+Two circles meet on their radical axis, the line left when one circle's equation is subtracted from the other's, so that case reduces to a line and a circle.
+
+### Predicates
+
+Because the numbers are exact, so are the questions asked of them: `collinear`, `concyclic`, `concurrent`, `parallel`, `perpendicular`, `orientation` (left turn, right turn or straight), `circle.power(p)` (negative inside, zero on, positive outside). None of them takes a tolerance.
+
+### A construction as a list of steps
+
+`construction(given)` records a construction the way it is written in a textbook. Each step names what it makes: `line(name, P, Q)` uses the ruler, `circle(name, centre, through)` the compass (a third argument carries the radius |PQ| to another centre), and `meet(names, f, g)` marks intersections. `count` says how many times each tool was used, `String(k)` prints the steps, and `get(name)` returns any object with its exact coordinates.
+
+### Regular polygons
+
+`regularPolygon(n)` uses the exact values of cos(2πk/n) and sin(2πk/n). For n = 3, 4, 5, 6, 8, 10, 12, 15, 17, … these are nested square roots, which is Gauss's theorem on which polygons are constructible. For n = 7 or 9 they are algebraic numbers of degree 3 that no nest of square roots expresses: still exact here, but out of the compass's reach.
+
+| call | returns |
+
+| point(x, y), line(P, Q), line(a, b, c), circle(centre, through \| { radius }) | Point, Line, Circle |
+
+| meet(f, g) | Point or null (two lines); Point[] ordered by x then y |
+
+| distance, distance2, midpoint, foot(P, l), reflect(P, l) | exact numbers and Points |
+
+| parallelThrough(l, P), perpendicularThrough(l, P), perpendicularBisector(P, Q), angleBisector(A, V, B) | Line |
+
+| circumcircle(A, B, C), tangents(circle, P), regularPolygon(n, { center, vertex }) | Circle, Line[], Point[] |
+
+| collinear, concyclic, concurrent, parallel, perpendicular, orientation | exact predicates |
+
+| construction(given).line(…).circle(…).meet(…) | Construction: get(name), steps, count |
+
+### Try it
+
+```js
+// Bisect a segment, the way Euclid does.
+const k = construction({ A: [0, 0], B: [1, 0] });
+k.circle("a", "A", "B").circle("b", "B", "A").meet(["C", "D"], "a", "b").line("m", "C", "D").line("AB", "A", "B").meet("M", "m", "AB");
+PRINT(String(k));
+PRINT("C =", String(k.get("C")), " M =", String(k.get("M")), " tools:", JSON.stringify(k.count));
+PRINT("ABC is equilateral:", N.eq(distance2(k.get("A"), k.get("C")), distance2(k.get("A"), k.get("B"))));
+
+PRINT("pentagon:", regularPolygon(5).join("  "));
+PRINT("a vertex of the heptagon:", String(regularPolygon(7)[1]), "(exact, but not a nest of square roots)");
+const c = circle([0, 0], { radius: 1 });
+PRINT("tangents from (2, 0):", tangents(c, [2, 0]).join("   and   "));
+concyclic([1, 0], [0, 1], [-1, 0], ["3/5", "-4/5"])
+```
+
+---
+
+Page: https://ratmath.com/geo/triangles.html
+
+Topic
+
+## Triangles and their centres
+
+A triangle has a great many notable points. The classical ones are here with exact coordinates, along with the circles and lines that go with them.
+
+```js
+const t = triangle([0, 0], [4, 0], [1, 3]);
+t.centroid; t.circumcenter; t.orthocenter; t.incenter; t.ninePointCenter; t.symmedian;
+t.circumcircle; t.incircle; t.excircles.A; t.ninePointCircle;
+t.eulerLine; t.medians.A; t.altitudes.B; t.bisectors.C;
+t.area; t.sides; t.cosines; t.classify();   // { angles: "acute", sides: "scalene" }
+t.barycentric(1, 2, 3);                     // any centre from its weights
+```
+
+### Barycentric weights
+
+Every point of the plane is a weighted average of the vertices, (uA+vB+wC)/(u+v+w), and each classical centre has simple weights in terms of the side lengths a, b, c (opposite A, B, C):
+
+| centre | weights | is where |
+
+| centroid G | 1 : 1 : 1 | the medians meet |
+
+| incentre I | a : b : c | the angle bisectors meet; centre of the inscribed circle |
+
+| excentres | −a : b : c and so on | centres of the circles touching one side and two extensions |
+
+| symmedian point | a² : b² : c² | the reflections of the medians in the bisectors meet |
+
+The circumcentre O (perpendicular bisectors) and orthocentre H (altitudes) are found as intersections of lines. For a triangle with rational vertices G, O, H, the nine-point centre and the symmedian point are rational. The incentre is not in general, because the side lengths are square roots: for the triangle above each coordinate has degree 4 or 8 over the rationals and is printed in digits, but it is held exactly, which is how [Feuerbach's theorem](https://ratmath.com/geo/theorems.html) can be checked on it.
+
+### Measures
+
+`area` is half the cross product, rational for rational vertices. `sides` are exact lengths and `sides2` their squares. The angles are given by their cosines, which are exact algebraic numbers; `degrees` gives ordinary numbers for reading. `classify()` decides acute, right or obtuse from the sign of a2+b2−c2 for the longest side, exactly, so a triangle is "right" only when it is.
+
+The inradius is 2⋅area/perimeter and the circumradius the radius of the circle through the vertices; Euler's relation OI2=R(R−2r) connects them and can be tested with `N.eq`.
+
+| property | value |
+
+| A, B, C, vertices, sides, sides2, area, perimeter, cosines, degrees | the figure and its measures |
+
+| centroid, circumcenter, orthocenter, incenter, excenters, ninePointCenter, symmedian, barycentric(u, v, w) | Points |
+
+| circumcircle, incircle, excircles, ninePointCircle, circumradius, inradius | Circles and radii |
+
+| medians, altitudes, bisectors, feet, eulerLine | Lines (by vertex) and Points |
+
+| classify() | { angles, sides } |
+
+### Try it
+
+```js
+const t = triangle([0, 0], [4, 0], [1, 3]);
+for (const name of ["centroid", "circumcenter", "orthocenter", "ninePointCenter", "symmedian", "incenter"]) PRINT(name.padEnd(16), String(t[name]));
+PRINT("Euler line:", String(t.eulerLine));
+PRINT("sides:", Object.values(t.sides).map((s) => N.text(s)).join(", "), " area:", N.text(t.area));
+PRINT("cosines:", Object.values(t.cosines).map((s) => N.text(s)).join(", "), " degrees:", Object.values(t.degrees).map((d) => d.toFixed(3)).join(", "));
+const [O, I, R, r] = [t.circumcenter, t.incenter, t.circumradius, t.inradius];
+PRINT("Euler's relation OI² = R(R − 2r):", N.eq(distance2(O, I), N.mul(R, N.sub(R, N.mul(num(2), r)))));
+const right = triangle([0, 0], [4, 0], [0, 3]);
+PRINT("3-4-5:", JSON.stringify(right.classify()), " incircle:", String(right.incircle), " excentre:", String(right.excenters.A));
+triangle([0, 0], [2, 0], [1, "sqrt(3)"]).classify()
+```
+
+---
+
+Page: https://ratmath.com/geo/transformations.html
+
+Topic
+
+## Transformations
+
+An isometry of the plane is one of four things: a translation, a rotation, a reflection or a glide reflection. With exact matrices the classification is a computation, and composing two maps and asking what you got is the quickest way to learn it.
+
+```js
+const r = rotation([1, 1], "1/4");               // a quarter turn about (1, 1)
+String(r.apply([2, 1]));                         // "(1, 2)"
+const m = reflection(line([0, 0], [1, 1]));
+m.compose(reflection(line([0, 0], [1, 0]))).classify();   // a rotation by 90° about the origin
+glide(line([0, 0], [1, 0]), [3, 0]).classify();  // { kind: "glide reflection", axis, vector }
+dilation([0, 0], 2).compose(r).classify().kind;  // "spiral similarity"
+inversion(circle([0, 0], { radius: 1 })).apply(line([2, 0], [2, 1]));   // a circle through the centre
+```
+
+### Exact angles
+
+A rotation matrix needs a cosine and a sine. Given as a fraction of a full turn, `rotation(c, "1/6")`, they are the exact algebraic values (21​ and 23​​ for a sixth of a turn). Or give any exact pair with cos2+sin2=1, such as `{ cos: "3/5", sin: "4/5" }`, which is checked. Rotating by a sixth of a turn six times gives back exactly the identity.
+
+### Classifying
+
+Every map here is p↦Mp+t. `classify()` looks at M:
+
+- MTM=I: an isometry. With determinant +1 it is a translation (M = I) or a rotation, whose centre is the one fixed point. With determinant −1 it is a reflection if it has a line of fixed points, and otherwise a glide reflection: a reflection followed by a slide along the mirror.
+
+- MTM=k2I: a similarity with ratio k. It has exactly one fixed point, its centre: a dilation, a spiral similarity (dilation and rotation), or a dilative reflection.
+
+- otherwise an affine map: lines stay lines and parallels stay parallel, but angles change; the determinant is the factor by which areas are multiplied.
+
+`fixed()` returns the fixed points: a point, a line, the whole plane or none.
+
+Two facts worth trying: reflections in two lines that meet compose to a rotation about the meeting point through twice the angle between them, and in two parallel lines to a translation through twice the distance. So every isometry is a product of at most three reflections.
+
+### Inversion
+
+Inversion in a circle with centre O and radius r sends p to the point p′ on the ray Op with ∣Op∣⋅∣Op′∣=r2. It swaps inside and outside, fixes the circle, and sends lines and circles to lines and circles: a line through O to itself, a line missing O to a circle through O, and a circle through O to a line. `inversion(c).apply(figure)` returns the image exactly.
+
+| call | returns |
+
+| translation(v), rotation(centre, turn \| { cos, sin }), reflection(line), glide(line, v), dilation(centre, k), affine(M, t), identity() | Transform |
+
+| T.apply(point \| line \| circle \| triangle \| points) | the image |
+
+| T.compose(U), T.inverse(), T.equals(U), T.determinant | T after U; the inverse |
+
+| T.isIsometry(), T.isSimilarity(), T.fixed(), T.classify() | { kind, center, axis, vector, cos, sin, ratio, … } |
+
+| inversion(circle).apply(point \| line \| circle) | the image |
+
+### Try it
+
+```js
+const a = reflection(line([0, 0], [1, 0]));
+const b = reflection(line([0, 0], [1, "sqrt(3)"]));       // a mirror at 60° to the first
+const two = b.compose(a).classify();
+PRINT("two mirrors at 60°:", two.kind, "about", String(two.center), "by", two.degrees.toFixed(0) + "°");
+const par = reflection(line([0, 2], [1, 2])).compose(a).classify();
+PRINT("two parallel mirrors 2 apart:", par.kind, "by", String(par.vector));
+const three = reflection(line([0, 0], [0, 1])).compose(reflection(line([0, 2], [1, 2]))).compose(reflection(line([1, 0], [2, 1])));
+PRINT("three mirrors:", three.classify().kind, " axis", String(three.classify().axis), " glide", String(three.classify().vector));
+
+const r = rotation([0, 0], "1/6");
+let power = identity();
+for (let k = 0; k < 6; k++) power = r.compose(power);
+PRINT("a sixth of a turn, six times, is exactly the identity:", power.equals(identity()));
+const spiral = dilation([1, 0], 2).compose(rotation([0, 0], "1/8")).classify();
+PRINT(spiral.kind, "ratio", N.text(spiral.ratio), "centre", String(spiral.center));
+
+const inv = inversion(circle([0, 0], { radius: 1 }));
+PRINT("the line x = 2 inverts to:", String(inv.apply(line([2, 0], [2, 1]))));
+String(inv.apply(circle([1, 0], { radius: 1 })))
+```
+
+---
+
+Page: https://ratmath.com/geo/theorems.html
+
+Topic
+
+## Theorems, checked on exact figures
+
+Each function here takes a figure, builds what a theorem talks about, and tests the conclusion with exact arithmetic. `holds: true` means the statement is true of this figure, with no tolerance involved.
+
+```js
+const t = triangle([0, 0], [4, 0], [1, 3]);
+theorems.eulerLine(t);        // { theorem, statement, holds: true, O, G, H, … }
+theorems.feuerbach(t);        // tangent to the incircle and the three excircles
+theorems.ceva(t, D, E, F);    // concurrent exactly when the product of ratios is 1
+theorems.ptolemy(A, B, C, D); // equality exactly when the four points are concyclic
+```
+
+### What a check is, and is not
+
+A check on one triangle is not a proof for all triangles. It is still worth more than a drawing or a floating-point test, for two reasons. First, the conclusion is an exact equality, so a false statement fails rather than passing within a tolerance. Second, a statement that is an identity between polynomials or algebraic functions of the coordinates and holds at a "generic" exact point is very unlikely to be false. For a proof that covers every figure, see [General proofs](https://ratmath.com/geo/proofs.html), where the coordinates are letters, hypotheses and conclusion become polynomials, and the proof is a certificate.
+
+Several of the functions test both directions. `ceva` reports the product of the ratios and whether the lines are concurrent, and `holds` says these agree, so it is as informative on a figure where the lines miss as on one where they meet. `ptolemy`, `simson` and `thales` work the same way.
+
+| theorems.… | statement checked |
+
+| pythagoras(t) | a² + b² = c² exactly when the triangle is right-angled |
+
+| heron(t) | area² = s(s − a)(s − b)(s − c) |
+
+| concurrency(t) | medians, altitudes and bisectors each meet in a point; G divides the medians 2 : 1 |
+
+| eulerLine(t) | O, G, H are collinear with GH = 2·OG |
+
+| ninePointCircle(t) | nine points on one circle of half the circumradius |
+
+| feuerbach(t) | the nine-point circle touches the incircle and each excircle |
+
+| napoleon(t) | centres of the outer equilateral triangles form an equilateral triangle |
+
+| ceva(t, D, E, F), menelaus(t, D, E, F) | product of signed ratios is 1 (concurrent) or −1 (collinear) |
+
+| simson(t, P) | the feet from P are collinear exactly when P is on the circumcircle |
+
+| ptolemy(A, B, C, D) | AC·BD = AB·CD + BC·DA exactly for cyclic quadrilaterals, ≤ otherwise |
+
+| thales(circle, A, B, P) | angle APB is right exactly when AB is a diameter |
+
+| powerOfPoint(circle, P, l1, l2) | PA·PB is the same on every secant and equals \|PO\|² − r² |
+
+| varignon(A, B, C, D) | midpoints of a quadrilateral form a parallelogram of half the area |
+
+| pentagon() | diagonal : side of the regular pentagon is the golden ratio |
+
+### Why Feuerbach's theorem is the hard one
+
+Two circles touch when the distance between their centres equals the sum or the difference of their radii. The nine-point circle of a rational triangle is rational, but the incentre and inradius involve the three side lengths, each a square root, so the distance is a square root of an expression in three square roots, and the test is whether that equals a difference of two more such numbers. In floating point one sees agreement to fifteen digits. Here the two sides are algebraic numbers and the equality is decided from their minimal polynomials.
+
+### Try it
+
+```js
+const t = triangle([0, 0], [4, 0], [1, 3]);
+for (const name of ["pythagoras", "heron", "concurrency", "eulerLine", "ninePointCircle", "feuerbach", "napoleon"]) {
+  const r = theorems[name](t);
+  PRINT(`${r.theorem}: ${r.statement} → ${r.holds}`);
+}
+const mids = [midpoint(t.B, t.C), midpoint(t.C, t.A), midpoint(t.A, t.B)];
+const ceva = theorems.ceva(t, ...mids);
+PRINT("Ceva with the midpoints: product", N.text(ceva.product), "concurrent", ceva.concurrent);
+const off = theorems.ceva(t, [3, 1], mids[1], [1, 0]);
+PRINT("Ceva with other points: product", N.text(off.product), "concurrent", off.concurrent, "→ the theorem still holds:", off.holds);
+
+const cut = line([-1, 1], [5, 2]);
+const men = theorems.menelaus(t, meet(cut, line(t.B, t.C)), meet(cut, line(t.C, t.A)), meet(cut, line(t.A, t.B)));
+PRINT("Menelaus for a line across the triangle: product", N.text(men.product));
+PRINT("Ptolemy, square:", theorems.ptolemy([1, 0], [0, 1], [-1, 0], [0, -1]).equal, " kite off the circle:", theorems.ptolemy([1, 0], [0, 1], [-1, 0], [0, -2]).equal);
+const g = theorems.pentagon();
+`${g.statement}: ${N.text(g.ratio)}`
+```
+
+---
+
+Page: https://ratmath.com/geo/proofs.html
+
+Topic
+
+## General proofs, by algebra
+
+A [check](https://ratmath.com/geo/theorems.html) tests a theorem on one figure. A proof here covers every figure at once: the coordinates are letters, the hypotheses and the conclusion are polynomials, and the proof is a single polynomial identity that you can multiply out yourself.
+
+Prove a theorem
+
+Theorem
+Method
+show the cofactors
+
+### From a figure to polynomials
+
+Take Thales' theorem: an angle inscribed in a semicircle is a right angle. Put the centre at the origin and the diameter along the x-axis, from A=(−r,0) to B=(r,0). Nothing is lost by this choice of axes. The third point C=(x,y) is on the circle, and that is the one hypothesis:
+
+h=x2+y2−r2=0.
+The conclusion is that CA and CB are perpendicular, so their dot product vanishes:
+
+g=(x+r)(x−r)+y⋅y=x2+y2−r2.
+Here g=h, so the conclusion follows from the hypothesis for every r, x and y. That one line is a complete proof of the theorem. Most theorems need more algebra, but the shape is the same.
+
+The coordinates come in three kinds. Some are numbers, fixed by the choice of axes. Some are parameters: r and x above, free to take any value, so that the figure is a general one. The rest are unknowns, tied to the earlier coordinates by the hypotheses: y above. Each unknown comes with one hypothesis.
+
+```js
+import { configuration } from "@ratmath/geo";
+
+const T = configuration("Thales");
+const O = T.at("O", 0, 0);
+const r = T.parameter("r");
+const A = T.at("A", r.neg(), 0);
+const B = T.at("B", r, 0);
+const C = T.on("C", (P) => T.onCircle(P, O, A));    // x free, y tied down by the circle
+const proof = T.prove(T.rightAngle(A, C, B));
+proof.proved;       // true
+proof.method;       // "wu"
+proof.replay();     // true: the identity was multiplied out again
+```
+
+### What counts as a proof
+
+Let h1​,…,hr​ be the hypotheses and g the conclusion. A proof is an identity between polynomials
+
+d⋅gk=c1​h1​+c2​h2​+⋯+cr​hr​
+with a multiplier d that is not the zero polynomial. At any figure where every hi​ is zero the right side is zero, so d⋅gk=0, and wherever d=0 that forces g=0. The identity can be checked by expanding both sides. Nothing about how it was found needs to be trusted, and `proof.replay()` does that expansion each time it is called.
+
+The multiplier matters. Its factors are the degenerate cases, the figures the proof does not cover: a triangle whose corners are in a line, two points that coincide, two lines that were supposed to meet but are parallel. A textbook proof assumes these away silently. Here they are computed, and `proof.conditions` lists them with a geometric reading where one is recognised.
+
+```js
+import { proofs } from "@ratmath/geo";
+
+const p = proofs.eulerLine().parts[0];         // O, G, H are collinear
+String(p.identity.multiplier);                 // "b·d"   for A = (0, 0), B = (b, 0), C = (c, d)
+p.identity.cofactors.map(String);              // the six cᵢ
+p.conditions.map((c) => c.meaning);            // ["A, B, C are not collinear"]
+p.explain();                                   // the whole proof as text
+```
+
+So the Euler line theorem is proved for every triangle that is not flat, which is every triangle.
+
+### Wu's method
+
+Build the figure one point at a time, and each new unknown coordinate arrives with the hypothesis that pins it down. The hypotheses are then in triangular form: h1​ involves the first unknown, h2​ the first two, and so on. Wu Wen-tsün's method divides the conclusion by the hypotheses in reverse order, each time treating the hypothesis as a polynomial in the unknown it introduced.
+
+Division by a polynomial whose leading coefficient is itself a polynomial needs pseudo-division: multiply by that leading coefficient first, so that no fractions appear.
+
+Is⋅g=q⋅h+r,degx​r<degx​h,
+where I is the leading coefficient of h as a polynomial in x. If after dividing by every hypothesis the remainder is zero, the pieces assemble into the identity above, with d a product of leading coefficients. The method is fast, because it never does more than follow the construction backwards. Every theorem in the list on this page is proved this way in a few milliseconds, except Desargues' theorem, which takes about a third of a second.
+
+When a point is given by two conditions that both involve both of its coordinates (the intersection of two lines, say), the library first eliminates one coordinate between them, again by pseudo-division, and keeps track of how the new polynomials are built from the original hypotheses, so that the final identity is still in terms of those.
+
+### The Gröbner method
+
+The second method follows Kapur. Treat the parameters as constants, that is, work with polynomials in the unknowns whose coefficients are rational functions of the parameters. The conclusion follows from the hypotheses, for general values of the parameters, exactly when
+
+1∈⟨h1​,…,hr​, 1−tg⟩
+for a new variable t. (If the hypotheses hold and g=0, the last generator is 1; if they hold and g=0, choose t=1/g. So the generators have no common zero exactly when g vanishes wherever the hypotheses do. This is Rabinowitsch's trick, the same one that proves the Nullstellensatz.) A [Gröbner basis](https://ratmath.com/structures/groebner.html) decides the question, and its cofactors, with denominators cleared and t replaced by 1/g, are the identity. The multiplier d is then a polynomial in the parameters alone, so the degenerate cases are conditions on the given points only.
+
+```js
+const w = proofs.simson({ method: "wu" });
+const k = proofs.simson({ method: "groebner" });
+[w.proved, k.proved];                          // [true, true]
+k.conditions.map((c) => c.meaning);            // ["A, B, C are not collinear", "A ≠ C", "B ≠ C"]
+[w.size.cofactorTerms, k.size.cofactorTerms];  // the two certificates differ, and both multiply out
+```
+
+The Gröbner method is complete where Wu's simple form is not: it finds a proof whenever the statement holds for general parameters. It is also much slower when the hypotheses are not linear in the unknowns, since it computes with fractions of polynomials. With `method: "auto"` (the default) Wu's method goes first; if it fails, one figure with random whole-number parameters is tried; and only if the conclusion holds at every solution of that figure is the Gröbner method run, with a time limit.
+
+### What algebra cannot see
+
+Polynomial equations do not distinguish inside from outside or one side of a line from the other. Three consequences are worth knowing.
+
+- Bisectors. The condition "equal angles" describes the internal and the external bisector together. A point on a bisector at A and a bisector at B is the incentre or one of the three excentres; tritangentCenter means all four. Theorems true of all four (the third bisector passes through, the distances to the sides are equal) are proved. Theorems true only of the incentre are not, and the report says at how many of the solutions the conclusion held.
+
+- Second intersections. "A point on this line and on this circle" has two solutions, and if one of them is already in the figure, the algebra allows the new point to be the old one. Use otherIntersection, which asks for the second point by a linear condition. The butterfly theorem is proved when stated that way and fails when stated loosely, as it should.
+
+- Complex figures. The identity holds for complex coordinates too. That is usually harmless, but it means a statement can be true of all real figures and still not provable this way, if it fails for complex ones.
+
+When no proof exists the result has `proved: false` and an `instance`: the parameters tried, the number of solutions of the hypotheses there, and at how many the conclusion holds. A statement that is simply false shows 0.
+
+```js
+const T = configuration("a false statement");
+const A = T.at("A", 0, 0), B = T.at("B", "b", 0), C = T.at("C", "c", "d");
+const M = T.midpoint("M", B, C);
+const no = T.prove(T.perpendicular(A, M, B, C));     // "every median is an altitude"
+no.proved;          // false
+no.instance;        // { parameters: { b: 14, c: 13, d: 22 }, solutions: 1, holdsAt: 0 }
+```
+
+### Stating your own theorem
+
+A configuration is built from points. The predicates return polynomials, and serve both as conditions on a new point and as conclusions.
+
+| Points | meaning |
+
+| T.at(name, x, y) | given coordinates: numbers, names of parameters (made on first use), or expressions |
+
+| T.free(name) | both coordinates are parameters |
+
+| T.on(name, P => condition, { free }) | one coordinate free, the other tied down by one condition |
+
+| T.where(name, P => [c1, c2]) | both coordinates tied down by two conditions |
+
+| T.parameter(name), T.unknown(name, v => condition) | a free number; a number defined by an equation, such as s with s² = 3 |
+
+| midpoint, intersection, foot, reflection, parallelogram | constructions: T.intersection("P", [A, B], [C, D]) |
+
+| circumcenter, orthocenter, centroid, tritangentCenter | triangle centres |
+
+| onLine, onCircumcircle, otherIntersection | points on a line or circle |
+
+| Predicates and quantities | vanishes when |
+
+| collinear(A, B, C), concurrent(l1, l2, l3) | three points on a line; three lines through a point |
+
+| parallel(A, B, C, D), perpendicular(A, B, C, D) | AB ∥ CD; AB ⊥ CD |
+
+| equidistant(P, A, B), equalLength(A, B, C, D) | \|PA\| = \|PB\|; \|AB\| = \|CD\| |
+
+| onCircle(P, O, A), concyclic(A, B, C, D), tangent(l, O, P) | circles |
+
+| rightAngle(A, B, C), equalAngle(A, B, C, D, E, F) | angles, as angles between lines |
+
+| isMidpoint(M, A, B) | two polynomials |
+
+| distance2, area2, dot, cross, equal(a, b) | build your own: T.equal(T.distance2(A, B), T.distance2(C, D).mul(4)) |
+
+### The theorems proved
+
+`provable` lists them, and `proofs.<id>(options)` proves one. `proofs.setup(id)` hands back the configuration and conclusion for inspection.
+
+| proofs.… | statement |
+
+### Try it
+
+```js
+// A theorem that is not in the list: reflect the orthocentre H in the midpoint of BC.
+// The image is on the circumcircle, and is the point opposite A.
+const T = configuration("antipode");
+const A = T.at("A", 0, 0), B = T.at("B", "b", 0), C = T.at("C", "c", "d");
+const H = T.orthocenter("H", A, B, C);
+const O = T.circumcenter("O", A, B, C);
+const M = T.midpoint("M", B, C);
+const K = T.where("K", (P) => T.isMidpoint(M, H, P), "M is the midpoint of HK");
+const proof = T.prove([T.concyclic(A, B, C, K), T.isMidpoint(O, A, K)]);
+PRINT(String(proof), " replayed:", proof.replay(), " in", proof.ms, "ms");
+PRINT("degenerate cases:", proof.conditions.map((c) => c.meaning ?? c.text).join("; "));
+PRINT(proof.parts[0].explain({ cofactors: false }));
+
+// A statement that is true of some solutions only: a centre I on two bisectors, with |IA| = |IB|.
+const U = configuration("isosceles?");
+const P = U.at("A", 0, 0), Q = U.at("B", "b", 0), R = U.at("C", "c", "d");
+const I = U.tritangentCenter("I", P, Q, R);
+const bad = U.prove(U.equidistant(I, P, Q));
+PRINT(String(bad), JSON.stringify(bad.instance));
+
+// Every theorem in the library, with its method and time
+proofs.all().map(({ name, proof }) => `${name}: ${proof.proved ? "proved" : "NOT proved"} (${proof.method}, ${proof.ms} ms)`)
+```
+
+---
+
+Page: https://ratmath.com/geo/computational.html
+
+Topic
+
+## Hulls, triangulations and Voronoi diagrams
+
+The algorithms of computational geometry are built from two questions: is this a left turn, and is this point inside that circle? Asked in floating point they sometimes get the wrong answer, and the algorithm then loops or returns nonsense. Asked exactly they cannot.
+
+```js
+convexHull(points);                       // counter-clockwise, edge points dropped
+const p = polygon([[0, 0], [4, 0], [4, 3], [2, 1], [0, 3]]);
+p.area; p.centroid; p.isSimple(); p.isConvex();
+p.locate([2, 1]);                         // "boundary": decided exactly
+p.triangulate();                          // [[1, 2, 3], [0, 1, 3], [0, 3, 4]]
+p.clip([[1, 1], [5, 1], [5, 5], [1, 5]]); // intersection with a convex polygon
+delaunay(points);                         // { points, triangles, edges, cocircular }
+voronoi(points);                          // { vertices, cells, edges }
+```
+
+### The two predicates
+
+Orientation. For points p, q, r the sign of the cross product (q−p)×(r−p) is +1 for a left turn, −1 for a right turn and 0 when the three are collinear. Convex hulls, segment intersection and point-in-polygon tests use nothing else.
+
+In-circle. Whether d is inside the circle through a, b, c is the sign of a 3×3 determinant in the coordinates. Delaunay triangulations are defined by it: no point may lie inside the circle through the corners of any triangle.
+
+Both are signs of polynomials, and with rational coordinates they are computed without error. The value 0 (three points on a line, four on a circle) is a real answer here and is handled as a case: the hull drops points on its edges, `locate` answers `"boundary"`, and `delaunay` reports `cocircular: true` when the triangulation is not unique.
+
+### Polygons
+
+The area is the shoelace formula and the centroid its companion, both exact. `isSimple()` tests every pair of edges for crossings. `triangulate()` clips ears: a corner whose triangle contains no other vertex is cut off, and this repeats. `clip(convex)` cuts the polygon by each edge of a convex polygon in turn (Sutherland and Hodgman's method); the new corners are intersections of lines with rational coefficients, so they are rational.
+
+### Delaunay and Voronoi
+
+`delaunay` adds the points one at a time: the triangles whose circles contain the new point are removed and the hole is re-triangulated from the new point (Bowyer and Watson's method). `voronoi` is the dual picture: each point's cell is the set of places nearer to it than to any other point, and its corners are the circumcentres of the Delaunay triangles around that point, which are rational when the points are. Cells of points on the hull are unbounded; their open edges are returned as rays.
+
+| call | returns |
+
+| convexHull(points) | Point[] |
+
+| segmentIntersection(a, b, c, d), onSegment(a, b, p) | { meets, kind, point }; boolean |
+
+| polygon(vertices) | Polygon: area, signedArea, perimeter, centroid, edges |
+
+| p.isSimple(), p.isConvex(), p.locate(q), p.contains(q) | "inside" \| "boundary" \| "outside" |
+
+| p.triangulate(), p.clip(convex) | index triples; Polygon or null |
+
+| inCircle(a, b, c, d) | 1 inside, 0 on, −1 outside |
+
+| delaunay(points) | { points, triangles, edges, cocircular } |
+
+| voronoi(points) | { points, vertices, cells: [{ site, corners, bounded }], edges } |
+
+| closestPair(points) | { points, distance, distance2 } |
+
+### Try it
+
+```js
+const pts = [[0, 0], [4, 0], [0, 3], [4, 3], [2, 1], [1, 2], [3, 5], [2, 0]];
+PRINT("hull:", convexHull(pts).join(" "));
+const d = delaunay(pts);
+PRINT("Delaunay triangles:", d.triangles.map((t) => t.join("-")).join("  "), " cocircular:", d.cocircular);
+const empty = d.triangles.every(([a, b, c]) => d.points.every((p, i) => [a, b, c].includes(i) || inCircle(d.points[a], d.points[b], d.points[c], p) <= 0));
+PRINT("every circle is empty:", empty);
+const v = voronoi(pts);
+for (const cell of v.cells.filter((c) => c.bounded)) PRINT("cell of", String(cell.site), "has corners", cell.corners.join(" "));
+
+const p = polygon([[0, 0], [4, 0], [4, 3], [2, 1], [0, 3]]);
+PRINT("area", N.text(p.area), " centroid", String(p.centroid), " simple", p.isSimple(), " convex", p.isConvex());
+PRINT("(2, 1) is", p.locate([2, 1]), " (2, 2) is", p.locate([2, 2]), " (1, 1) is", p.locate([1, 1]));
+PRINT("triangles:", p.triangulate().map((t) => t.join("-")).join("  "));
+PRINT("a square's Delaunay triangulation is not unique:", delaunay([[0, 0], [1, 0], [0, 1], [1, 1]]).cocircular);
+String(p.clip([[1, 1], [5, 1], [5, 5], [1, 5]]))
+```
+
+---
+
+Page: https://ratmath.com/geo/lattice.html
+
+Topic
+
+## Lattice points and Pick's theorem
+
+The points with whole-number coordinates form a lattice, and polygons with corners on it have areas that can be found by counting.
+
+```js
+pick([[0, 0], [5, 0], [0, 5]]);     // { area: 25/2, interior: 6, boundary: 15, formula: 25/2, holds: true }
+latticePointsOn([0, 0], [6, 4]);    // 3: the ends and (3, 2)
+isVisible(3, 5);                    // true: gcd(3, 5) = 1
+visiblePoints(100);                 // { count: 6087, share: 6087/10000, … }
+```
+
+### Pick's theorem
+
+For a polygon whose corners are lattice points and whose edges do not cross, with I lattice points strictly inside and B on the boundary,
+
+area=I+2B​−1.
+`pick` finds the three quantities independently, so that `holds` is a check and not a restatement. The area comes from the shoelace formula. B comes from the edges: the segment from (0, 0) to (a, b) passes through gcd(a, b) + 1 lattice points, since the first one after the origin is (a/g, b/g). I is counted by testing every lattice point of the bounding box with the exact point-in-polygon test.
+
+The theorem fails for polygons with holes and has no analogue in three dimensions: a tetrahedron with corners (0,0,0), (1,0,0), (0,1,0), (1,1,n) contains no other lattice points, yet its volume n/6 can be as large as you like.
+
+### Visible points
+
+From the origin, the lattice point (x, y) is visible when no other lattice point lies on the segment to it, which is when gcd(x, y) = 1. The share of visible points in a large square tends to
+
+ζ(2)1​=π26​≈0.6079,
+because two numbers avoid sharing the prime factor p with probability 1−1/p2, and the product of these over all primes is 1/ζ(2). `visiblePoints(n)` gives the exact count in the n by n square and its share as a fraction; that the share approaches 6/π2 is a limit it illustrates and does not prove.
+
+| call | returns |
+
+| pick(vertices \| polygon) | { area, interior, boundary, formula, holds } |
+
+| latticePointsOn(p, q) | number of lattice points on the closed segment |
+
+| isVisible(x, y) | boolean |
+
+| visiblePoints(n) | { n, count, share, limit } |
+
+### Try it
+
+```js
+for (const v of [[[0, 0], [5, 0], [0, 5]], [[0, 0], [4, 0], [4, 3], [2, 1], [0, 3]], [[0, 0], [7, 1], [9, 6], [3, 8], [-2, 4]]]) {
+  const r = pick(v);
+  PRINT(`area ${N.text(r.area)} = ${r.interior} + ${r.boundary}/2 − 1 = ${N.text(r.formula)}  → ${r.holds}`);
+}
+PRINT("lattice points from (0,0) to (12, 18):", latticePointsOn([0, 0], [12, 18]));
+for (const n of [10, 100, 1000]) {
+  const v = visiblePoints(n);
+  PRINT(`n = ${n}: ${v.count} visible, share ${v.share.toNumber().toFixed(4)}`);
+}
+"6/π² = " + (6 / Math.PI ** 2).toFixed(6)
+```
+
+---
+
+Page: https://ratmath.com/geo/metrics.html
+
+Topic
+
+## Other ways to measure distance
+
+Change how distance is measured and the plane is the same set of points with a different geometry. In a city of square blocks the distance that matters is ∣dx∣+∣dy∣, and circles turn into squares.
+
+```js
+const taxi = metric("taxicab");          // also "chebyshev" (max(|dx|, |dy|)) and "euclidean"
+taxi.distance([0, 0], [3, 4]);           // 7
+taxi.circle([0, 0], 2);                  // the corners (2,0), (0,2), (−2,0), (0,−2)
+taxi.pi;                                 // 4
+taxi.bisector([0, 0], [4, 2]);           // a bent line: { segments, rays, regions, kind }
+taxi.ellipse([0, 0], [4, 0], 6);         // six corners
+```
+
+### Circles and π
+
+A circle is the set of points at a fixed distance from a centre. In the taxicab metric ∣x∣+∣y∣=r is a square standing on a corner; in the Chebyshev metric max(∣x∣,∣y∣)=r is a square with level sides. Measuring the circumference in the same metric and dividing by the diameter gives 4 in both, so "π = 4" there. The two metrics are in fact the same geometry turned by 45° and rescaled, and `ellipse` for the Chebyshev metric is computed through that change of coordinates.
+
+### Bisectors
+
+The points equally far from P and Q form a straight line in Euclid's geometry. In taxicab geometry the middle part is a segment of slope ±1, and it continues from each end as a vertical ray (when P and Q are further apart sideways than up and down) or a horizontal one. When ∣dx∣=∣dy∣ something stranger happens: beyond each end of the diagonal segment an entire quarter of the plane is equidistant from the two points. `bisector` returns the segment, the rays and, in that case, the two regions by their corner and bounding directions.
+
+One consequence: the theorem that three points not on a line have exactly one point equidistant from all of them fails. Three such points can have none, or infinitely many.
+
+### Ellipses
+
+The points whose distances to two foci add up to a constant form a hexagon or an octagon. `ellipse` returns its corners, found exactly: the sum of distances is a convex function that is linear between the vertical and horizontal lines through the foci, so the corners lie on those lines.
+
+### Side-angle-side fails
+
+Congruence fails too. The triangle (0,0), (2,0), (0,2) and the triangle (0,0), (1,1), (1,−1) each have two sides of taxicab length 2 from the origin with a right angle between them, yet the third sides have taxicab lengths 4 and 2. Side-angle-side is not a theorem here, and taxicab geometry is the standard example of a geometry that satisfies Euclid's other axioms without it.
+
+| call | returns |
+
+| metric(name).distance(p, q) | exact number |
+
+| .circle(centre, r) | the four corners |
+
+| .pi | circumference ÷ diameter in that metric |
+
+| .bisector(p, q) (taxicab) | { segments, rays, regions, kind } |
+
+| .ellipse(f1, f2, sum) | the corners, counter-clockwise |
+
+### Try it
+
+```js
+const taxi = metric("taxicab");
+const cheb = metric("chebyshev");
+const eu = metric("euclidean");
+PRINT("from (0,0) to (3,4): taxicab", N.text(taxi.distance([0, 0], [3, 4])), " Chebyshev", N.text(cheb.distance([0, 0], [3, 4])), " Euclid", N.text(eu.distance([0, 0], [3, 4])));
+PRINT("taxicab circle:", taxi.circle([0, 0], 2).join(" "), "  π =", N.text(taxi.pi));
+const b = taxi.bisector([0, 0], [4, 2]);
+PRINT("bisector of (0,0) and (4,2):", b.kind + ":", "segment", b.segments[0].join(" to "), "then rays", b.rays.map((r) => `from ${r.from} towards ${r.direction}`).join(" and "));
+PRINT("bisector of (0,0) and (2,2):", taxi.bisector([0, 0], [2, 2]).kind);
+PRINT("ellipse, foci (0,0) and (4,0), sum 6:", taxi.ellipse([0, 0], [4, 0], 6).join(" "));
+PRINT("ellipse, foci (0,0) and (2,2), sum 6:", taxi.ellipse([0, 0], [2, 2], 6).join(" "));
+// side-angle-side fails: two triangles with a right angle between sides of taxicab length 2
+const d = (p, q) => N.text(taxi.distance(p, q));
+`third sides: ${d([2, 0], [0, 2])} and ${d([1, 1], [1, -1])}`
+```
+
+---
+
+Page: https://ratmath.com/geo/spherical.html
+
+Topic
+
+## Spherical geometry
+
+On a sphere the straight lines are the great circles. Any two of them cross, the angles of a triangle add up to more than two right angles, and the surplus is the triangle's area. Here the points have exact coordinates, so those statements are equalities, not measurements.
+
+```js
+const A = spoint(1, 0, 0), B = spoint(1, 1, 0), C = spoint(1, 1, 1);   // any non-zero vector, scaled onto the sphere
+A.distanceTo(B).text;                     // "π/4": the distance is the angle between them
+const t = striangle(A, B, C);
+[t.angles.A.text, t.angles.B.text, t.angles.C.text];   // ["π/4", "π/2", "π/3"]
+t.excess.text;                            // "π/12": the angle sum is π + π/12
+String(t.fractionOfSphere);               // "1/48"
+t.checks().all;                           // true: every law of spherical trigonometry, exactly
+greatCircle(A, B).meet(greatCircle(A, C));   // two opposite points: there are no parallels
+```
+
+### Points and distance
+
+A point is a unit vector (x,y,z) with x2+y2+z2=1, and the coordinates are exact real algebraic numbers. `spoint(1, 1, 1)` scales a vector onto the sphere, giving (33​​,33​​,33​​); `latLon(lat, lon)` takes a latitude and longitude as fractions of a full turn; and `fromStereographic([X, Y])` lifts a point of the plane, which turns rational points of the plane into rational points of the sphere, such as (4936​,4924​,−4923​).
+
+The distance between two points is the angle between the vectors, measured along the great circle through them, and its cosine is the dot product:
+
+cosd(P,Q)=P⋅Q.
+The cosine is exact. The distance itself is an `Angle`.
+
+### Angles that are, and are not, fractions of π
+
+An `Angle` keeps its cosine and sine exactly. Its `turns` is the angle as a fraction of a full turn when it is a rational multiple of π, and `null` when it is not, and the answer is decided, not guessed. The reason it can be decided: cos(2πk/n) is an algebraic number of degree φ(n)/2 (Euler's function), so the degree of a cosine leaves only finitely many denominators n to try, and each is tested with an exact equality. In particular a rational cosine can only be 0,±21​,±1 (Niven's theorem), so the angle with cosine 31​ is not a rational multiple of π, and the library says so with a proof behind it.
+
+When the angle is such a multiple, `text` is of the form "π/12". Otherwise `value(digits)` gives an interval of radians that contains it. Angles add as real numbers (a float tracks which turn the sum is on), so an angle sum of 13π/12 is that and not the same thing modulo 2π.
+
+### Great circles
+
+A great circle is where a plane through the centre cuts the sphere. It is kept as a vector n normal to that plane: the circle is {P:n⋅P=0}. Through two points that are neither equal nor opposite there is exactly one, with n=P×Q. Two great circles always meet, in the two opposite points ±n1​×n2​. So on the sphere there are no parallel lines, and two "lines" meet twice, which is why two points do not always determine a line: through two opposite points there are infinitely many, and `greatCircle` refuses them.
+
+### Triangles and their excess
+
+Three points not on one great circle make a triangle. Its sides a,b,c are angles (the distances between the vertices), and its angles A,B,C are the angles between the planes of the sides. Their sum is always more than π, and the surplus
+
+E=A+B+C−π
+is the spherical excess. Girard's theorem says the area of the triangle on the unit sphere is exactly E. The octant triangle with vertices on the three axes has three right angles, excess π/2, and covers one eighth of the sphere's 4π. The triangle in the example at the top has angles π/4,π/2,π/3 and covers one forty-eighth: the 48 symmetries of a cube move it over the whole sphere.
+
+When the angles are not fractions of π the excess usually is not one either, and it comes as an enclosure. `checks()` also tests it against a formula that needs no angles at all,
+
+tan2E​=1+A⋅B+B⋅C+C⋅A∣A⋅(B×C)∣​,
+as an exact equality of algebraic numbers.
+
+### Spherical trigonometry
+
+The plane's law of cosines has two forms on the sphere:
+
+cosa=cosbcosc+sinbsinccosA,cosA=−cosBcosC+sinBsinCcosa.
+The second has no counterpart in the plane: it gives the sides from the angles, so on a sphere there are no similar triangles of different sizes. The law of sines is sinA/sina=sinB/sinb=sinC/sinc. The polar triangle, whose vertices are the poles of the sides, has sides π−A,π−B,π−C. `checks()` tests all of these on the triangle given, each as an exact equality.
+
+### Circles
+
+A circle of radius r (an angle) about a point has circumference 2πsinr and encloses a cap of area 2π(1−cosr): both less than the plane's 2πr and πr2. They come as exact multiples of π: the circle of radius π/6 has circumference exactly π and area (2−3​)π.
+
+### Isometries
+
+The isometries of the sphere are the orthogonal 3 × 3 matrices. `srotation(axis, turns)` is the rotation about an axis, and `classify()` reads any isometry back: by Euler's theorem every isometry that keeps orientation is a rotation about some axis, so the product of two rotations about different axes is a third rotation, and the library finds its axis and angle exactly. The ones that reverse orientation are reflections in great circles and rotary reflections, the antipodal map among them.
+
+| call | returns |
+
+| spoint(x, y, z), latLon(lat, lon), fromStereographic(p), northPole() | SPoint: x, y, z, antipode, distanceTo, dot, latLon, stereographic |
+
+| greatCircle(P, Q), greatCircle(pole), equator() | GreatCircle: contains, side, poles, meet, angleWith, perpendicularThrough, distanceTo, reflection, parallelsThrough |
+
+| striangle(A, B, C) | STriangle: sides, angles, angleSum, excess, area, fractionOfSphere, perimeter, polar, classify(), checks() |
+
+| scircle(centre, point \| { radius } \| { cos }) | SCircle: radius, circumference, area, contains, isGreat |
+
+| srotation(axis, turns), antipodalMap(), circle.reflection | SIsometry: apply, then, inverse, classify() |
+
+| angle(turns \| { cos } \| { cos, sin }), Angle | cos, sin, turns, text, degrees, value(digits), add, sub, equals |
+
+| turnsOfCos(c), piTimes(k), lune(angle) | The fraction of a turn with that cosine, or null; π times an exact number; a lune's area |
+
+### Try it
+
+```js
+const t = striangle([1, 0, 0], [1, 1, 0], [1, 1, 1]);
+PRINT("angles:", t.angles.A.text, t.angles.B.text, t.angles.C.text, "  sides:", t.sides.a.text, t.sides.b.text, t.sides.c.text);
+PRINT("excess:", t.excess.text, "  share of the sphere:", String(t.fractionOfSphere));
+PRINT("laws:", JSON.stringify(t.checks()));
+// a triangle with no nice angle: still exact cosines, and the excess enclosed
+const u = striangle([1, 2, 2], [2, -1, 2], [0, 0, 1]);
+PRINT("cos A =", N.text(u.angles.A.cos), " A =", u.angles.A.text, " a fraction of π?", u.angles.A.isRational);
+PRINT("excess in", u.excess.value(15).low.toDecimal(15), "…, laws hold:", u.checks().all);
+// Niven: the angle with cosine 1/3 is not a rational multiple of π
+PRINT("turnsOfCos(1/2) =", String(turnsOfCos("1/2")), "  turnsOfCos(1/3) =", String(turnsOfCos("1/3")));
+// two quarter turns about different axes make a third of a turn
+const r = srotation([0, 0, 1], "1/4").then(srotation([1, 0, 0], "1/4"));
+PRINT(String(r));
+const c = scircle([0, 0, 1], { radius: "1/12" });
+`circle of radius π/6: circumference ${c.circumference.text}, area ${c.area.text}`
+```
+
+---
+
+Page: https://ratmath.com/geo/hyperbolic.html
+
+Topic
+
+## The hyperbolic plane
+
+In the hyperbolic plane, through a point off a line there are infinitely many lines that never meet it. The plane cannot be drawn in ours without distortion, so it is drawn in models, each wrong in a different way. Here a point is one exact object and the models are four views of it.
+
+```js
+const p = hpoint("1/2", 0);                // coordinates in the Poincaré disc
+p.klein;  p.halfPlane;  p.hyperboloid;     // (4/5, 0)   (0, 3)   [5/3, 4/3, 0]
+horigin().distanceTo(p).text;              // "ln(3)"
+const l = hline(["1/2", 0], [0, "1/2"]);
+String(l.disc);                            // "circle, centre (5/4, 5/4), radius √34/4"
+String(l.klein);                           // "5·x + 5·y - 4 = 0": a straight chord
+const axis = hline(ideal(-1, 0), ideal(1, 0));
+axis.parallelsThrough([0, "1/2"]).angle;   // the angle of parallelism, cosine 4/5
+```
+
+### Four models, one point
+
+The model that makes the algebra simple is the hyperboloid: the points (t,x,y) with t2−x2−y2=1 and t>0. With the form
+
+B(p,q)=p0​q0​−p1​q1​−p2​q2​
+it behaves like a sphere of radius i: the distance is given by coshd(p,q)=B(p,q), a line is {p:B(n,p)=0} for a vector n, and the isometries are the matrices that keep B. The library keeps every point there. The other three are views:
+
+- The Poincaré disc, (x,y)/(1+t). Angles are true to the eye; lines are arcs of circles that meet the boundary at right angles, or diameters.
+
+- The Klein disc, (x,y)/t. Lines are straight chords, so incidence looks Euclidean; angles are distorted.
+
+- The half-plane, the Poincaré disc under z↦i1−z1+z​. Lines are half-circles centred on the real axis, or vertical lines.
+
+The maps between the hyperboloid, the Poincaré disc and the half-plane are rational, so a point with rational coordinates in one has them in the others: (½, 0) in the disc is (0, 3) in the half-plane and (5/3, 4/3, 0) on the hyperboloid. Going to and from the Klein disc needs one square root in one direction. `hpoint(x, y)` takes Poincaré disc coordinates; `fromKlein`, `fromHalfPlane` and `fromHyperboloid` take the others; and every point has `.disc`, `.klein`, `.halfPlane` and `.hyperboloid`.
+
+The boundary circle is not part of the plane. Its points are the ideal points, the directions in which a line can leave: `ideal(x, y)`, or `ideal("1/8")` at an angle given as a fraction of a turn.
+
+### Distance
+
+A distance is a `Length`. It holds coshd and sinhd exactly, so ed=coshd+sinhd is an exact algebraic number and the distance is its logarithm: from the centre of the disc to (½, 0) is exactly ln3, and `value(digits)` encloses it. Lengths add exactly, by the addition formulas for cosh and sinh. Near the boundary the disc's scale shrinks without limit: the point at Euclidean radius r is at distance ln1−r1+r​ from the centre.
+
+### Lines, and three ways for two of them to lie
+
+Through two points there is one line, `hline(a, b)`; either point may be ideal. A line has two `ends`, and its shape in each model is available as an exact circle or line of the plane.
+
+For two lines with normals n1​,n2​, compare B(n1​,n2​)2 with B(n1​,n1​)B(n2​,n2​). `relation` reports which case holds:
+
+- intersecting (less): they cross in one point, at an angle with exact cosine;
+
+- asymptotic (equal): they share an end and come arbitrarily close without meeting;
+
+- ultraparallel (more): they have exactly one common perpendicular, and its length, the shortest distance between them, has coshd=∣B(n1​,n2​)∣/B(n1​,n1​)B(n2​,n2​)​.
+
+### Parallels and the angle of parallelism
+
+Take a line and a point P at distance d from it. The two lines from P to the ends of the line are the limiting parallels. Every line through P between them misses the given line, so there are infinitely many parallels. The limiting ones make an angle Π(d) with the perpendicular from P, the angle of parallelism, and Lobachevsky's formula for it becomes an exact statement about a cosine:
+
+cosΠ(d)=tanhd.
+As d→0 the angle tends to a right angle, the Euclidean answer; as d grows it tends to 0. At distance ln3​ it is exactly 60°, and `parallelsThrough` returns it as the angle π/3. See [the parallel postulate](https://ratmath.com/geo/parallel-postulate.html) for the same question in every geometry of the package.
+
+### Circles and horocycles
+
+A circle of radius r has circumference 2πsinhr and area 2π(coshr−1), both more than in the plane and growing exponentially. They are exact multiples of π: the circle of radius ln3 has circumference 38​π and area 34​π. In the Poincaré disc a hyperbolic circle is a Euclidean circle, but its centre is somewhere else; `circle.disc` gives it. A horocycle is the limit of circles through a point as the centre goes off to an ideal point: in the disc, a circle touching the boundary.
+
+| call | returns |
+
+| hpoint(x, y), fromKlein, fromHalfPlane, fromHyperboloid, horigin() | HPoint: disc, klein, halfPlane, hyperboloid, distanceTo |
+
+| ideal(x, y), ideal(turns) | HIdeal: disc, halfPlane (a number, or null for the point at infinity) |
+
+| hline(a, b), hbisector(a, b), hmidpoint(a, b) | HLine: contains, side, ends, disc, klein, halfPlane, distanceTo, foot, perpendicularThrough, relation, meets, reflection, parallelsThrough |
+
+| hcircle(centre, point \| { cosh } \| { exp }), horocycle(ideal, p) | HCircle: radius, circumference, area, disc, contains |
+
+| Length.ofCosh(c), Length.ofExp(e), Length.ofSinh(s) | Length: cosh, sinh, exp, tanh, text, value(digits), add, double, half, equals |
+
+| hyperbolicFigure(items, { model }) | A figure in the Poincaré disc, the Klein disc or the half-plane |
+
+### Try it
+
+```js
+const p = hpoint("1/2", 0), q = hpoint(0, "1/2");
+PRINT("disc", String(p.disc), " Klein", String(p.klein), " half-plane", String(p.halfPlane), " hyperboloid", p.hyperboloid.map((c) => N.text(c)).join(", "));
+PRINT("distance p to q:", p.distanceTo(q).text, "=", p.distanceTo(q).value(15).low.toDecimal(15), "…");
+const l = hline(p, q);
+PRINT("the line pq: in the disc a", String(l.disc), "; in Klein", String(l.klein), "; in the half-plane a", String(l.halfPlane));
+const axis = hline(ideal(-1, 0), ideal(1, 0));
+const far = hline(ideal("3/5", "4/5"), ideal("-3/5", "4/5"));
+const r = axis.relation(far);
+PRINT("axis and the chord y = 4/5:", r.kind, "at distance", r.distance.text);
+const P = hpoint(0, "1/2");
+const par = axis.parallelsThrough(P);
+PRINT("through", String(P), ": limiting parallels", par.limiting.map((m) => axis.relation(m).kind).join(", "), "; angle of parallelism has cosine", N.text(par.angle.cos), "= tanh", par.distance.text);
+const c = hcircle([0, 0], { exp: 3 });
+PRINT("circle of radius ln 3: circumference", c.circumference.text, " area", c.area.text);
+SHOW(figureSVG(hyperbolicFigure([axis, ...par.limiting, par.ultraparallel, far, P], { model: "disc" }), { width: 320, height: 320 }));
+SHOW(figureSVG(hyperbolicFigure([axis, ...par.limiting, par.ultraparallel, far, P], { model: "klein" }), { width: 320, height: 320 }));
+```
+
+---
+
+Page: https://ratmath.com/geo/hyperbolic-triangles.html
+
+Topic
+
+## Hyperbolic triangles, motions and tilings
+
+The angles of a hyperbolic triangle add up to less than two right angles, and what is missing is its area. So no triangle, however long its sides, has area more than π. Regular polygons can have any small enough angle, which is why seven-sided tiles can meet three at a corner.
+
+```js
+const t = htriangle([0, 0], ["1/2", 0], [0, "1/2"]);
+t.angles.A.text;                  // "π/2"
+t.defect;                         // π − (A + B + C): the area
+t.checks().all;                   // true: the laws of hyperbolic trigonometry, exactly
+htriangle(ideal(1, 0), ideal(0, 1), ideal(-1, 0)).area.text;   // "π": the largest a triangle can be
+hrotation(["1/2", 0], "1/6").classify();        // { kind: "rotation", center, angle: π/3 }
+htranslation([0, 0], ["1/2", 0]).classify();    // { kind: "translation", axis, length: ln(3) }
+hyperbolicTiling(7, 3).patch(4).counts;         // [1, 7, 21, 56, 147]
+```
+
+### Triangles and their defect
+
+For a triangle with angles A,B,C, the defect is π−(A+B+C). It is always positive, and by Gauss's theorem it is the area. A vertex may be an ideal point: the two sides that run to it are infinitely long and asymptotic, and the angle there is 0. A triangle with all three vertices ideal has defect, and area, exactly π, and every such triangle is congruent to every other.
+
+The angle at a vertex has an exact cosine, computed from the tangent vectors there; the sides have exact cosh. As on the [sphere](https://ratmath.com/geo/spherical.html), whether an angle or the defect is a rational multiple of π is decided, and otherwise it is enclosed.
+
+### Hyperbolic trigonometry
+
+Replace the sphere's cos and sin of a side by cosh and sinh:
+
+cosha=coshbcoshc−sinhbsinhccosA,cosA=−cosBcosC+sinBsinCcosha,
+sinhasinA​=sinhbsinB​=sinhcsinC​.
+For a right angle at A the first is Pythagoras' theorem here: cosha=coshbcoshc. The second says the three angles determine the sides, so there are no similar triangles: a shape has one size. `checks()` tests all three laws on the triangle given, each as an exact equality.
+
+### Isometries
+
+An isometry is a 3 × 3 matrix that keeps the form B and the upper sheet of the hyperboloid. `line.reflection`, `hrotation(centre, turns)`, `hhalfTurn(centre)` and `htranslation(a, b)` build them, `then` composes them, and they act on points, ideal points, lines, triangles and circles. `classify()` reads any isometry back. The ones that keep orientation come in three kinds, told apart by the trace:
+
+- a rotation about a point (trace less than 3), with its centre and angle;
+
+- a parabolic map (trace exactly 3), which fixes one ideal point and no point of the plane: what a rotation becomes when its centre goes to infinity;
+
+- a translation along a line (trace more than 3), with its axis and length. Only the axis is moved along itself; points off it travel along curves at a fixed distance from it, which are not lines.
+
+Those that reverse orientation are reflections and glide reflections. Every isometry is a product of at most three reflections, and the kind of a product of two is the relation of the two mirrors: intersecting mirrors give a rotation, asymptotic ones a parabolic map, ultraparallel ones a translation along the common perpendicular, by twice the distance between them.
+
+`toMobius()` gives the same map of the Poincaré disc as a Möbius map z↦cz+daz+b​ with exact complex coefficients, each a pair [re, im]. The translation taking 0 to ½ is z↦21​z+1z+21​​. The coefficients can be handed to the complex package's Möbius maps.
+
+### Regular tilings
+
+The symbol {p,q} means regular p-gons, q around each vertex, so each corner has angle 2π/q. A Euclidean regular p-gon has corner angle π−2π/p, and comparing the two sorts every symbol into one of three geometries:
+
+(p−2)(q−2)⎩⎨⎧​<4=4>4​sphere: the five Platonic solidsplane: {4,4}, {3,6}, {6,3}hyperbolic plane: all the rest​
+On the sphere and in the hyperbolic plane the corner angle fixes the size of the tile, and `schlafli(p, q)` gives it exactly: for the hyperbolic ones,
+
+cosh2s​=sin(π/q)cos(π/p)​,coshR=cotpπ​cotqπ​,area=π(p−2−q2p​),
+for the side s and the circumradius R. Every tile of {7,3} has area exactly π/3.
+
+`hyperbolicTiling(p, q)` places one tile at the centre of the disc with exact vertices; `check()` confirms, exactly, that its corner angle is 2π/q and its side is the one above (for {7, 3} the numbers have high degree and this takes several seconds). `patch(n)` grows the tiling outward by reflecting in sides, in floats and labelled `kind: "float"`, and counts the tiles at each step. The counts grow exponentially, as areas do in this plane.
+
+| call | returns |
+
+| htriangle(A, B, C) | HTriangle: sides, angles, angleSum, defect, area, lines, idealVertices, checks() |
+
+| line.reflection, hrotation(c, turns), hhalfTurn(c), htranslation(a, b) | HIsometry: apply, then, inverse, preservesOrientation, classify(), toMobius() |
+
+| schlafli(p, q) | { geometry, interiorAngle, tileArea, edge, circumradius, inradius }, and for the sphere the solid with its faces, vertices and edges |
+
+| hyperbolicTiling(p, q) | The same, with tile (exact vertices), discRadius, check(), patch(layers) |
+
+| hyperbolicTilingFigure(p, q, { layers, model }) | A figure of the tiling in the Poincaré or Klein disc |
+
+### Try it
+
+```js
+const t = htriangle([0, 0], ["1/2", 0], [0, "1/2"]);
+PRINT("angles:", t.angles.A.text, t.angles.B.text, t.angles.C.text, "  defect = area:", t.defect.text);
+PRINT("sides:", t.sides.a.text, t.sides.b.text, t.sides.c.text, "  laws:", JSON.stringify(t.checks()));
+PRINT("ideal triangle: area", htriangle(ideal(1, 0), ideal(0, 1), ideal(-1, 0)).area.text);
+const r = hrotation(["1/2", 0], "1/6");
+const tr = htranslation([0, 0], ["1/2", 0]);
+PRINT(String(r));
+PRINT(String(tr));
+PRINT("rotation then translation:", String(r.then(tr)), "(cos 60° = tanh(ln √3), so the mirrors are asymptotic)");
+const m = tr.toMobius();
+PRINT("as a Möbius map: a =", m.a.map((c) => N.text(c)).join(" + i·"), " b =", m.b.map((c) => N.text(c)).join(" + i·"), " c =", m.c.map((c) => N.text(c)).join(" + i·"), " d = 1");
+for (const [p, q] of [[5, 3], [4, 4], [5, 4], [7, 3]]) {
+  const s = schlafli(p, q);
+  PRINT(s.symbol, s.geometry, s.solid ?? "", s.tileArea ? "tile area " + s.tileArea.text : "", s.edge ? "edge " + s.edge.text : "");
+}
+const T = hyperbolicTiling(5, 4);
+PRINT("{5, 4}: right-angled pentagons; exact check", JSON.stringify(T.check()), " tiles by step:", T.patch(3).counts.join(", "));
+SHOW(figureSVG(hyperbolicTilingFigure(7, 3, { layers: 4 }), { width: 360, height: 360 }));
+```
+
+---
+
+Page: https://ratmath.com/geo/parallel-postulate.html
+
+Topic
+
+## The parallel postulate
+
+Through a point not on a line, how many lines never meet it? Euclid needed the answer to be one, and for two thousand years people tried to prove it from his other postulates. It cannot be proved, because there are geometries where everything else holds and the answer is different. Here are five, with the count made exactly in each.
+
+```js
+parallelPostulate().map((r) => [r.geometry, r.parallels]);
+// Euclidean plane                           exactly one
+// sphere                                    none
+// hyperbolic plane                          infinitely many
+// affine plane over the field with 3 elements   exactly one
+// Fano plane (projective, 7 points)         none
+```
+
+### The postulate
+
+Euclid's fifth postulate is about two lines cut by a third. The form used now is Playfair's: through a point not on a given line there is exactly one line that does not meet it. "At least one" follows from Euclid's other postulates; the content is "at most one". It is equivalent to the angles of a triangle adding up to two right angles, to the existence of similar triangles of different sizes, and to Pythagoras' theorem.
+
+### One: the Euclidean plane, and finite affine planes
+
+In the plane, `parallelThrough(l, P)` is the one parallel, and any other line through P meets l in a point that `meet` finds exactly. The same holds in a world with nine points: in the [affine plane](https://ratmath.com/geo/finite-geometries.html) over the field with three elements, every line has 3 points, and for each of the 12 lines and each of the 6 points off it there is exactly one line through the point that shares no point with the line. The row for it is checked for every such pair.
+
+### None: the sphere and projective planes
+
+On the [sphere](https://ratmath.com/geo/spherical.html) two great circles always cross, so there are no parallels at all. The price is that two lines meet twice, and that Euclid's first postulate fails for opposite points. Identify each point with its opposite and that is repaired: the result is the [projective plane](https://ratmath.com/geo/projective.html), where two lines meet exactly once. Its smallest relative is the [Fano plane](https://ratmath.com/geo/finite-geometries.html), seven points and seven lines, any two of which meet.
+
+With no parallels, the angles of a triangle add up to more than two right angles, and the surplus is the area.
+
+### Infinitely many: the hyperbolic plane
+
+In the [hyperbolic plane](https://ratmath.com/geo/hyperbolic.html) all of Euclid's other postulates hold, and through a point off a line there are two limiting parallels and infinitely many lines between them, none meeting the line. The row for it builds three different lines through the point (the two limiting parallels and one ultraparallel) and verifies exactly that each passes through the point and misses the line. The models inside the Euclidean plane are what show the fifth postulate cannot be proved: a proof would hold in the model too, where the postulate is false.
+
+With many parallels, the angles of a triangle add up to less than two right angles, and the shortfall is the area.
+
+| geometry | parallels | angle sum of a triangle | circumference of a circle |
+
+| sphere | none | more than π; the excess is the area | 2πsinr |
+
+| Euclidean plane | exactly one | π | 2πr |
+
+| hyperbolic plane | infinitely many | less than π; the defect is the area | 2πsinhr |
+
+### What the function returns
+
+`parallelPostulate({ q })` returns one row per geometry: `geometry`, `parallels`, `count`, an `example` with the line, the point and the lines found, and `checked`, which is true when the example was verified exactly. `q` chooses the field for the affine plane (a prime power; 3 by default). The same question can be put to any single figure: `greatCircle.parallelsThrough(P)` is always empty and carries a witness, `hline.parallelsThrough(P)` returns the limiting parallels and the angle of parallelism, and an incidence structure's `parallels(p, l)` lists them.
+
+### Try it
+
+```js
+for (const r of parallelPostulate()) PRINT(r.geometry.padEnd(46), r.parallels.padEnd(16), "checked:", r.checked);
+// the hyperbolic example, in detail
+const h = parallelPostulate()[2].example;
+PRINT("line:", String(h.line), " point:", String(h.point));
+PRINT("limiting parallels:", h.limiting.map(String).join("; "));
+PRINT("angle of parallelism: cosine", N.text(h.angleOfParallelism.cos), "that is", h.angleOfParallelism.degrees.toFixed(4), "degrees");
+// a triangle of each kind with the same three right-ish corners
+const s = striangle([1, 0, 0], [0, 1, 0], [0, 0, 1]);
+const e = triangle([0, 0], [1, 0], [0, 1]);
+const y = htriangle([0, 0], ["1/2", 0], [0, "1/2"]);
+PRINT("angle sums: sphere", s.angleSum.text, " plane π  hyperbolic", y.angleSum.text);
+// affine planes over other fields
+[2, 4, 5].map((q) => `q = ${q}: ${parallelPostulate({ q })[3].checked}`)
+```
+
+---
+
+Page: https://ratmath.com/geo/projective.html
+
+Topic
+
+## The projective plane
+
+Add to the plane one point at infinity for each direction, and a line through them all. Then any two lines meet, any two points lie on one line, and points and lines can trade places in every statement.
+
+```js
+const A = ppoint(0, 0), B = ppoint(1, 0);    // [0 : 0 : 1], [1 : 0 : 1]
+join(A, B);                                    // the line [0 : 1 : 0], that is y = 0
+meetLines(join([0, 0], [1, 1]), join([0, 1], [1, 2]));   // [1 : 1 : 0], at infinity
+crossRatio([0, 0], [1, 0], [2, 0], [5, 0]);    // 8/5
+projectivityFrom(fourPoints, fourImages);      // the one projective map that does it
+conicThrough([[5, 0], [3, 4], [-4, 3], [0, -5], [4, -3]]).classify();   // "circle"
+pascal(sixPointsOnAConic).holds;               // true
+```
+
+### Homogeneous coordinates
+
+The point (x, y) is written [x : y : 1], and any non-zero multiple [λx : λy : λ] is the same point. Triples with last coordinate 0 are the points at infinity: [a : b : 0] is where all lines with direction (a, b) meet. A line ax+by+c=0 is the triple [a : b : c], and the point [x : y : z] is on it exactly when ax+by+cz=0.
+
+The line through two points is their cross product, and so is the point on two lines. This is duality: every true statement about points and lines stays true when the words are swapped, and `p.dual` turns one into the other. Two parallel lines are no exception: they meet at a point of the line at infinity, `lineAtInfinity()`.
+
+### The cross-ratio
+
+Lengths and angles do not survive a projective map, but one number does. For four points on a line,
+
+(A,B;C,D)=[AD][BC][AC][BD]​,
+where [PQ] is a 2 × 2 determinant of the homogeneous coordinates, and for ordinary points it is the ratio of signed lengths AD⋅BCAC⋅BD​. With exact coordinates it comes out as an exact rational, and it is the same after any projective map. When it is −1 the four points are harmonic; `harmonicConjugate(A, B, C)` finds the fourth.
+
+### Projective maps
+
+An invertible 3 × 3 matrix acts on homogeneous coordinates and sends lines to lines. Two matrices that differ by a factor are the same map, so the library scales each to a standard form. The fundamental theorem says four points in general position (no three on a line) can be sent to any other four by exactly one projective map; `projectivityFrom` builds it, by sending the standard frame [1:0:0], [0:1:0], [0:0:1], [1:1:1] to each set.
+
+### Conics
+
+A conic is xTCx=0 for a symmetric matrix C, and five points with no four on a line fix exactly one. `conicThrough` solves the linear system exactly. The polar of a point p is the line Cp, which for p on the conic is the tangent; the pole of a line is C−1ℓ. In the projective plane every non-degenerate real conic is the same, and the affine kinds differ only in how they meet the line at infinity: an ellipse misses it, a parabola touches it, a hyperbola crosses it. `classify` reads this from the signs of two determinants.
+
+### Four theorems, checked on exact figures
+
+- Desargues. Two triangles are in perspective from a point exactly when they are in perspective from a line.
+
+- Pappus. With A, B, C on one line and a, b, c on another, the points Ab·aB, Ac·aC, Bc·bC are collinear.
+
+- Pascal. For a hexagon inscribed in a conic, the three meets of opposite sides are collinear. Pappus is the case of a conic that is two lines.
+
+- Brianchon. For a hexagon circumscribed about a conic, the three main diagonals meet in a point: Pascal's dual.
+
+Each function takes a figure, builds the lines and points exactly, and reports whether the conclusion holds together with the points it found. These are checks on one figure; proofs in general are the elimination phase still to come.
+
+| call | returns |
+
+| ppoint(x, y) or ppoint(x, y, z), pline(a, b, c), lineAtInfinity() | PPoint, PLine: coords, equals, dual, atInfinity, toAffine() |
+
+| join(p, q), meetLines(l, m), collinearP, concurrentP | The line through two points, the point on two lines |
+
+| crossRatio(a, b, c, d), harmonicConjugate(a, b, c) | An exact number (or "infinity"); a PPoint |
+
+| projectivity(matrix), projectivityFrom(from, to) | Projectivity: apply (points and lines), compose, inverse, isAffine |
+
+| conicThrough(points), Conic.fromCoefficients([a, b, c, d, e, f]) | Conic: contains, polar, pole, tangentAt, transform, classify |
+
+| desargues(t1, t2), pappus(abc, ABC), pascal(six), brianchon(conic, six) | { holds, … the points and lines found } |
+
+### Try it
+
+```js
+PRINT("cross-ratio (0, 1; 2, 5) on the x-axis:", String(crossRatio([0, 0], [1, 0], [2, 0], [5, 0])));
+const T = projectivityFrom([[0, 0], [1, 0], [0, 1], [1, 1]], [[1, 2], [3, "1/2"], [-1, 4], [5, 7]]);
+PRINT(String(T));
+const pts = [[0, 0], [1, 0], [2, 0], [5, 0]].map((p) => T.apply(p));
+PRINT("their images:", pts.map(String).join(" "), "  cross-ratio", String(crossRatio(...pts)));
+PRINT("harmonic conjugate of 2 for 0 and 6:", String(harmonicConjugate([0, 0], [6, 0], [2, 0])));
+// Pascal on six rational points of the unit circle
+const onCircle = (t) => [`${1 - t * t}/${1 + t * t}`, `${2 * t}/${1 + t * t}`];
+const six = [0, 1, 2, 3, -1, -4].map(onCircle);
+const p = pascal(six);
+PRINT("conic:", String(p.conic), "→", p.conic.classify());
+PRINT("Pascal line through", p.points.map(String).join(", "), "→", p.holds);
+PRINT("Brianchon:", brianchon(p.conic, six).holds);
+const d = desargues([[1, 0], [4, 1], [0, 4]], [[3, 0], [8, 2], [0, 12]]);   // A′ = 3A, B′ = 2B, C′ = 3C: in perspective from the origin
+`Desargues: perspective from ${d.center} and from the line ${d.axis}: ${d.holds}`
+```
+
+---
+
+Page: https://ratmath.com/geo/finite-geometries.html
+
+Topic
+
+## Finite geometries
+
+A geometry can have finitely many points. The smallest projective plane, the Fano plane, has seven points and seven lines, three points on each line and three lines through each point, and its 168 symmetries form a famous simple group.
+
+```js
+const F = fano();                    // PG(2, 2)
+F.projectiveAxioms();                // { twoPointsOneLine: true, twoLinesOnePoint: true, … }
+F.collineations().order;             // 168, by searching all permutations
+projectivePlane(4).collineationGroup().order;   // 120960 = 2 · |PGL(3, 4)|
+affinePlane(3).isAffinePlane();      // true: Playfair's axiom holds
+affinePlane(3).completion();         // add points at infinity: a projective plane of order 3
+```
+
+### Planes over finite fields
+
+Replace the real numbers by a finite field with q elements (q a prime or a prime power, from algebraic's `galoisField`) and the definitions still work. The projective plane PG(2, q) has a point for each triple [x : y : z] up to non-zero multiples, which makes q2+q+1 points; lines are triples too, with the same count, and each line has q + 1 points. The affine plane AG(2, q) has the q2 pairs (x, y) as points and the lines y = mx + c and x = c, in q + 1 parallel classes of q lines each.
+
+The incidence matrix N of a projective plane of order n (rows lines, columns points) satisfies NNT=nI+J: two lines meet in exactly one point. The tests check this for every q up to 9.
+
+### The axioms, checked
+
+`incidence(lines)` takes any family of lines as lists of points. `projectiveAxioms()` checks that two points lie on exactly one line, two lines meet in exactly one point, and there are four points with no three collinear. `affineAxioms()` checks the first and Playfair's axiom: through a point off a line there is exactly one parallel. In a projective plane there are no parallels at all (`parallels(p, ℓ)` is empty), and adding a point at infinity for each parallel class of an affine plane, plus one line through them, gives a projective plane. That is `completion()`.
+
+Every plane here is also a block design: a projective plane of order n is a 2-(n² + n + 1, n + 1, 1) design. `designParameters()` returns v, b, k, r and λ, and the lines can be handed to the discrete package's `blockDesign`.
+
+### Collineations
+
+A collineation is a permutation of the points that sends lines to lines. For PG(2, q) the invertible matrices give them, and for q = pᵏ with k > 1 so do the field automorphisms. `collineationGroup()` generates this group as a PermGroup on the points, of order kq3(q3−1)(q2−1): 168 for the Fano plane, 5616 for q = 3, 120960 for q = 4. For small structures `collineations()` finds every collineation by a backtracking search, which needs no algebra at all, and for the Fano plane it also finds 168.
+
+Not every projective plane comes from a field. Planes of order 9 that are not PG(2, 9) exist, no plane of order 6 exists (Bruck–Ryser), none of order 10 (Lam's computer search, 1989), and order 12 is open.
+
+| call | returns |
+
+| projectivePlane(q), affinePlane(q), fano() | FiniteProjectivePlane (coordinates, pointAt, collineationGroup) and FiniteAffinePlane (parallelClasses, completion) |
+
+| incidence(lines, { points, name, labels }) | Incidence: v, b, lines, matrix, linesThrough, lineThrough, meet, parallels, dual |
+
+| projectiveAxioms(), affineAxioms(), order, designParameters() | The checks, each named |
+
+| collineations() | { order, group, elements } by search |
+
+### Try it
+
+```js
+const F = fano();
+PRINT(String(F));
+F.lines.forEach((l, i) => PRINT(`line ${i}:`, l.map((p) => F.labels[p]).join(" ")));
+PRINT("axioms:", JSON.stringify(F.projectiveAxioms()));
+PRINT("as a design:", JSON.stringify(F.designParameters()));
+PRINT("collineations found by search:", F.collineations().order, "  by matrices:", F.collineationGroup().order);
+for (const q of [3, 4, 5, 7]) {
+  const P = projectivePlane(q);
+  PRINT(`${P.name}: ${P.v} points, order ${P.order}`);
+}
+const A = affinePlane(3);
+PRINT(String(A), "parallel classes:", A.parallelClasses.length, " Playfair:", A.affineAxioms().playfair);
+`the completion is a projective plane: ${A.completion().isProjectivePlane()}`
+```
+
+---
+
+Page: https://ratmath.com/geo/polyhedra.html
+
+Topic
+
+## Polyhedra
+
+The five Platonic solids and their relatives have coordinates in Q, Q(√2) or Q(√5), so their volumes, angles and symmetries can be found exactly.
+
+```js
+const D = solids.dodecahedron();     // (±1, ±1, ±1) and cyclic shifts of (0, ±1/φ, ±φ)
+D.euler;                             // 20 − 30 + 12 = 2
+D.volume;                            // 10 + 2√5
+D.dihedralCosines;                   // [−√5/5]
+D.dual().faceCounts;                 // { 3: 20 }: the icosahedron
+D.symmetry();                        // { order: 120, rotations: 60, group: PermGroup, … }
+polyhedron([[0,0,0], [3,0,0], [0,2,0], [0,0,5], [2,2,2]]);   // the convex hull of any exact points
+```
+
+### Faces, found and proved
+
+`polyhedron(points)` builds the convex hull. The faces are found in floating point, by testing which planes through three points have every other point on one side. Then each face is proved exactly: all its vertices lie on its plane, every other vertex is strictly on the inner side, and every point given is a corner. A point inside the hull is refused rather than silently dropped. With faces known, edges and vertex configurations (the faces around a vertex, such as 3.4.3.4 for the cuboctahedron) follow by counting.
+
+### Exact measurements
+
+The volume is a sum of tetrahedra from the centre, 61​det(a−c,b−c,d−c), exact in the field of the coordinates. The dodecahedron with these coordinates has edge 5​−1 and volume 10+25​, which agrees with 415+75​​a3. Areas need one more square root, which algebraic numbers handle: the icosahedron's surface is 203​. The angle between two faces along an edge has cosine −∣n1​∣∣n2​∣n1​⋅n2​​ for outward normals, and these are exact too: 31​ for the tetrahedron, 0 for the cube, −55​​ for the dodecahedron.
+
+### Euler's formula and duals
+
+For every convex polyhedron V−E+F=2. The dual swaps vertices and faces: reflecting each face's plane in a sphere about the centre gives a vertex, and each old vertex gives a face. The cube and octahedron are duals, as are the dodecahedron and icosahedron; the tetrahedron is its own dual; the cuboctahedron's dual is the rhombic dodecahedron, with twelve rhombic faces and two kinds of vertex.
+
+### Symmetry groups
+
+A symmetry about the centre is a linear map, and it is fixed by where it sends one vertex and two of its neighbours. `symmetry()` tries every such image in floating point, with a wide margin, keeps the ones that send the vertices onto themselves, and checks each generator of the group exactly: MTM=I and every vertex goes to a vertex. The group comes back as a PermGroup on the vertices, with the rotations as a subgroup: order 24 (12 rotations) for the tetrahedron, 48 (24) for the cube and octahedron, 120 (60) for the dodecahedron and icosahedron. The rotation groups are A₄, S₄ and A₅.
+
+| call | returns |
+
+| polyhedron(points, { name }), new Polyhedron(vertices, faces) | Polyhedron: vertices, faces, edges, V, E, F, euler, center |
+
+| faceCounts, vertexConfigurations, edgeLengths2 | Combinatorics and the edge lengths that occur |
+
+| volume, surfaceArea, faceArea(k), dihedralCosines | Exact numbers |
+
+| dual(), symmetry() | A Polyhedron; { order, rotations, group, rotationGroup, name } |
+
+| solids, prism(n, { height }) | tetrahedron, cube, octahedron, dodecahedron, icosahedron, cuboctahedron, truncatedTetrahedron, truncatedOctahedron, truncatedCube |
+
+### Try it
+
+```js
+for (const k of ["tetrahedron", "cube", "octahedron", "dodecahedron", "icosahedron"]) {
+  const P = solids[k]();
+  const s = P.symmetry();
+  PRINT(`${k.padEnd(13)} V ${P.V} E ${P.E} F ${P.F}  V−E+F = ${P.euler}  volume ${N.text(P.volume)}  edge² ${N.text(P.edgeLengths2[0])}  cos dihedral ${P.dihedralCosines.map((c) => N.text(c)).join(", ")}  symmetries ${s.order} (${s.rotations} rotations)`);
+}
+const C = solids.cuboctahedron();
+PRINT(String(C), C.vertexConfigurations, "dual:", JSON.stringify(C.dual().faceCounts));
+const H = polyhedron([[0, 0, 0], [3, 0, 0], [0, 2, 0], [0, 0, 5], [2, 2, 2], [1, -1, 3]], { name: "hull" });
+PRINT(String(H), " volume", N.text(H.volume), " faces", JSON.stringify(H.faceCounts));
+`icosahedron surface area: ${N.text(solids.icosahedron().surfaceArea)}`
+```
+
+---
+
+Page: https://ratmath.com/geo/symmetry.html
+
+Topic
+
+## Symmetry groups in the plane
+
+A finite figure can only have rotations about one point and mirrors through it; a strip pattern has one of seven frieze groups; a pattern repeated in two directions has one of seventeen wallpaper groups. Give a pattern exactly and the library finds its group.
+
+```js
+figureSymmetry(regularPolygon(5)).name;          // "D5": 5 rotations, 5 mirrors
+friezeGroup({ points, period: 1 });              // { name: "p2mg", conway: "spinning sidle", … }
+wallpaperGroup({ gram: [[1, 0], [0, 1]], points });   // { name: "p4g", orbifold: "4*2", steps }
+wallpaper.pattern("p31m", [["1/7", "2/11"]]);    // a pattern with that group
+```
+
+### Rosettes
+
+Every symmetry of a finite figure fixes its centroid, so the symmetry group is finite and, as Leonardo da Vinci noticed, is either cyclic, Cn​ (n rotations), or dihedral, Dn​ (n rotations and n mirrors). `figureSymmetry(points)` tries the rotation and the reflection that take one point to each other point at the same distance from the centre, keeps those that map the whole figure to itself exactly, and returns them as Transforms and as a PermGroup on the points. Labels keep points of different kinds apart.
+
+### Friezes
+
+A frieze is a pattern repeated along a line by one translation. Its symmetries keep the strip, so they can only be: a mirror along the centre line, mirrors across it, half-turns about points of it, and a glide reflection (reflect in the centre line and move half a period). Which of these occur decides the group, one of seven, given here in crystallographic notation with Conway's names: p1 hop, p11g step, p1m1 sidle, p2 spinning hop, p2mg spinning sidle, p11m jump, p2mm spinning jump. Give the points of one period; the centre line is the middle of their heights, and the candidate mirrors and centres come from pairs of points, so the search is finite and exact.
+
+### Wallpaper groups
+
+A wallpaper pattern is repeated by a lattice of translations. Write its points in lattice coordinates (fractions of the two basis vectors) and give the shape of the lattice by its Gram matrix (a⋅aa⋅b​a⋅bb⋅b​). The hexagonal lattice has Gram matrix (1−21​​−21​1​), rational although the vectors are not, so everything stays in rationals.
+
+A symmetry is x↦Mx+t where M is an integer matrix that keeps the Gram matrix (a rotation or reflection of the lattice) and t is found by sending one point to another. By the crystallographic restriction, rotations have order 1, 2, 3, 4 or 6. The group is then named by the usual flowchart:
+
+- the highest order of rotation;
+
+- whether there are mirrors, and in how many directions;
+
+- whether some glide reflection has an axis that is not a mirror, which happens when its glide vector 21​(t+Mt) is not a lattice vector;
+
+- whether the centres of rotation lie on mirrors, where a centre c is on a mirror when some reflection fixes it: (I−M)c−t is a lattice vector.
+
+The answer comes with each step of the flowchart and with Conway's orbifold symbol. `wallpaper.pattern(name, seeds)` goes the other way: it applies the standard generators of a group to a few points and returns a pattern. The tests run all seventeen round the circle, and check that moving the origin or changing the lattice basis does not change the answer.
+
+| call | returns |
+
+| figureSymmetry(points, { labels }) | { name, order, rotations, reflections, center, transforms, group } |
+
+| friezeGroup({ points, period, labels }) | { name, conway, orbifold, horizontalMirror, verticalMirror, halfTurn, glide, … } |
+
+| wallpaperGroup({ gram, points, labels }) | { name, orbifold, pointGroupOrder, symmetries, steps } |
+
+| wallpaper.names, wallpaper.pattern(name, seeds), friezes | The seventeen and the seven |
+
+### Try it
+
+```js
+for (const n of [3, 4, 6]) PRINT(`regular ${n}-gon:`, figureSymmetry(regularPolygon(n)).name);
+PRINT("pinwheel:", figureSymmetry([[2, 0], [0, 2], [-2, 0], [0, -2], [2, 1], [-1, 2], [-2, -1], [1, -2]]).name);
+const seeds = [["1/7", "2/11"], ["1/5", "3/13"], ["2/9", "1/17"]];
+for (const name of wallpaper.names) {
+  const g = wallpaperGroup(wallpaper.pattern(name, seeds));
+  PRINT(`${name.padEnd(5)} → ${g.name.padEnd(5)} ${g.orbifold.padEnd(6)} ${g.steps.join("; ")}`);
+}
+// a frieze: a motif and its mirror image across a vertical line, shifted half a period and flipped
+const m = [["1/10", "1/5"], ["3/20", "1/2"], ["1/5", "3/10"], ["2/5", "0"], ["9/20", "1"]];
+const pts = [];
+for (const [x, y] of m) {
+  const X = num(x), Y = num(y);
+  pts.push([X, Y], [N.neg(X), Y], [N.add(X, num("1/2")), N.sub(num(1), Y)], [N.sub(num("1/2"), X), N.sub(num(1), Y)]);
+}
+const f = friezeGroup({ points: pts });
+`frieze: ${f.name} (${f.conway}), mirrors at x = ${String(f.mirrorAt)} + k/2`
+```
+
+---
+
+Page: https://ratmath.com/geo/tilings.html
+
+Topic
+
+## Tilings by regular polygons
+
+Regular polygons fit together round a point in exactly 21 ways. Only 11 of them can be the pattern at every vertex of a tiling, and for the other 10 there is a short reason, which the library gives.
+
+```js
+polygonAngle(6);              // 1/3 of a full turn
+vertexTypes();                // 21 cyclic sequences: [3, 7, 42], …, [3, 3, 3, 3, 3, 3]
+uniformTiling("3.4.6.4");     // { uniform: true, … }
+uniformTiling("5.5.10");      // { uniform: false, reason: "round a 5-gon …" }
+regularTilings();             // {3, 6}, {4, 4}, {6, 3}
+```
+
+### Fitting round a point
+
+The interior angle of a regular n-gon is 2nn−2​ of a full turn. Polygons with n1​,…,nk​ sides fit round a point exactly when
+
+i=1∑k​2ni​ni​−2​=1,
+an equation in rationals. Each angle is at least 61​ and less than 21​, so there are 3 to 6 polygons, and a search over increasing n with exact fractions finds 17 sets of polygons and 21 cyclic orders, from 3.7.42 (a triangle, a heptagon and a 42-gon) to six triangles.
+
+### Regular tilings
+
+If q copies of the regular p-gon meet at each vertex, the equation becomes q2pp−2​=1, which is (p−2)(q−2)=4. Its only solutions are {3, 6}, {4, 4} and {6, 3}: triangles, squares and hexagons. The triangle and hexagon tilings are dual to each other, and the square tiling is its own dual.
+
+### Uniform tilings
+
+In a uniform (Archimedean) tiling every vertex has the same type. Consider an n-gon of the tiling with n odd. At each of its corners, the polygons on its two edges are the neighbours of that n-gon in the vertex type. If those two neighbours are always different kinds, the polygons round the n-gon must alternate between two kinds, which is impossible round an odd number of edges. The library carries out this argument in its general form: it asks whether the allowed pairs of neighbours can be chained round a cycle of length n. That rules out exactly 10 of the 21 types, among them 3.7.42, 5.5.10 and 3.4.4.6. The other 11 are realized by the three regular tilings and the eight semiregular ones, known since Kepler's Harmonices Mundi (1619). They are drawn on [Pictures of geometry](https://ratmath.com/geo/pictures.html), where a patch is grown from each vertex type and checked.
+
+| call | returns |
+
+| polygonAngle(n) | A Rational: the fraction of a full turn |
+
+| vertexTypes() | The 21 types as arrays |
+
+| uniformTiling(type) | { type, fits, uniform, reason } |
+
+| regularTilings() | [{ p, q, symbol, dual }] |
+
+### Try it
+
+```js
+const types = vertexTypes();
+PRINT(types.length, "vertex types");
+for (const t of types) {
+  const u = uniformTiling(t);
+  PRINT(`${u.type.padEnd(12)} ${u.uniform ? "tiles" : "no   "}  ${u.reason}`);
+}
+PRINT("angles of the 3.12.12 type:", [3, 12, 12].map((n) => String(polygonAngle(n))).join(" + "), "= 1");
+regularTilings().map((t) => `${t.symbol} (dual ${t.dual})`)
+```
+
+---
+
+Page: https://ratmath.com/geo/pictures.html
+
+Topic
+
+## Pictures of geometry
+
+Geo computes; graphics draws. This page covers the pictures (tilings, solids, patterns, finite planes, constructions step by step) and how geo's exact plane meets graphics' exact plane.
+
+```js
+tilingFigure("3.4.6.4");                 // a patch of the rhombitrihexagonal tiling
+tilingPatch("3.3.3.3.6", { radius: 6 }); // { ok, polygons, choices }: every inner vertex checked
+solidPicture(solids.icosahedron());      // lit faces under a camera
+wallpaperFigure(wallpaper.pattern("p6m", [["1/10", "1/5"]]));
+incidenceFigure(fano());                 // the Fano plane as its Levi graph
+constructionFrames(c);                   // frames: one step of a construction each
+toGraphics(point("1/2", "sqrt(3)/2"));   // the same point in graphics, exactly
+figureSVG(fig);                          // any of these as SVG (also PNG, PDF, TikZ, text)
+```
+
+### Growing a tiling from its vertex type
+
+A vertex type such as 3.4.6.4 says which regular polygons meet at every vertex, in order round it. `tilingPatch(type)` starts with one vertex at the origin, the polygons of the type placed round it, and grows outward. At each open vertex it asks which rotations and reflections of the type fit the polygons already there, in their angles and order. If exactly one does, the missing polygons are placed. If no way fits, or a polygon would overlap another, there is no such tiling. When every open vertex allows more than one way, the nearest takes the first one, and `choices` counts these choices; the chirality of the snub tilings is one. At the end every vertex well inside the patch is checked to have exactly the type round it.
+
+Run over all 21 vertex types, growth succeeds for exactly the 11 that [the parity argument](https://ratmath.com/geo/tilings.html) leaves, and fails for the other 10: two independent arguments that agree. Coordinates are floats (edges of length 1), so the picture is marked estimated; the combinatorics are what is checked.
+
+### Solids, patterns and finite planes
+
+`solidPicture(p)` draws a [Polyhedron](https://ratmath.com/geo/polyhedra.html) with its faces lit and coloured by their number of sides, in a box that keeps its proportions. `wallpaperFigure(pattern)` builds a basis from the pattern's Gram matrix, repeats the cell and colours the points by label: the pictures behind [the 17 wallpaper groups](https://ratmath.com/geo/symmetry.html). `incidenceFigure(g)` draws a finite geometry as its Levi graph: points on one side, lines on the other, an edge for each incidence. A projective plane of order q has q2+q+1 of each and q+1 edges at every vertex.
+
+### Constructions step by step
+
+`constructionFrames(c)` turns a recorded [construction](https://ratmath.com/geo/constructions.html) into frames: each frame adds what one step made, in the highlight colour, with the step's text as its note. `framesSVG` plays them. `geoFigure(items)` draws points, lines, circles, segments, polygons and triangles together; it is exact when every coordinate is rational and estimated otherwise (the objects stay exact in geo).
+
+### Joining the two kernels
+
+Graphics has exact plane geometry with coordinates in Q(d​): numbers a+bd​. Geo works with all real algebraic numbers, which it needs: the incentre of a triangle with rational vertices involves several square roots. `toGraphics(x)` moves a point, line, circle, polygon or triangle across exactly when each number in it is rational or quadratic: a quadratic number is a root of c0​+c1​x+c2​x2, so it is 2c2​−c1​±c12​−4c0​c2​​​, with the sign that matches its value. Anything of higher degree is refused rather than rounded. `fromGraphics` goes the other way, so a figure can be built with graphics' tools and its theorems checked in geo.
+
+| call | returns |
+
+| tilingPatch(type, { radius }) | { type, ok, polygons, vertices, choices, reason? } |
+
+| tilingFigure(type, { radius, view }) | A figure of the patch, or a refusal with the reason |
+
+| solidPicture(polyhedron, { cam }) | A figure of the solid |
+
+| wallpaperFigure(pattern, { cells }) | A figure of the pattern over cells |
+
+| incidenceFigure(geometry) | The Levi graph as a figure |
+
+| constructionFrames(construction) | Frames, one per step |
+
+| geoFigure(items, { x, y }) | Geo objects in one figure |
+
+| toSurd(x), toGraphics(x), fromGraphics(x) | The join with graphics' exact plane |
+
+| figureSVG, figurePNG, figurePDF, figureTikZ, figureASCII, framesSVG, framesPNG | Drawing, from @ratmath/graphics |
+
+### Try it
+
+```js
+const ok = vertexTypes().filter((t) => tilingPatch(t, { radius: 4 }).ok).map((t) => t.join("."));
+PRINT(ok.length, "types grow into a tiling:", ok.join(", "));
+const p = tilingPatch("3.3.3.3.6", { radius: 5 });
+PRINT("3.3.3.3.6:", p.polygons.length, "polygons,", p.choices, "choices (its handedness among them)");
+const t = triangle([0, 0], [4, 0], [1, 3]);
+PRINT("circumcentre in graphics:", String(toGraphics(t.circumcenter)));
+try { toGraphics(t.incenter); } catch (e) { PRINT("incentre:", e.message); }
+SHOW(figureSVG(tilingFigure("3.4.6.4", { radius: 6 }), { width: 360, height: 360 }));
+SHOW(figureSVG(solidPicture(solids.icosahedron()), { width: 300, height: 260 }));
+```
