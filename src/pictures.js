@@ -18,12 +18,16 @@
 //   solidPicture       a Polyhedron, lit, faces coloured by number of sides
 //   wallpaperFigure    a lattice pattern repeated over a few cells
 //   incidenceFigure    a finite geometry as its Levi graph (points against lines)
+//   hyperbolicFigure   points, lines, triangles and circles of the hyperbolic
+//                      plane in the Poincaré disc, the Klein disc or the half-plane
+//   hyperbolicTilingFigure  the tiling {p, q} in either disc
 import { Rational } from "@ratmath/core";
 import * as G from "@ratmath/graphics";
 import { N, num, refuse } from "./num.js";
 import { Point, Line, Circle, Triangle } from "./plane.js";
 import { Polygon } from "./discrete.js";
 import { tilingPatch } from "./tilings.js";
+import { HPoint, HIdeal, HLine, HTriangle, HCircle, hyperbolicTiling } from "./hyperbolic.js";
 
 // ---- the join -------------------------------------------------------------------------------
 
@@ -189,3 +193,114 @@ export function incidenceFigure(geom, { title = geom.name ?? "" } = {}) {
   return G.drawGraph({ vertices: [...pts, ...lines], edges }, { layout: "bipartite", left: pts, title });
 }
 
+
+// ---- the hyperbolic plane ----------------------------------------------------------------------
+
+const hv = (p) => p.v.map(N.toNumber);
+const hnorm = (w) => {
+  const n = Math.sqrt(Math.max(1e-300, w[0] * w[0] - w[1] * w[1] - w[2] * w[2]));
+  return [w[0] / n, w[1] / n, w[2] / n];
+};
+const toModel = (model) => (w) => {
+  const [u, v] = model === "klein" ? [w[1] / w[0], w[2] / w[0]] : [w[1] / (1 + w[0]), w[2] / (1 + w[0])];
+  if (model !== "halfPlane") return [u, v];
+  const D = (1 - u) * (1 - u) + v * v;
+  return [(-2 * v) / D, (1 - u * u - v * v) / D];
+};
+/** points along the geodesic from a to b (each a point or an ideal point), on the hyperboloid */
+function geodesic(a, b, n = 48) {
+  const [p, q] = [hv(a), hv(b)];
+  const [ia, ib] = [a instanceof HIdeal, b instanceof HIdeal];
+  const mix = (s, t) => hnorm([p[0] * s + q[0] * t, p[1] * s + q[1] * t, p[2] * s + q[2] * t]);
+  const out = [];
+  for (let k = 0; k <= n; k++) {
+    const s = k / n;
+    if (ia && ib) out.push(mix(Math.exp(7 * (1 - 2 * s)), Math.exp(-7 * (1 - 2 * s))));
+    else if (ib) out.push(mix(1, Math.expm1(9 * s)));
+    else if (ia) out.push(mix(Math.expm1(9 * (1 - s)), 1));
+    else out.push(mix(1 - s, s));
+  }
+  return out;
+}
+
+/**
+ * Hyperbolic objects in one figure, in a chosen model: "disc" (Poincaré,
+ * the default), "klein" or "halfPlane". Items are HPoints, ideal points,
+ * HLines, HTriangles, HCircles, segments [p, q], or { item, color, label }.
+ * The objects are exact; the picture draws their float values.
+ */
+export function hyperbolicFigure(items, { model = "disc", title = "", x, y } = {}) {
+  if (!["disc", "klein", "halfPlane"].includes(model)) refuse("bad-argument", 'model is "disc", "klein" or "halfPlane"');
+  const M = toModel(model);
+  const out = [];
+  const finite = [];
+  const curve = (pts, style) => {
+    const m = pts.map(M).filter((q) => Number.isFinite(q[0]) && Number.isFinite(q[1]) && Math.abs(q[0]) < 1e3 && Math.abs(q[1]) < 1e3);
+    finite.push(...m);
+    if (m.length > 1) out.push(G.path(m, style));
+  };
+  if (model !== "halfPlane") out.push(G.path(Array.from({ length: 181 }, (_, k) => [Math.cos((Math.PI * k) / 90), Math.sin((Math.PI * k) / 90)]), { color: "#64748b", width: 1.2 }));
+  items.forEach((it, i) => {
+    const o = it?.item ?? it;
+    const color = it?.color ?? G.CATEGORY[i % G.CATEGORY.length];
+    if (o instanceof HPoint) {
+      const q = M(hv(o));
+      finite.push(q);
+      out.push(G.dot(q, { r: 4, color }));
+      if (it?.label) out.push(G.text(q, it.label, { anchor: "ne", color, size: 13 }));
+    } else if (o instanceof HIdeal) {
+      if (model === "halfPlane" && o.halfPlane === null) return;
+      const q = model === "halfPlane" ? [N.toNumber(o.halfPlane), 0] : [N.toNumber(o.x), N.toNumber(o.y)];
+      finite.push(q);
+      out.push(G.dot(q, { r: 4, color, fill: "#ffffff" }));
+    } else if (o instanceof HLine) curve(geodesic(...o.ends, 96), { width: 1.6, color });
+    else if (o instanceof HTriangle) {
+      const [A, B, C] = o.vertices;
+      curve([...geodesic(A, B), ...geodesic(B, C), ...geodesic(C, A)], { closed: true, width: 1.6, color, fill: color, fillAlpha: 0.14 });
+    } else if (o instanceof HCircle) {
+      const c = o.disc;
+      const [cx, cy] = c.center.toNumbers();
+      const r = Math.sqrt(N.toNumber(c.radius2));
+      const pts = Array.from({ length: 145 }, (_, k) => {
+        const [u, v] = [cx + r * Math.cos((Math.PI * k) / 72), cy + r * Math.sin((Math.PI * k) / 72)];
+        const d = 1 - u * u - v * v;
+        return [(1 + u * u + v * v) / d, (2 * u) / d, (2 * v) / d];
+      });
+      curve(pts, { closed: true, width: 1.6, color });
+    } else if (Array.isArray(o) && o.length === 2) curve(geodesic(o[0], o[1]), { width: 1.8, color });
+    else refuse("bad-argument", "hyperbolicFigure draws hyperbolic points, ideal points, lines, triangles, circles and segments [p, q]");
+  });
+  let win = { x: [-1.05, 1.05], y: [-1.05, 1.05] };
+  if (model === "halfPlane") {
+    const near = finite.filter((q) => Math.abs(q[0]) <= 5 && q[1] <= 5);
+    const xs = near.map((q) => q[0]);
+    const [lo, hi] = xs.length ? [Math.min(...xs), Math.max(...xs)] : [-1, 1];
+    const pad = Math.max(0.4, 0.1 * (hi - lo));
+    const top = Math.max(1.5, Math.min(5, Math.max(0, ...near.map((q) => q[1])) * 1.15));
+    win = { x: [lo - pad, hi + pad], y: [-0.04 * top, top] };
+    out.unshift(G.path([[win.x[0], 0], [win.x[1], 0]], { color: "#64748b", width: 1.2 }));
+  }
+  return G.figure({ layers: [G.shapes(out)], x: x?.map(Number) ?? win.x, y: y?.map(Number) ?? win.y, equal: true, axes: false, status: "estimated", title });
+}
+
+/** The tiling {p, q} of the hyperbolic plane, drawn in the Poincaré disc (or "klein"), tiles coloured by their distance in steps from the central one. */
+export function hyperbolicTilingFigure(p, q, { layers = 3, model = "disc", title } = {}) {
+  if (!["disc", "klein"].includes(model)) refuse("bad-argument", 'model is "disc" or "klein"');
+  const patch = hyperbolicTiling(p, q).patch(layers);
+  const shade = ["#1d4ed8", "#3b82f6", "#93c5fd", "#bfdbfe", "#dbeafe", "#eff6ff"];
+  const M = toModel(model);
+  const lift = ([u, v]) => {
+    const d = 1 - u * u - v * v;
+    return [(1 + u * u + v * v) / d, (2 * u) / d, (2 * v) / d];
+  };
+  const out = [G.path(Array.from({ length: 181 }, (_, k) => [Math.cos((Math.PI * k) / 90), Math.sin((Math.PI * k) / 90)]), { color: "#64748b", width: 1.2 })];
+  for (const t of patch.tiles) {
+    const vs = t.points.map(lift);
+    const pts = vs.flatMap((a, i) => {
+      const b = vs[(i + 1) % vs.length];
+      return Array.from({ length: 8 }, (_, k) => M(hnorm([a[0] + ((b[0] - a[0]) * k) / 8, a[1] + ((b[1] - a[1]) * k) / 8, a[2] + ((b[2] - a[2]) * k) / 8])));
+    });
+    out.push(G.path(pts, { closed: true, fill: shade[Math.min(t.layer, shade.length - 1)], fillAlpha: 1, color: "#1e293b", width: 0.7 }));
+  }
+  return G.figure({ layers: [G.shapes(out)], x: [-1.05, 1.05], y: [-1.05, 1.05], equal: true, axes: false, status: "estimated", title: title ?? `the tiling {${p}, ${q}}`, notes: [`${patch.tiles.length} tiles: ${patch.counts.join(" + ")}`] });
+}

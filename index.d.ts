@@ -526,3 +526,335 @@ export function tilingFigure(type: string | number[], options?: { radius?: numbe
 export function solidPicture(poly: Polyhedron | { vertices: unknown[][]; faces: number[][]; name?: string }, options?: { cam?: Camera; colors?: string[]; opacity?: number }): Figure;
 export function wallpaperFigure(pattern: { gram: unknown[][]; points: unknown[][]; labels?: number[] }, options?: { cells?: number; title?: string }): Figure;
 export function incidenceFigure(geometry: Incidence, options?: { title?: string }): Figure;
+
+// ---- angles and hyperbolic lengths ----
+import type { RationalInterval } from "@ratmath/core";
+/** An angle kept as its exact cosine and sine, with a float saying which turn it is on. */
+export class Angle {
+  constructor(cos: NumLike, sin: NumLike, approx?: number);
+  readonly cos: Num;
+  readonly sin: Num;
+  /** The angle in radians as a double. */
+  readonly approx: number;
+  /** The angle between 0 and π with this cosine. */
+  static ofCos(c: NumLike): Angle;
+  /** From a fraction of a full turn. */
+  static ofTurns(q: NumLike): Angle;
+  static readonly PI: Angle;
+  static readonly ZERO: Angle;
+  static readonly RIGHT: Angle;
+  /** The fraction of a full turn, or null when the angle is not a rational multiple of π (decided exactly). */
+  readonly turns: Rational | null;
+  readonly isRational: boolean;
+  readonly isRight: boolean;
+  readonly isZero: boolean;
+  readonly degrees: number;
+  /** "π/3", or radians to 10 places when the angle is not a rational multiple of π. */
+  readonly text: string;
+  /** An interval of radians containing the angle. */
+  value(digits?: number): RationalInterval;
+  toNumber(): number;
+  add(o: Angle): Angle;
+  sub(o: Angle): Angle;
+  neg(): Angle;
+  equals(o: Angle): boolean;
+  compare(o: Angle): -1 | 0 | 1;
+  toString(): string;
+}
+export type AngleLike = Angle | NumLike | { cos: NumLike; sin?: NumLike };
+export function angle(x: AngleLike): Angle;
+/** The fraction q of a full turn (0 ≤ q ≤ 1/2) with cos(2πq) = c, or null: a proof that there is none. */
+export function turnsOfCos(c: NumLike): Rational | null;
+/** π times an exact number. */
+export interface PiMultiple { coefficient: Num; text: string; value(digits?: number): RationalInterval; toNumber(): number }
+export function piTimes(k: NumLike): PiMultiple;
+/** A hyperbolic length held as its exact cosh and sinh. */
+export class Length {
+  constructor(cosh: NumLike, sinh?: NumLike);
+  readonly cosh: Num;
+  readonly sinh: Num;
+  static ofCosh(c: NumLike): Length;
+  static ofSinh(s: NumLike): Length;
+  /** From eᵈ: Length.ofExp(2) is ln 2. */
+  static ofExp(e: NumLike): Length;
+  readonly exp: Num;
+  readonly tanh: Num;
+  readonly isZero: boolean;
+  /** "ln(2 + √3)". */
+  readonly text: string;
+  add(o: Length): Length;
+  double(): Length;
+  half(): Length;
+  equals(o: Length): boolean;
+  compare(o: Length): number;
+  value(digits?: number): RationalInterval;
+  toNumber(): number;
+  toString(): string;
+}
+
+// ---- the sphere ----
+export type Vec3Like = [NumLike, NumLike, NumLike];
+export class SPoint {
+  constructor(x: NumLike, y: NumLike, z: NumLike);
+  readonly v: [Num, Num, Num];
+  readonly x: Num;
+  readonly y: Num;
+  readonly z: Num;
+  readonly antipode: SPoint;
+  readonly latLon: { lat: Angle; lon: Angle };
+  /** Stereographic projection from the north pole onto the plane z = 0. */
+  readonly stereographic: Point;
+  equals(o: SPoint): boolean;
+  isAntipodeOf(o: SPoint): boolean;
+  dot(o: SPointLike): Num;
+  distanceTo(o: SPointLike): Angle;
+  toNumbers(): [number, number, number];
+  toString(): string;
+}
+export type SPointLike = SPoint | Vec3Like;
+/** The point of the sphere in the direction of a non-zero vector. */
+export function spoint(x: NumLike, y: NumLike, z: NumLike): SPoint;
+export function spoint(p: SPointLike): SPoint;
+/** Latitude and longitude as fractions of a full turn. */
+export function latLon(lat: AngleLike, lon: AngleLike): SPoint;
+export function fromStereographic(p: PointLike): SPoint;
+export function northPole(): SPoint;
+export class GreatCircle {
+  constructor(normal: Vec3Like);
+  readonly n: [Num, Num, Num];
+  readonly poles: [SPoint, SPoint];
+  readonly reflection: SIsometry;
+  contains(p: SPointLike): boolean;
+  side(p: SPointLike): -1 | 0 | 1;
+  equals(o: GreatCircle): boolean;
+  /** The two opposite points where the circles cross. */
+  meet(o: GreatCircle): [SPoint, SPoint];
+  angleWith(o: GreatCircle): Angle;
+  isPerpendicularTo(o: GreatCircle): boolean;
+  perpendicularThrough(p: SPointLike): GreatCircle;
+  distanceTo(p: SPointLike): Angle;
+  /** Always empty: any two great circles meet. */
+  parallelsThrough(p: SPointLike): GreatCircle[] & { count: 0; reason: string; witness: { line: GreatCircle; meets: [SPoint, SPoint] } };
+  toString(): string;
+}
+/** The great circle through two points, or with a given pole. */
+export function greatCircle(a: SPointLike, b?: SPointLike): GreatCircle;
+export function equator(): GreatCircle;
+export class SCircle {
+  constructor(center: SPointLike, cosRadius: NumLike);
+  readonly center: SPoint;
+  readonly cosRadius: Num;
+  readonly radius: Angle;
+  readonly circumference: PiMultiple;
+  readonly area: PiMultiple;
+  readonly isGreat: boolean;
+  contains(p: SPointLike): boolean;
+  toString(): string;
+}
+export function scircle(center: SPointLike, through: SPointLike | { radius: AngleLike } | { cos: NumLike }): SCircle;
+export interface TrigChecks { lawOfCosines: boolean; secondLawOfCosines: boolean; lawOfSines: boolean; all: boolean }
+export class STriangle {
+  constructor(A: SPointLike, B: SPointLike, C: SPointLike);
+  readonly A: SPoint;
+  readonly B: SPoint;
+  readonly C: SPoint;
+  readonly vertices: [SPoint, SPoint, SPoint];
+  /** The sides as angles; a is opposite A. */
+  readonly sides: { a: Angle; b: Angle; c: Angle };
+  readonly angles: { A: Angle; B: Angle; C: Angle };
+  readonly angleSum: Angle;
+  /** A + B + C − π. */
+  readonly excess: Angle;
+  /** The area on the unit sphere: the excess. */
+  readonly area: Angle;
+  /** The share of the whole sphere, when rational. */
+  readonly fractionOfSphere: Rational | null;
+  readonly perimeter: Angle;
+  readonly polar: STriangle;
+  readonly sidesAsCircles: { a: GreatCircle; b: GreatCircle; c: GreatCircle };
+  classify(): { rightAngles: number; sides: "equilateral" | "isosceles" | "scalene" };
+  checks(): TrigChecks & { polar: boolean; excess: boolean };
+  toString(): string;
+}
+export function striangle(a: SPointLike, b: SPointLike, c: SPointLike): STriangle;
+/** The area of a lune with the given angle: twice the angle. */
+export function lune(a: AngleLike): Angle;
+export type SIsometryKind =
+  | { kind: "identity" }
+  | { kind: "rotation"; axis: SPoint; angle: Angle }
+  | { kind: "reflection"; mirror: GreatCircle }
+  | { kind: "rotary reflection"; axis: SPoint | null; angle: Angle; antipodal: boolean };
+export class SIsometry {
+  constructor(matrix: NumLike[][]);
+  readonly matrix: Num[][];
+  readonly inverse: SIsometry;
+  readonly determinant: Num;
+  apply(x: SPoint): SPoint;
+  apply(x: GreatCircle): GreatCircle;
+  apply(x: STriangle): STriangle;
+  apply(x: SCircle): SCircle;
+  then(o: SIsometry): SIsometry;
+  equals(o: SIsometry): boolean;
+  classify(): SIsometryKind;
+  toString(): string;
+}
+export function srotation(axis: SPointLike, turns: AngleLike): SIsometry;
+export function antipodalMap(): SIsometry;
+
+// ---- the hyperbolic plane ----
+export class HPoint {
+  constructor(t: NumLike, x: NumLike, y: NumLike);
+  readonly v: [Num, Num, Num];
+  /** (t, x, y) with t² − x² − y² = 1. */
+  readonly hyperboloid: [Num, Num, Num];
+  readonly disc: Point;
+  readonly klein: Point;
+  readonly halfPlane: Point;
+  equals(o: unknown): boolean;
+  distanceTo(o: HPointLike): Length;
+  toString(): string;
+}
+export type HPointLike = HPoint | Point | [NumLike, NumLike];
+/** The point with coordinates (x, y) in the Poincaré disc. */
+export function hpoint(x: NumLike, y: NumLike): HPoint;
+export function hpoint(p: HPointLike): HPoint;
+export function fromKlein(x: NumLike | Point | [NumLike, NumLike], y?: NumLike): HPoint;
+export function fromHalfPlane(x: NumLike | Point | [NumLike, NumLike], y?: NumLike): HPoint;
+export function fromHyperboloid(t: NumLike | Vec3Like, x?: NumLike, y?: NumLike): HPoint;
+export function horigin(): HPoint;
+/** A point of the circle at infinity. */
+export class HIdeal {
+  constructor(x: NumLike, y: NumLike);
+  readonly x: Num;
+  readonly y: Num;
+  readonly disc: Point;
+  readonly klein: Point;
+  /** The real number on the edge of the half-plane, or null for its point at infinity. */
+  readonly halfPlane: Num | null;
+  equals(o: unknown): boolean;
+  toString(): string;
+}
+/** The ideal point in a direction, or at an angle given as a fraction of a full turn. */
+export function ideal(x: NumLike | Point | [NumLike, NumLike] | HIdeal, y?: NumLike): HIdeal;
+export type HAny = HPointLike | HIdeal;
+export type HRelation =
+  | { kind: "equal" }
+  | { kind: "intersecting"; point: HPoint; angle: Angle }
+  | { kind: "asymptotic"; ideal: HIdeal }
+  | { kind: "ultraparallel"; commonPerpendicular: HLine; distance: Length };
+export class HLine {
+  constructor(normal: Vec3Like);
+  readonly n: [Num, Num, Num];
+  /** A straight chord of the Klein disc. */
+  readonly klein: Line;
+  /** In the Poincaré disc: a circle orthogonal to the unit circle, or a diameter. */
+  readonly disc: Circle | Line;
+  /** In the half-plane: a half-circle centred on the real axis, or a vertical line. */
+  readonly halfPlane: Circle | Line;
+  readonly ends: [HIdeal, HIdeal];
+  readonly reflection: HIsometry;
+  contains(p: HAny): boolean;
+  side(p: HAny): -1 | 0 | 1;
+  equals(o: HLine): boolean;
+  distanceTo(p: HPointLike): Length;
+  foot(p: HPointLike): HPoint;
+  perpendicularThrough(p: HAny): HLine;
+  relation(o: HLine): HRelation;
+  meets(o: HLine): boolean;
+  isPerpendicularTo(o: HLine): boolean;
+  /** Infinitely many: the two limiting parallels, one ultraparallel, and the angle of parallelism. */
+  parallelsThrough(p: HPointLike): { count: number; limiting: [HLine, HLine]; ultraparallel: HLine; distance: Length; angle: Angle };
+  toString(): string;
+}
+export function hline(a: HAny, b: HAny): HLine;
+export function hmidpoint(a: HPointLike, b: HPointLike): HPoint;
+export function hbisector(a: HPointLike, b: HPointLike): HLine;
+export class HCircle {
+  constructor(center: HPointLike, coshRadius: NumLike);
+  readonly center: HPoint;
+  readonly radius: Length;
+  readonly circumference: PiMultiple;
+  readonly area: PiMultiple;
+  /** The same circle as a Euclidean circle of the Poincaré disc. */
+  readonly disc: Circle;
+  contains(p: HPointLike): boolean;
+  toString(): string;
+}
+export function hcircle(center: HPointLike, through: HPointLike | Length | { cosh: NumLike } | { exp: NumLike }): HCircle;
+export function horocycle(at: HIdeal | NumLike, p: HPointLike): { ideal: HIdeal; through: HPoint; disc: Circle };
+export class HTriangle {
+  constructor(A: HAny, B: HAny, C: HAny);
+  readonly A: HPoint | HIdeal;
+  readonly B: HPoint | HIdeal;
+  readonly C: HPoint | HIdeal;
+  readonly vertices: Array<HPoint | HIdeal>;
+  readonly idealVertices: number;
+  /** null for a side that runs to an ideal vertex. */
+  readonly sides: { a: Length | null; b: Length | null; c: Length | null };
+  readonly angles: { A: Angle; B: Angle; C: Angle };
+  readonly angleSum: Angle;
+  /** π − (A + B + C). */
+  readonly defect: Angle;
+  /** The area: the defect. */
+  readonly area: Angle;
+  readonly lines: { a: HLine; b: HLine; c: HLine };
+  checks(): TrigChecks;
+  toString(): string;
+}
+export function htriangle(a: HAny, b: HAny, c: HAny): HTriangle;
+export type HIsometryKind =
+  | { kind: "identity" }
+  | { kind: "rotation"; center: HPoint; angle: Angle }
+  | { kind: "parabolic"; ideal: HIdeal }
+  | { kind: "translation"; axis: HLine; length: Length }
+  | { kind: "reflection"; line: HLine }
+  | { kind: "glide reflection"; axis: HLine; length: Length };
+/** An exact complex number as [re, im]. */
+export type ExactComplex = [Num, Num];
+export class HIsometry {
+  constructor(matrix: NumLike[][]);
+  readonly matrix: Num[][];
+  readonly inverse: HIsometry;
+  readonly preservesOrientation: boolean;
+  apply(x: HPoint): HPoint;
+  apply(x: HIdeal): HIdeal;
+  apply(x: HLine): HLine;
+  apply(x: HTriangle): HTriangle;
+  apply(x: HCircle): HCircle;
+  then(o: HIsometry): HIsometry;
+  equals(o: HIsometry): boolean;
+  classify(): HIsometryKind;
+  /** The map of the Poincaré disc z → (a·z + b)/(c·z + d), applied to the conjugate of z when `conjugate` is true. */
+  toMobius(): { a: ExactComplex; b: ExactComplex; c: ExactComplex; d: ExactComplex; conjugate: boolean };
+  toString(): string;
+}
+export function hreflection(l: HLine): HIsometry;
+export function hrotation(center: HPointLike, turns: AngleLike): HIsometry;
+export function hhalfTurn(center: HPointLike): HIsometry;
+export function htranslation(a: HPointLike, b: HPointLike): HIsometry;
+export interface SchlafliBase { p: number; q: number; symbol: string; interiorAngle: Angle }
+export type Schlafli =
+  | (SchlafliBase & { geometry: "euclidean" })
+  | (SchlafliBase & { geometry: "spherical"; solid: string; faces: number; vertices: number; edges: number; tileArea: Angle; edge: Angle; circumradius: Angle; inradius: Angle })
+  | (SchlafliBase & { geometry: "hyperbolic"; tileArea: Angle; edge: Length; circumradius: Length; inradius: Length });
+/** The regular tiling {p, q}: which geometry it lives in, and the forced size of its tile. */
+export function schlafli(p: number, q: number): Schlafli;
+export interface HyperbolicTiling extends SchlafliBase {
+  geometry: "hyperbolic";
+  tileArea: Angle;
+  edge: Length;
+  circumradius: Length;
+  inradius: Length;
+  /** The central tile's circumradius in the Poincaré disc. */
+  discRadius: Num;
+  /** The central tile's vertices, exact. */
+  readonly tile: HPoint[];
+  check(): { angle: boolean; edge: boolean };
+  /** The tiles within `layers` steps of the central one, in floats (disc coordinates). */
+  patch(layers?: number, options?: { maxTiles?: number }): { kind: "float"; complete: boolean; counts: number[]; tiles: Array<{ layer: number; points: [number, number][] }> };
+}
+export function hyperbolicTiling(p: number, q: number): HyperbolicTiling;
+/** Playfair's postulate tested in each geometry. */
+export function parallelPostulate(options?: { q?: number }): Array<{ geometry: string; parallels: "exactly one" | "none" | "infinitely many"; count: number; example: Record<string, unknown>; checked: boolean }>;
+export function hyperbolicFigure(items: unknown[], options?: { model?: "disc" | "klein" | "halfPlane"; title?: string; x?: [number, number]; y?: [number, number] }): Figure;
+export function hyperbolicTilingFigure(p: number, q: number, options?: { layers?: number; model?: "disc" | "klein"; title?: string }): Figure;

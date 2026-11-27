@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Spherical geometry · RatMath Geo</title>
+<meta name="description" content="Geometry on the unit sphere with exact coordinates: great circles, distances as angles, triangles with their angle excess and area, the laws of spherical trigonometry as exact equalities, circles, and rotations.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<script type="module" src="assets/site.js"></script>
+</head>
+<body>
+<div class="shell">
+<aside></aside>
+<main>
+<article>
+<div class="eyebrow">Topic</div>
+<h1>Spherical geometry</h1>
+<p class="lede">On a sphere the straight lines are the great circles. Any two of them cross, the angles of a triangle add up to more than two right angles, and the surplus is the triangle's area. Here the points have exact coordinates, so those statements are equalities, not measurements.</p>
+<pre><code>const A = spoint(1, 0, 0), B = spoint(1, 1, 0), C = spoint(1, 1, 1);   // any non-zero vector, scaled onto the sphere
+A.distanceTo(B).text;                     // "π/4": the distance is the angle between them
+const t = striangle(A, B, C);
+[t.angles.A.text, t.angles.B.text, t.angles.C.text];   // ["π/4", "π/2", "π/3"]
+t.excess.text;                            // "π/12": the angle sum is π + π/12
+String(t.fractionOfSphere);               // "1/48"
+t.checks().all;                           // true: every law of spherical trigonometry, exactly
+greatCircle(A, B).meet(greatCircle(A, C));   // two opposite points: there are no parallels</code></pre>
+
+<h2>Points and distance</h2>
+<p>A point is a unit vector \((x, y, z)\) with \(x^2 + y^2 + z^2 = 1\), and the coordinates are exact real algebraic numbers. <code>spoint(1, 1, 1)</code> scales a vector onto the sphere, giving \((\tfrac{\sqrt3}{3}, \tfrac{\sqrt3}{3}, \tfrac{\sqrt3}{3})\); <code>latLon(lat, lon)</code> takes a latitude and longitude as fractions of a full turn; and <code>fromStereographic([X, Y])</code> lifts a point of the plane, which turns rational points of the plane into rational points of the sphere, such as \((\tfrac{36}{49}, \tfrac{24}{49}, -\tfrac{23}{49})\).</p>
+<p>The distance between two points is the angle between the vectors, measured along the great circle through them, and its cosine is the dot product:</p>
+\[ \cos d(P, Q) = P \cdot Q. \]
+<p>The cosine is exact. The distance itself is an <code>Angle</code>.</p>
+
+<h2>Angles that are, and are not, fractions of π</h2>
+<p>An <code>Angle</code> keeps its cosine and sine exactly. Its <code>turns</code> is the angle as a fraction of a full turn when it is a rational multiple of π, and <code>null</code> when it is not, and the answer is decided, not guessed. The reason it can be decided: \(\cos(2\pi k/n)\) is an algebraic number of degree \(\varphi(n)/2\) (Euler's function), so the degree of a cosine leaves only finitely many denominators \(n\) to try, and each is tested with an exact equality. In particular a rational cosine can only be \(0, \pm\tfrac12, \pm1\) (Niven's theorem), so the angle with cosine \(\tfrac13\) is not a rational multiple of π, and the library says so with a proof behind it.</p>
+<p>When the angle is such a multiple, <code>text</code> is of the form "π/12". Otherwise <code>value(digits)</code> gives an interval of radians that contains it. Angles add as real numbers (a float tracks which turn the sum is on), so an angle sum of \(13\pi/12\) is that and not the same thing modulo \(2\pi\).</p>
+
+<h2>Great circles</h2>
+<p>A great circle is where a plane through the centre cuts the sphere. It is kept as a vector \(n\) normal to that plane: the circle is \(\{P : n \cdot P = 0\}\). Through two points that are neither equal nor opposite there is exactly one, with \(n = P \times Q\). Two great circles always meet, in the two opposite points \(\pm\, n_1 \times n_2\). So on the sphere there are no parallel lines, and two "lines" meet twice, which is why two points do not always determine a line: through two opposite points there are infinitely many, and <code>greatCircle</code> refuses them.</p>
+
+<h2>Triangles and their excess</h2>
+<p>Three points not on one great circle make a triangle. Its sides \(a, b, c\) are angles (the distances between the vertices), and its angles \(A, B, C\) are the angles between the planes of the sides. Their sum is always more than π, and the surplus</p>
+\[ E = A + B + C - \pi \]
+<p>is the <em>spherical excess</em>. Girard's theorem says the area of the triangle on the unit sphere is exactly \(E\). The octant triangle with vertices on the three axes has three right angles, excess \(\pi/2\), and covers one eighth of the sphere's \(4\pi\). The triangle in the example at the top has angles \(\pi/4, \pi/2, \pi/3\) and covers one forty-eighth: the 48 symmetries of a cube move it over the whole sphere.</p>
+<p>When the angles are not fractions of π the excess usually is not one either, and it comes as an enclosure. <code>checks()</code> also tests it against a formula that needs no angles at all,</p>
+\[ \tan\frac E2 = \frac{|A \cdot (B \times C)|}{1 + A\cdot B + B \cdot C + C \cdot A}, \]
+<p>as an exact equality of algebraic numbers.</p>
+
+<h2>Spherical trigonometry</h2>
+<p>The plane's law of cosines has two forms on the sphere:</p>
+\[ \cos a = \cos b \cos c + \sin b \sin c \cos A, \qquad \cos A = -\cos B \cos C + \sin B \sin C \cos a. \]
+<p>The second has no counterpart in the plane: it gives the sides from the angles, so on a sphere there are no similar triangles of different sizes. The law of sines is \(\sin A / \sin a = \sin B / \sin b = \sin C / \sin c\). The <em>polar triangle</em>, whose vertices are the poles of the sides, has sides \(\pi - A, \pi - B, \pi - C\). <code>checks()</code> tests all of these on the triangle given, each as an exact equality.</p>
+
+<h2>Circles</h2>
+<p>A circle of radius \(r\) (an angle) about a point has circumference \(2\pi \sin r\) and encloses a cap of area \(2\pi(1 - \cos r)\): both less than the plane's \(2\pi r\) and \(\pi r^2\). They come as exact multiples of π: the circle of radius \(\pi/6\) has circumference exactly π and area \((2 - \sqrt3)\pi\).</p>
+
+<h2>Isometries</h2>
+<p>The isometries of the sphere are the orthogonal 3 × 3 matrices. <code>srotation(axis, turns)</code> is the rotation about an axis, and <code>classify()</code> reads any isometry back: by Euler's theorem every isometry that keeps orientation is a rotation about some axis, so the product of two rotations about different axes is a third rotation, and the library finds its axis and angle exactly. The ones that reverse orientation are reflections in great circles and rotary reflections, the antipodal map among them.</p>
+<div class="tablewrap"><table class="ref">
+<tr><th>call</th><th>returns</th></tr>
+<tr><td>spoint(x, y, z), latLon(lat, lon), fromStereographic(p), northPole()</td><td>SPoint: x, y, z, antipode, distanceTo, dot, latLon, stereographic</td></tr>
+<tr><td>greatCircle(P, Q), greatCircle(pole), equator()</td><td>GreatCircle: contains, side, poles, meet, angleWith, perpendicularThrough, distanceTo, reflection, parallelsThrough</td></tr>
+<tr><td>striangle(A, B, C)</td><td>STriangle: sides, angles, angleSum, excess, area, fractionOfSphere, perimeter, polar, classify(), checks()</td></tr>
+<tr><td>scircle(centre, point | { radius } | { cos })</td><td>SCircle: radius, circumference, area, contains, isGreat</td></tr>
+<tr><td>srotation(axis, turns), antipodalMap(), circle.reflection</td><td>SIsometry: apply, then, inverse, classify()</td></tr>
+<tr><td>angle(turns | { cos } | { cos, sin }), Angle</td><td>cos, sin, turns, text, degrees, value(digits), add, sub, equals</td></tr>
+<tr><td>turnsOfCos(c), piTimes(k), lune(angle)</td><td>The fraction of a turn with that cosine, or null; π times an exact number; a lune's area</td></tr>
+</table></div>
+<template data-runbox>
+const t = striangle([1, 0, 0], [1, 1, 0], [1, 1, 1]);
+PRINT("angles:", t.angles.A.text, t.angles.B.text, t.angles.C.text, "  sides:", t.sides.a.text, t.sides.b.text, t.sides.c.text);
+PRINT("excess:", t.excess.text, "  share of the sphere:", String(t.fractionOfSphere));
+PRINT("laws:", JSON.stringify(t.checks()));
+// a triangle with no nice angle: still exact cosines, and the excess enclosed
+const u = striangle([1, 2, 2], [2, -1, 2], [0, 0, 1]);
+PRINT("cos A =", N.text(u.angles.A.cos), " A =", u.angles.A.text, " a fraction of π?", u.angles.A.isRational);
+PRINT("excess in", u.excess.value(15).low.toDecimal(15), "…, laws hold:", u.checks().all);
+// Niven: the angle with cosine 1/3 is not a rational multiple of π
+PRINT("turnsOfCos(1/2) =", String(turnsOfCos("1/2")), "  turnsOfCos(1/3) =", String(turnsOfCos("1/3")));
+// two quarter turns about different axes make a third of a turn
+const r = srotation([0, 0, 1], "1/4").then(srotation([1, 0, 0], "1/4"));
+PRINT(String(r));
+const c = scircle([0, 0, 1], { radius: "1/12" });
+`circle of radius π/6: circumference ${c.circumference.text}, area ${c.area.text}`
+</template>
+</article>
+</main>
+</div>
+</body>
+</html>

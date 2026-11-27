@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The parallel postulate · RatMath Geo</title>
+<meta name="description" content="Playfair's parallel postulate tested exactly in five geometries: the Euclidean plane, the sphere, the hyperbolic plane, a finite affine plane and the Fano plane. Exactly one parallel, none, or infinitely many.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<script type="module" src="assets/site.js"></script>
+</head>
+<body>
+<div class="shell">
+<aside></aside>
+<main>
+<article>
+<div class="eyebrow">Topic</div>
+<h1>The parallel postulate</h1>
+<p class="lede">Through a point not on a line, how many lines never meet it? Euclid needed the answer to be one, and for two thousand years people tried to prove it from his other postulates. It cannot be proved, because there are geometries where everything else holds and the answer is different. Here are five, with the count made exactly in each.</p>
+<pre><code>parallelPostulate().map((r) =&gt; [r.geometry, r.parallels]);
+// Euclidean plane                           exactly one
+// sphere                                    none
+// hyperbolic plane                          infinitely many
+// affine plane over the field with 3 elements   exactly one
+// Fano plane (projective, 7 points)         none</code></pre>
+
+<h2>The postulate</h2>
+<p>Euclid's fifth postulate is about two lines cut by a third. The form used now is Playfair's: <em>through a point not on a given line there is exactly one line that does not meet it.</em> "At least one" follows from Euclid's other postulates; the content is "at most one". It is equivalent to the angles of a triangle adding up to two right angles, to the existence of similar triangles of different sizes, and to Pythagoras' theorem.</p>
+
+<h2>One: the Euclidean plane, and finite affine planes</h2>
+<p>In the plane, <code>parallelThrough(l, P)</code> is the one parallel, and any other line through P meets l in a point that <code>meet</code> finds exactly. The same holds in a world with nine points: in the <a href="finite-geometries.html">affine plane</a> over the field with three elements, every line has 3 points, and for each of the 12 lines and each of the 6 points off it there is exactly one line through the point that shares no point with the line. The row for it is checked for every such pair.</p>
+
+<h2>None: the sphere and projective planes</h2>
+<p>On the <a href="spherical.html">sphere</a> two great circles always cross, so there are no parallels at all. The price is that two lines meet twice, and that Euclid's first postulate fails for opposite points. Identify each point with its opposite and that is repaired: the result is the <a href="projective.html">projective plane</a>, where two lines meet exactly once. Its smallest relative is the <a href="finite-geometries.html">Fano plane</a>, seven points and seven lines, any two of which meet.</p>
+<p>With no parallels, the angles of a triangle add up to more than two right angles, and the surplus is the area.</p>
+
+<h2>Infinitely many: the hyperbolic plane</h2>
+<p>In the <a href="hyperbolic.html">hyperbolic plane</a> all of Euclid's other postulates hold, and through a point off a line there are two limiting parallels and infinitely many lines between them, none meeting the line. The row for it builds three different lines through the point (the two limiting parallels and one ultraparallel) and verifies exactly that each passes through the point and misses the line. The models inside the Euclidean plane are what show the fifth postulate cannot be proved: a proof would hold in the model too, where the postulate is false.</p>
+<p>With many parallels, the angles of a triangle add up to less than two right angles, and the shortfall is the area.</p>
+
+<div class="tablewrap"><table class="ref">
+<tr><th>geometry</th><th>parallels</th><th>angle sum of a triangle</th><th>circumference of a circle</th></tr>
+<tr><td>sphere</td><td>none</td><td>more than π; the excess is the area</td><td>\(2\pi \sin r\)</td></tr>
+<tr><td>Euclidean plane</td><td>exactly one</td><td>π</td><td>\(2\pi r\)</td></tr>
+<tr><td>hyperbolic plane</td><td>infinitely many</td><td>less than π; the defect is the area</td><td>\(2\pi \sinh r\)</td></tr>
+</table></div>
+
+<h2>What the function returns</h2>
+<p><code>parallelPostulate({ q })</code> returns one row per geometry: <code>geometry</code>, <code>parallels</code>, <code>count</code>, an <code>example</code> with the line, the point and the lines found, and <code>checked</code>, which is true when the example was verified exactly. <code>q</code> chooses the field for the affine plane (a prime power; 3 by default). The same question can be put to any single figure: <code>greatCircle.parallelsThrough(P)</code> is always empty and carries a witness, <code>hline.parallelsThrough(P)</code> returns the limiting parallels and the angle of parallelism, and an incidence structure's <code>parallels(p, l)</code> lists them.</p>
+<template data-runbox>
+for (const r of parallelPostulate()) PRINT(r.geometry.padEnd(46), r.parallels.padEnd(16), "checked:", r.checked);
+// the hyperbolic example, in detail
+const h = parallelPostulate()[2].example;
+PRINT("line:", String(h.line), " point:", String(h.point));
+PRINT("limiting parallels:", h.limiting.map(String).join("; "));
+PRINT("angle of parallelism: cosine", N.text(h.angleOfParallelism.cos), "that is", h.angleOfParallelism.degrees.toFixed(4), "degrees");
+// a triangle of each kind with the same three right-ish corners
+const s = striangle([1, 0, 0], [0, 1, 0], [0, 0, 1]);
+const e = triangle([0, 0], [1, 0], [0, 1]);
+const y = htriangle([0, 0], ["1/2", 0], [0, "1/2"]);
+PRINT("angle sums: sphere", s.angleSum.text, " plane π  hyperbolic", y.angleSum.text);
+// affine planes over other fields
+[2, 4, 5].map((q) =&gt; `q = ${q}: ${parallelPostulate({ q })[3].checked}`)
+</template>
+</article>
+</main>
+</div>
+</body>
+</html>

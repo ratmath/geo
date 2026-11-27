@@ -1,8 +1,8 @@
 // Shared page furniture for the geo docs: the contents column, the theme
 // switch and the code boxes. Add each topic page to PAGES as it is written.
 
-import * as A from "./geo.js?v=124a82ef6a";
-import { mountRunboxes } from "./runbox.js?v=124a82ef6a";
+import * as A from "./geo.js?v=356fa44d42";
+import { mountRunboxes } from "./runbox.js?v=356fa44d42";
 
 export { A };
 
@@ -19,6 +19,11 @@ export const PAGES = [
   { href: "computational.html", title: "Computational geometry", blurb: "Hulls, polygons, Delaunay and Voronoi with exact predicates" },
   { href: "lattice.html", title: "Lattice geometry", blurb: "Pick's theorem and visible points" },
   { href: "metrics.html", title: "Taxicab geometry", blurb: "Other metrics: square circles and bent bisectors" },
+  { group: "Sphere and hyperbolic plane" },
+  { href: "spherical.html", title: "Spherical geometry", blurb: "Great circles, triangles and their excess, exact trigonometry, rotations" },
+  { href: "hyperbolic.html", title: "The hyperbolic plane", blurb: "Four models of one plane; exact distance, parallels, circles" },
+  { href: "hyperbolic-triangles.html", title: "Hyperbolic triangles, motions, tilings", blurb: "Defect as area, isometries classified, the tilings {p, q}" },
+  { href: "parallel-postulate.html", title: "The parallel postulate", blurb: "One parallel, none, or infinitely many: counted in five geometries" },
   { group: "Projective and finite" },
   { href: "projective.html", title: "The projective plane", blurb: "Duality, cross-ratio, projective maps, conics; Desargues to Brianchon" },
   { href: "finite-geometries.html", title: "Finite geometries", blurb: "The Fano plane, PG(2, q), AG(2, q) and their collineations" },

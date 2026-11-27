@@ -39,7 +39,11 @@ N.text(metric("taxicab").pi);           // "4"
 | Polyhedra | `solids` (Platonic and some Archimedean, coordinates in Q, Q(√2), Q(√5)), `polyhedron(points)` with faces proved exactly, `prism(n)`: Euler's formula, `volume`, `surfaceArea`, `dihedralCosines`, `dual()`, `symmetry()` as a PermGroup |
 | Plane symmetry | `figureSymmetry` (Cₙ or Dₙ), `friezeGroup` (the 7), `wallpaperGroup` (the 17, by the flowchart with its steps), `wallpaper.pattern` |
 | Tilings | `polygonAngle`, `vertexTypes` (the 21), `uniformTiling` (11 possible, a reason for the other 10), `regularTilings`, `tilingPatch` (a patch grown from the vertex type and checked) |
-| Pictures | `tilingFigure`, `solidPicture`, `wallpaperFigure`, `incidenceFigure`, `constructionFrames`, `geoFigure`, drawn by `@ratmath/graphics` (`figureSVG` and the others are re-exported) |
+| Angles and lengths | `Angle` (exact cosine and sine; `turns` decides whether it is a rational multiple of π; `value` encloses it), `Length` (exact cosh, sinh and eᵈ) |
+| The sphere | `spoint`, `greatCircle`, `striangle` (sides, angles, excess as area, the laws of spherical trigonometry as exact equalities, polar triangle), `scircle`, `srotation` and `SIsometry.classify()` |
+| The hyperbolic plane | `hpoint` with `.disc`, `.klein`, `.halfPlane`, `.hyperboloid`; `ideal`; `hline` (its shape in each model, `relation`, `parallelsThrough` with the angle of parallelism); `hcircle`, `horocycle`; `htriangle` (defect as area, ideal vertices, exact laws); `hrotation`, `htranslation`, reflections and `classify()`, `toMobius()`; `schlafli(p, q)` and `hyperbolicTiling(p, q)` |
+| The parallel postulate | `parallelPostulate()`: one, none or infinitely many parallels, counted exactly in five geometries |
+| Pictures | `hyperbolicFigure`, `hyperbolicTilingFigure`, `tilingFigure`, `solidPicture`, `wallpaperFigure`, `incidenceFigure`, `constructionFrames`, `geoFigure`, drawn by `@ratmath/graphics` (`figureSVG` and the others are re-exported) |
 | The join with graphics | `toGraphics` and `fromGraphics` move points, lines, circles and polygons between geo's kernel (all real algebraic numbers) and graphics' (Q(√d)) exactly; `toSurd` |
 
 A checked theorem is a test of one figure, exactly; it is not a proof of the
@@ -49,7 +53,6 @@ theorem. General proofs by elimination are phase 6.
 
 | Phase | Contents |
 |---|---|
-| 3 | Spherical and hyperbolic models |
 | 6 | General proofs of theorems by elimination |
 
 The plan is in the
@@ -60,7 +63,8 @@ The plan is in the
 - `index.js`, `src/`: the library. `src/num.js` (exact numbers), `src/plane.js`
   (the Euclidean plane), `src/theorems.js`, `src/discrete.js`,
   `src/projective.js`, `src/finite.js`, `src/solids.js`, `src/symmetry.js`,
-  `src/tilings.js`, `src/plan.js`.
+  `src/tilings.js`, `src/angle.js`, `src/sphere.js`, `src/hyperbolic.js`,
+  `src/postulate.js`, `src/plan.js`.
 - `vendor/algebraic`: `@ratmath/algebraic` as a git submodule (clone with
   `--recurse-submodules`).
 - `tests/`: `bun run test`.

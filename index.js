@@ -4,7 +4,8 @@
 // centres, transformations, theorems checked on exact figures), exact
 // computational and lattice geometry, and other metrics; the projective
 // plane and finite geometries; polyhedra, symmetry groups, friezes,
-// wallpaper groups and tilings. `plan` lists what is coming.
+// wallpaper groups and tilings; the sphere and the hyperbolic plane with
+// exact trigonometry. `plan` lists what is coming.
 
 export { plan } from "./src/plan.js";
 export { GeoError, num, N } from "./src/num.js";
@@ -24,6 +25,13 @@ export { Incidence, incidence, FiniteProjectivePlane, FiniteAffinePlane, project
 export { Polyhedron, polyhedron, solids, prism } from "./src/solids.js";
 export { figureSymmetry, wallpaperGroup, wallpaper, friezeGroup, friezes } from "./src/symmetry.js";
 export { polygonAngle, vertexTypes, uniformTiling, regularTilings, tilingPatch } from "./src/tilings.js";
-export { toSurd, toGraphics, fromGraphics, geoFigure, constructionFrames, tilingFigure, solidPicture, wallpaperFigure, incidenceFigure } from "./src/pictures.js";
+export { Angle, angle, Length, piTimes, turnsOfCos } from "./src/angle.js";
+export { SPoint, spoint, latLon, fromStereographic, northPole, GreatCircle, greatCircle, equator, SCircle, scircle, STriangle, striangle, lune, SIsometry, srotation, antipodalMap } from "./src/sphere.js";
+export {
+  HPoint, hpoint, fromKlein, fromHalfPlane, fromHyperboloid, horigin, HIdeal, ideal, HLine, hline, hmidpoint, hbisector, HCircle, hcircle, horocycle,
+  HTriangle, htriangle, HIsometry, hreflection, hrotation, hhalfTurn, htranslation, schlafli, hyperbolicTiling,
+} from "./src/hyperbolic.js";
+export { parallelPostulate } from "./src/postulate.js";
+export { toSurd, toGraphics, fromGraphics, geoFigure, constructionFrames, tilingFigure, solidPicture, wallpaperFigure, incidenceFigure, hyperbolicFigure, hyperbolicTilingFigure } from "./src/pictures.js";
 // Drawing a figure, from @ratmath/graphics (re-exported so geo's pictures need no second import).
 export { figureSVG, figurePNG, figurePDF, figureTikZ, figureASCII, framesSVG, framesPNG } from "@ratmath/graphics";

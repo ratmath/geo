@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The hyperbolic plane · RatMath Geo</title>
+<meta name="description" content="The hyperbolic plane with exact coordinates in four models at once: the Poincaré disc, the Klein disc, the half-plane and the hyperboloid. Lines, distance with exact cosh, the three ways two lines can lie, limiting parallels and the angle of parallelism, circles and horocycles.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<script type="module" src="assets/site.js"></script>
+</head>
+<body>
+<div class="shell">
+<aside></aside>
+<main>
+<article>
+<div class="eyebrow">Topic</div>
+<h1>The hyperbolic plane</h1>
+<p class="lede">In the hyperbolic plane, through a point off a line there are infinitely many lines that never meet it. The plane cannot be drawn in ours without distortion, so it is drawn in models, each wrong in a different way. Here a point is one exact object and the models are four views of it.</p>
+<pre><code>const p = hpoint("1/2", 0);                // coordinates in the Poincaré disc
+p.klein;  p.halfPlane;  p.hyperboloid;     // (4/5, 0)   (0, 3)   [5/3, 4/3, 0]
+horigin().distanceTo(p).text;              // "ln(3)"
+const l = hline(["1/2", 0], [0, "1/2"]);
+String(l.disc);                            // "circle, centre (5/4, 5/4), radius √34/4"
+String(l.klein);                           // "5·x + 5·y - 4 = 0": a straight chord
+const axis = hline(ideal(-1, 0), ideal(1, 0));
+axis.parallelsThrough([0, "1/2"]).angle;   // the angle of parallelism, cosine 4/5</code></pre>
+
+<h2>Four models, one point</h2>
+<p>The model that makes the algebra simple is the <strong>hyperboloid</strong>: the points \((t, x, y)\) with \(t^2 - x^2 - y^2 = 1\) and \(t &gt; 0\). With the form</p>
+\[ B(p, q) = p_0 q_0 - p_1 q_1 - p_2 q_2 \]
+<p>it behaves like a sphere of radius \(i\): the distance is given by \(\cosh d(p, q) = B(p, q)\), a line is \(\{p : B(n, p) = 0\}\) for a vector \(n\), and the isometries are the matrices that keep \(B\). The library keeps every point there. The other three are views:</p>
+<ul>
+<li>The <strong>Poincaré disc</strong>, \((x, y)/(1 + t)\). Angles are true to the eye; lines are arcs of circles that meet the boundary at right angles, or diameters.</li>
+<li>The <strong>Klein disc</strong>, \((x, y)/t\). Lines are straight chords, so incidence looks Euclidean; angles are distorted.</li>
+<li>The <strong>half-plane</strong>, the Poincaré disc under \(z \mapsto i\,\dfrac{1 + z}{1 - z}\). Lines are half-circles centred on the real axis, or vertical lines.</li>
+</ul>
+<p>The maps between the hyperboloid, the Poincaré disc and the half-plane are rational, so a point with rational coordinates in one has them in the others: (½, 0) in the disc is (0, 3) in the half-plane and (5/3, 4/3, 0) on the hyperboloid. Going to and from the Klein disc needs one square root in one direction. <code>hpoint(x, y)</code> takes Poincaré disc coordinates; <code>fromKlein</code>, <code>fromHalfPlane</code> and <code>fromHyperboloid</code> take the others; and every point has <code>.disc</code>, <code>.klein</code>, <code>.halfPlane</code> and <code>.hyperboloid</code>.</p>
+<p>The boundary circle is not part of the plane. Its points are the <em>ideal points</em>, the directions in which a line can leave: <code>ideal(x, y)</code>, or <code>ideal("1/8")</code> at an angle given as a fraction of a turn.</p>
+
+<h2>Distance</h2>
+<p>A distance is a <code>Length</code>. It holds \(\cosh d\) and \(\sinh d\) exactly, so \(e^d = \cosh d + \sinh d\) is an exact algebraic number and the distance is its logarithm: from the centre of the disc to (½, 0) is exactly \(\ln 3\), and <code>value(digits)</code> encloses it. Lengths add exactly, by the addition formulas for cosh and sinh. Near the boundary the disc's scale shrinks without limit: the point at Euclidean radius \(r\) is at distance \(\ln\frac{1 + r}{1 - r}\) from the centre.</p>
+
+<h2>Lines, and three ways for two of them to lie</h2>
+<p>Through two points there is one line, <code>hline(a, b)</code>; either point may be ideal. A line has two <code>ends</code>, and its shape in each model is available as an exact circle or line of the plane.</p>
+<p>For two lines with normals \(n_1, n_2\), compare \(B(n_1, n_2)^2\) with \(B(n_1, n_1)\,B(n_2, n_2)\). <code>relation</code> reports which case holds:</p>
+<ul>
+<li><strong>intersecting</strong> (less): they cross in one point, at an angle with exact cosine;</li>
+<li><strong>asymptotic</strong> (equal): they share an end and come arbitrarily close without meeting;</li>
+<li><strong>ultraparallel</strong> (more): they have exactly one common perpendicular, and its length, the shortest distance between them, has \(\cosh d = |B(n_1, n_2)| / \sqrt{B(n_1,n_1)B(n_2,n_2)}\).</li>
+</ul>
+
+<h2>Parallels and the angle of parallelism</h2>
+<p>Take a line and a point \(P\) at distance \(d\) from it. The two lines from \(P\) to the ends of the line are the <em>limiting parallels</em>. Every line through \(P\) between them misses the given line, so there are infinitely many parallels. The limiting ones make an angle \(\Pi(d)\) with the perpendicular from \(P\), the <em>angle of parallelism</em>, and Lobachevsky's formula for it becomes an exact statement about a cosine:</p>
+\[ \cos \Pi(d) = \tanh d. \]
+<p>As \(d \to 0\) the angle tends to a right angle, the Euclidean answer; as \(d\) grows it tends to 0. At distance \(\ln\sqrt3\) it is exactly 60°, and <code>parallelsThrough</code> returns it as the angle π/3. See <a href="parallel-postulate.html">the parallel postulate</a> for the same question in every geometry of the package.</p>
+
+<h2>Circles and horocycles</h2>
+<p>A circle of radius \(r\) has circumference \(2\pi \sinh r\) and area \(2\pi(\cosh r - 1)\), both more than in the plane and growing exponentially. They are exact multiples of π: the circle of radius \(\ln 3\) has circumference \(\tfrac83\pi\) and area \(\tfrac43\pi\). In the Poincaré disc a hyperbolic circle is a Euclidean circle, but its centre is somewhere else; <code>circle.disc</code> gives it. A <em>horocycle</em> is the limit of circles through a point as the centre goes off to an ideal point: in the disc, a circle touching the boundary.</p>
+<div class="tablewrap"><table class="ref">
+<tr><th>call</th><th>returns</th></tr>
+<tr><td>hpoint(x, y), fromKlein, fromHalfPlane, fromHyperboloid, horigin()</td><td>HPoint: disc, klein, halfPlane, hyperboloid, distanceTo</td></tr>
+<tr><td>ideal(x, y), ideal(turns)</td><td>HIdeal: disc, halfPlane (a number, or null for the point at infinity)</td></tr>
+<tr><td>hline(a, b), hbisector(a, b), hmidpoint(a, b)</td><td>HLine: contains, side, ends, disc, klein, halfPlane, distanceTo, foot, perpendicularThrough, relation, meets, reflection, parallelsThrough</td></tr>
+<tr><td>hcircle(centre, point | { cosh } | { exp }), horocycle(ideal, p)</td><td>HCircle: radius, circumference, area, disc, contains</td></tr>
+<tr><td>Length.ofCosh(c), Length.ofExp(e), Length.ofSinh(s)</td><td>Length: cosh, sinh, exp, tanh, text, value(digits), add, double, half, equals</td></tr>
+<tr><td>hyperbolicFigure(items, { model })</td><td>A figure in the Poincaré disc, the Klein disc or the half-plane</td></tr>
+</table></div>
+<template data-runbox>
+const p = hpoint("1/2", 0), q = hpoint(0, "1/2");
+PRINT("disc", String(p.disc), " Klein", String(p.klein), " half-plane", String(p.halfPlane), " hyperboloid", p.hyperboloid.map((c) =&gt; N.text(c)).join(", "));
+PRINT("distance p to q:", p.distanceTo(q).text, "=", p.distanceTo(q).value(15).low.toDecimal(15), "…");
+const l = hline(p, q);
+PRINT("the line pq: in the disc a", String(l.disc), "; in Klein", String(l.klein), "; in the half-plane a", String(l.halfPlane));
+const axis = hline(ideal(-1, 0), ideal(1, 0));
+const far = hline(ideal("3/5", "4/5"), ideal("-3/5", "4/5"));
+const r = axis.relation(far);
+PRINT("axis and the chord y = 4/5:", r.kind, "at distance", r.distance.text);
+const P = hpoint(0, "1/2");
+const par = axis.parallelsThrough(P);
+PRINT("through", String(P), ": limiting parallels", par.limiting.map((m) =&gt; axis.relation(m).kind).join(", "), "; angle of parallelism has cosine", N.text(par.angle.cos), "= tanh", par.distance.text);
+const c = hcircle([0, 0], { exp: 3 });
+PRINT("circle of radius ln 3: circumference", c.circumference.text, " area", c.area.text);
+SHOW(figureSVG(hyperbolicFigure([axis, ...par.limiting, par.ultraparallel, far, P], { model: "disc" }), { width: 320, height: 320 }));
+SHOW(figureSVG(hyperbolicFigure([axis, ...par.limiting, par.ultraparallel, far, P], { model: "klein" }), { width: 320, height: 320 }));
+</template>
+</article>
+</main>
+</div>
+</body>
+</html>
