@@ -11,6 +11,7 @@
 // incidence and the cross-ratio are decided exactly.
 import { num, N, refuse, ZERO, ONE } from "./num.js";
 import { Point } from "./plane.js";
+import { conicProperties as conicPropertiesOf } from "./conics.js";
 
 const cross3 = (u, v) => [N.sub(N.mul(u[1], v[2]), N.mul(u[2], v[1])), N.sub(N.mul(u[2], v[0]), N.mul(u[0], v[2])), N.sub(N.mul(u[0], v[1]), N.mul(u[1], v[0]))];
 const dot3 = (u, v) => N.sum(N.mul(u[0], v[0]), N.mul(u[1], v[1]), N.mul(u[2], v[2]));
@@ -300,6 +301,10 @@ export class Conic {
     if (N.isZero(d2)) return "parabola";
     // ellipse: real when a·det < 0
     return N.sign(N.mul(M[0][0], D)) < 0 ? (N.eq(M[0][0], M[1][1]) && N.isZero(M[0][1]) ? "circle" : "ellipse") : "ellipse with no real points";
+  }
+  /** Centre, axes, vertices, foci, eccentricity, directrices, asymptotes: see conicProperties. */
+  properties() {
+    return conicPropertiesOf(this.coefficients);
   }
   toString() {
     const names = ["x²", "xy", "y²", "x", "y", ""];

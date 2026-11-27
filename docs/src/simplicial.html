@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Simplicial complexes · RatMath Geo</title>
+<meta name="description" content="Simplicial complexes from maximal simplices: faces, f-vectors, boundary maps, homology, recognising and classifying triangulated surfaces, the complex of a graph or a polyhedron, and fundamental groups.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<script type="module" src="assets/site.js"></script>
+</head>
+<body>
+<div class="shell">
+<aside></aside>
+<main>
+<article>
+<div class="eyebrow">Topology</div>
+<h1>Simplicial complexes</h1>
+<p class="lede">A simplicial complex is a space built from points, edges, triangles and their higher analogues, glued along whole faces. It is given by its maximal simplices; everything else, from the face counts to the homology and the fundamental group, follows by counting and integer linear algebra.</p>
+
+<h2>Faces and the f-vector</h2>
+<p><code>simplicialComplex</code> takes a list of simplices, each a list of vertices, and adds every face of each. The <em>f-vector</em> counts the faces in each dimension, and the Euler characteristic is its alternating sum. The boundary of a tetrahedron, four triangles on four vertices, is a sphere: \(4 - 6 + 4 = 2\).</p>
+<pre><code>import { simplicialComplex, simplicial } from "@ratmath/geo";
+
+const S = simplicialComplex([[1, 2, 3], [1, 2, 4], [1, 3, 4], [2, 3, 4]]);
+S.fVector;               // [4, 6, 4]
+S.eulerCharacteristic;   // 2
+String(S.chainComplex());   // "H0 = Z, H1 = 0, H2 = Z"</code></pre>
+<p>The boundary map sends a simplex \([v_0, \dots, v_k]\) (vertices in increasing order) to \(\sum_i (-1)^i [v_0, \dots, \widehat{v_i}, \dots, v_k]\), the face without \(v_i\) with sign \((-1)^i\). These matrices go to <a href="https://ratmath.com/structures/homology.html">@ratmath/structures</a> for the homology, with coefficients in \(\mathbb Z\), \(\mathbb Q\) or \(\mathbb Z/p\).</p>
+
+<h2>Named complexes</h2>
+<p><code>simplicial.sphere(n)</code> is the boundary of the \((n+1)\)-simplex. <code>simplicial.torus()</code> is Möbius and Császár's torus on 7 vertices, the smallest possible: every pair of vertices is an edge, \(\binom72 = 21\), and \(7 - 21 + 14 = 0\). <code>simplicial.projectivePlane()</code> is the 6-vertex projective plane (an icosahedron with opposite points identified), and <code>simplicial.kleinBottle()</code> a 12-vertex Klein bottle from a grid of squares.</p>
+<pre><code>const T = simplicial.torus();
+T.fVector;                    // [7, 21, 14]
+String(T.homology(1));        // "Z^2"
+simplicial.projectivePlane().betti({ coefficients: "Z/2" });   // [1, 1, 1]
+simplicial.sphere(3).fVector; // [5, 10, 10, 5]</code></pre>
+
+<h2>Triangulated surfaces</h2>
+<p>A 2-dimensional complex is a surface when every edge lies in one or two triangles and the triangles around each vertex form a disk: the <em>link</em> of the vertex is a circle (or an arc, on the boundary). <code>isSurface</code> checks this, and <code>classify()</code> turns the triangles into glued polygons, one edge label per edge, so the classification agrees with the one from an <a href="surfaces.html">edge word</a>.</p>
+<pre><code>simplicial.kleinBottle().classify().name;   // "Klein bottle"
+simplicialComplex([[1, 2, 3], [1, 2, 4], [1, 2, 5]]).surfaceCheck();
+// { surface: false, reason: "edge [1,2] is in 3 triangles" }</code></pre>
+
+<h2>Graphs, polyhedra and π₁</h2>
+<p>A graph is a 1-dimensional complex: \(\chi = V - E\), and for a connected graph \(b_1 = E - V + 1\) counts independent cycles. <code>simplicial.fromGraph</code> takes <code>{ vertices, edges }</code> or a graph from <a href="https://ratmath.com/discrete/">@ratmath/discrete</a>. A <a href="polyhedra.html">polyhedron</a>'s boundary, each face cut into triangles, is a sphere. The fundamental group comes from a spanning tree of the edges: the other edges generate, and each triangle gives a relation.</p>
+<pre><code>import { solids } from "@ratmath/geo";
+simplicial.fromPolyhedron(solids.cube()).classify().name;   // "sphere"
+String(simplicial.sphere(1).fundamentalGroup());             // "⟨e3 | ⟩": the circle, Z
+String(simplicial.torus().fundamentalGroup().abelianInvariants());   // "Z^2"</code></pre>
+
+<template data-runbox>
+// Spheres of each dimension, and the three small surfaces
+for (let n = 1; n &lt;= 4; n++) {
+  const S = simplicial.sphere(n);
+  PRINT(`S${n}: f = (${S.fVector.join(", ")}), χ = ${S.eulerCharacteristic}, ${S.chainComplex()}`);
+}
+for (const k of ["torus", "projectivePlane", "kleinBottle"]) {
+  const X = simplicial[k]();
+  PRINT(k.padEnd(16), `f = (${X.fVector.join(", ")})`, String(X.chainComplex()).padEnd(32), "mod 2:", X.betti({ coefficients: "Z/2" }).join(" "));
+}
+// Two tetrahedra sharing a face: still a ball, so contractible
+simplicialComplex([[1, 2, 3, 4], [2, 3, 4, 5]]).homologyGroups().map((H) =&gt; H.toString({ additive: true }))
+</template>
+</article>
+</main>
+</div>
+</body>
+</html>

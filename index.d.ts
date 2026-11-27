@@ -82,6 +82,14 @@ export class Line {
   at(p: PointLike): Num;
   contains(p: PointLike): boolean;
   equals(o: Line): boolean;
+  /** −a/b, or null for a vertical line. */
+  readonly slope: Num | null;
+  /** The y-intercept −c/b, or null for a vertical line. */
+  readonly intercept: Num | null;
+  /** "y = -2x + 1", or "x = k" for a vertical line. */
+  toSlopeIntercept(): string;
+  /** "y - 5 = -2(x + 2)" through a point of the line. */
+  toPointSlope(p?: PointLike): string;
   toString(): string;
 }
 export function line(p: PointLike, q: PointLike): Line;
@@ -407,6 +415,8 @@ export class Conic {
   tangentAt(p: PPointLike): PLine;
   transform(T: Projectivity): Conic;
   classify(): string;
+  /** See conicProperties. */
+  properties(): ConicPropertiesBase | CentralConicProperties | ParabolaProperties;
   toString(): string;
 }
 export function conicThrough(points: PPointLike[]): Conic;
@@ -1022,4 +1032,270 @@ export const provable: ReadonlyArray<{ readonly id: ProvableId; readonly name: s
 export const proofs: { readonly [K in ProvableId]: (options?: ProveOptions) => Proof } & {
   all(options?: ProveOptions): Array<{ id: ProvableId; name: string; statement: string; proof: Proof }>;
   setup(id: ProvableId): { configuration: Configuration; conclusion: GeoExpr | Array<GeoExpr | GeoExpr[]> };
+};
+
+// ---- measurement (school geometry) ----------------------------------------------
+
+/** (n − 2)·180, in degrees. */
+export function angleSum(n: number): Rational;
+/** (n − 2)·180/n, in degrees: each angle of a regular n-gon. */
+export function interiorAngle(n: number): Rational;
+/** 360/n, in degrees. */
+export function exteriorAngle(n: number): Rational;
+export function slopeIntercept(l: Line): { slope: Num | null; intercept: Num | null; text: string; line: Line };
+export function slopeIntercept(p: PointLike, q: PointLike): { slope: Num | null; intercept: Num | null; text: string; line: Line };
+/** The line through p with slope m. */
+export function pointSlope(p: PointLike, m: NumLike): Line;
+/** √(power of p): the length of a tangent segment from p. */
+export function tangentLength(c: Circle, p: PointLike): Num;
+/** The box a × b × c as an exact polyhedron. */
+export function box(a: NumLike, b: NumLike, c: NumLike): Polyhedron;
+export interface PiMultiple { coefficient: Num; text: string; value(digits?: number): unknown }
+export function cylinder(r: NumLike, h: NumLike): { kind: "cylinder"; radius: Num; height: Num; volume: PiMultiple; lateralArea: PiMultiple; surfaceArea: PiMultiple };
+export function cone(r: NumLike, h: NumLike): { kind: "cone"; radius: Num; height: Num; slant: Num; volume: PiMultiple; lateralArea: PiMultiple; surfaceArea: PiMultiple };
+export function sphere(r: NumLike): { kind: "sphere"; radius: Num; volume: PiMultiple; surfaceArea: PiMultiple };
+/** Ratios for similar figures with scale factor k: lengths k, areas k², volumes k³. */
+export function similar(spec: NumLike | { lengths: [NumLike, NumLike] } | { areas: [NumLike, NumLike] } | { volumes: [NumLike, NumLike] }): { scale: Num; length: Num; area: Num; volume: Num };
+/** [A, B, C, D, E, F] of Ax² + Bxy + Cy² + Dx + Ey + F from text or six numbers. */
+export function conicCoefficients(input: string | NumLike[]): [Num, Num, Num, Num, Num, Num];
+/** The circle x² + y² + Dx + Ey + F = 0, by completing the square. */
+export function circleFromEquation(input: string | NumLike[]): Circle;
+
+// ---- vectors, lines and planes in space ------------------------------------------
+
+export class Vector {
+  constructor(x: NumLike, y: NumLike, z: NumLike);
+  readonly x: Num;
+  readonly y: Num;
+  readonly z: Num;
+  toArray(): [Num, Num, Num];
+  add(o: VectorLike): Vector;
+  sub(o: VectorLike): Vector;
+  scale(k: NumLike): Vector;
+  neg(): Vector;
+  dot(o: VectorLike): Num;
+  cross(o: VectorLike): Vector;
+  readonly norm2: Num;
+  readonly norm: Num;
+  readonly isZero: boolean;
+  unit(): Vector;
+  angle(o: VectorLike): Angle;
+  projectOnto(o: VectorLike): Vector;
+  componentAlong(o: VectorLike): Num;
+  isParallel(o: VectorLike): boolean;
+  isOrthogonal(o: VectorLike): boolean;
+  equals(o: VectorLike): boolean;
+  toString(): string;
+}
+export type VectorLike = Vector | [NumLike, NumLike, NumLike] | { x: NumLike; y: NumLike; z: NumLike };
+export function vector(x: NumLike, y: NumLike, z: NumLike): Vector;
+export function vector(v: VectorLike): Vector;
+/** u·(v × w). */
+export function tripleProduct(u: VectorLike, v: VectorLike, w: VectorLike): Num;
+/** The line p + t·d. */
+export class Line3 {
+  constructor(point: VectorLike, direction: VectorLike);
+  readonly point: Vector;
+  readonly direction: Vector;
+  at(t: NumLike): Vector;
+  contains(p: VectorLike): boolean;
+  distance(p: VectorLike): Num;
+  toString(): string;
+}
+export function line3(p: VectorLike, q: VectorLike): Line3;
+/** The plane n·x = d. */
+export class Plane {
+  constructor(normal: VectorLike, d: NumLike);
+  readonly normal: Vector;
+  readonly d: Num;
+  /** [a, b, c, d] of ax + by + cz = d, whole numbers when rational. */
+  readonly coefficients: [Num, Num, Num, Num];
+  /** "5x + 3y + 4z = 13" */
+  readonly equation: string;
+  at(p: VectorLike): Num;
+  contains(p: VectorLike): boolean;
+  distance(p: VectorLike): Num;
+  foot(p: VectorLike): Vector;
+  isParallel(o: Plane | VectorLike): boolean;
+  angle(o: Plane): Angle;
+  meet(o: Line3): Vector | Line3 | null;
+  meet(o: Plane): Line3 | Plane | null;
+  equals(o: Plane): boolean;
+  toString(): string;
+}
+export function plane(p: VectorLike, q: VectorLike, r: VectorLike): Plane;
+export function plane(p: VectorLike, options: { normal: VectorLike }): Plane;
+export function plane(spec: { coefficients: [NumLike, NumLike, NumLike, NumLike] }): Plane;
+
+// ---- conic sections -------------------------------------------------------------
+
+export type ConicType = "ellipse" | "circle" | "hyperbola" | "parabola" | "point" | "two crossing lines" | "two parallel lines" | "double line" | "empty";
+export interface ConicPropertiesBase {
+  type: ConicType;
+  coefficients: [Num, Num, Num, Num, Num, Num];
+  /** B² − 4AC */
+  discriminant: Num;
+  /** det of the 3 × 3 matrix */
+  determinant: Num;
+  degenerate: boolean;
+  note?: string;
+}
+export interface CentralConicProperties extends ConicPropertiesBase {
+  type: "ellipse" | "circle" | "hyperbola";
+  center: Point;
+  a: Num; b: Num; c: Num;
+  semiMajor: Num; semiMinor: Num;
+  eccentricity: Num;
+  axes: { major: Line; minor: Line };
+  axisDirection: [Num, Num];
+  vertices: [Point, Point];
+  coVertices: [Point, Point];
+  foci: Point[];
+  directrices: Line[];
+  asymptotes?: [Line, Line];
+  radius?: Num;
+  standardForm: string;
+}
+export interface ParabolaProperties extends ConicPropertiesBase {
+  type: "parabola";
+  vertex: Point;
+  focus: Point;
+  focalLength: Num;
+  eccentricity: Num;
+  axis: Line;
+  axisDirection: [Num, Num];
+  directrix: Line;
+  latusRectum: Num;
+  standardForm: string;
+}
+/** Type, centre or vertex, axes, vertices, foci, eccentricity, directrices and asymptotes of Ax² + Bxy + Cy² + Dx + Ey + F = 0. */
+export function conicProperties(input: string | NumLike[]): ConicPropertiesBase | CentralConicProperties | ParabolaProperties;
+
+// ---- topology: glued polygons, simplicial complexes, finite spaces ----------------
+
+import type { ChainComplex, AbelianGroup, FieldHomology, HomologyCoefficients, Presentation } from "@ratmath/structures";
+
+export interface EdgeToken { label: string; exp: 1 | -1 }
+export function parseEdgeWord(text: string | Array<string | EdgeToken>): EdgeToken[];
+export function formatEdgeWord(w: EdgeToken[]): string;
+
+export interface SurfaceClassification {
+  eulerCharacteristic: number;
+  orientable: boolean;
+  /** Number of handles (orientable), else null. */
+  genus: number | null;
+  /** Number of cross-caps (non-orientable), else null. */
+  crosscaps: number | null;
+  boundaryComponents: number;
+  closed: boolean;
+  /** "sphere", "torus", "connected sum of 2 tori", "Klein bottle", "Möbius band", … */
+  name: string;
+  /** a1 b1 a1^-1 b1^-1 … or a1 a1 a2 a2 …, then x c x^-1 per boundary circle. */
+  normalForm: string;
+}
+export function classifySurface(spec: { eulerCharacteristic?: number; euler?: number; orientable: boolean; boundaryComponents?: number }): SurfaceClassification;
+
+export class Surface {
+  constructor(faces: string | EdgeToken[] | Array<string | EdgeToken[]>, options?: { name?: string | null });
+  readonly faces: ReadonlyArray<ReadonlyArray<EdgeToken>>;
+  readonly edges: readonly string[];
+  readonly boundaryEdges: readonly string[];
+  readonly vertexCount: number;
+  readonly orientable: boolean;
+  readonly boundaryComponents: number;
+  readonly name: string | null;
+  /** [V, E, F]. */
+  readonly cells: [number, number, number];
+  readonly eulerCharacteristic: number;
+  readonly closed: boolean;
+  readonly boundaryMatrices: [number[][], number[][]];
+  chainComplex(): ChainComplex;
+  homology(k: number, options?: { coefficients?: HomologyCoefficients }): AbelianGroup | FieldHomology;
+  homologyGroups(options?: { coefficients?: HomologyCoefficients }): Array<AbelianGroup | FieldHomology>;
+  betti(options?: { coefficients?: HomologyCoefficients }): number[];
+  classify(): SurfaceClassification;
+  fundamentalGroup(): Presentation;
+  singleFace(): Surface;
+  connectedSum(other: Surface | string): Surface;
+  toString(): string;
+}
+export function surface(faces: string | EdgeToken[] | Array<string | EdgeToken[]>, options?: { name?: string | null }): Surface;
+
+export type Vertex = number | string;
+export class SimplicialComplex {
+  constructor(simplices: Vertex[][], options?: { name?: string | null });
+  readonly dimension: number;
+  readonly vertices: readonly Vertex[];
+  readonly facets: ReadonlyArray<readonly Vertex[]>;
+  readonly name: string | null;
+  faces(k: number): ReadonlyArray<readonly Vertex[]>;
+  readonly fVector: number[];
+  readonly eulerCharacteristic: number;
+  readonly isPure: boolean;
+  readonly isConnected: boolean;
+  readonly isSurface: boolean;
+  boundary(k: number): number[][] | null;
+  chainComplex(): ChainComplex;
+  homology(k: number, options?: { coefficients?: HomologyCoefficients }): AbelianGroup | FieldHomology;
+  homologyGroups(options?: { coefficients?: HomologyCoefficients }): Array<AbelianGroup | FieldHomology>;
+  betti(options?: { coefficients?: HomologyCoefficients }): number[];
+  link(v: Vertex): SimplicialComplex | null;
+  components(): Vertex[][];
+  surfaceCheck(): { surface: boolean; reason?: string };
+  toSurface(): Surface;
+  classify(): SurfaceClassification;
+  fundamentalGroup(): Presentation;
+  toString(): string;
+}
+export function simplicialComplex(simplices: Vertex[][], options?: { name?: string | null }): SimplicialComplex;
+export const simplicial: {
+  simplex(n: number): SimplicialComplex;
+  sphere(n: number): SimplicialComplex;
+  torus(): SimplicialComplex;
+  projectivePlane(): SimplicialComplex;
+  kleinBottle(): SimplicialComplex;
+  fromGraph(G: { vertices?: Vertex[] | (() => Vertex[]); edges: Array<[Vertex, Vertex]> | (() => Array<{ from: Vertex; to: Vertex }>) }): SimplicialComplex;
+  fromPolyhedron(P: { faces: ReadonlyArray<ReadonlyArray<number>>; name?: string }): SimplicialComplex;
+};
+
+export type FinitePoint = number | string;
+export class FiniteSpace {
+  constructor(points: FinitePoint[], opens: FinitePoint[][], options?: { check?: boolean; name?: string | null });
+  readonly points: readonly FinitePoint[];
+  readonly name: string | null;
+  readonly size: number;
+  readonly opens: FinitePoint[][];
+  readonly closedSets: FinitePoint[][];
+  isOpen(A: FinitePoint[]): boolean;
+  isClosed(A: FinitePoint[]): boolean;
+  interior(A: FinitePoint[]): FinitePoint[];
+  closure(A: FinitePoint[]): FinitePoint[];
+  boundary(A: FinitePoint[]): FinitePoint[];
+  isDense(A: FinitePoint[]): boolean;
+  minimalOpen(x: FinitePoint): FinitePoint[];
+  readonly minimalBasis: FinitePoint[][];
+  isBasis(family: FinitePoint[][]): boolean;
+  readonly specialization: Array<[FinitePoint, FinitePoint]>;
+  readonly isT0: boolean;
+  readonly isT1: boolean;
+  readonly isHausdorff: boolean;
+  components(): FinitePoint[][];
+  readonly isConnected: boolean;
+  readonly isCompact: boolean;
+  subspace(A: FinitePoint[]): FiniteSpace;
+  continuity(f: ((x: FinitePoint) => FinitePoint) | Map<FinitePoint, FinitePoint> | Record<string, FinitePoint>, Y: FiniteSpace): { continuous: boolean; witness?: { open: FinitePoint[]; preimage: FinitePoint[] } };
+  isContinuous(f: ((x: FinitePoint) => FinitePoint) | Map<FinitePoint, FinitePoint> | Record<string, FinitePoint>, Y: FiniteSpace): boolean;
+  equals(other: FiniteSpace): boolean;
+  toString(): string;
+}
+export function finiteSpace(points: FinitePoint[], opens: FinitePoint[][], options?: { check?: boolean; name?: string | null }): FiniteSpace;
+export function fromBasis(points: FinitePoint[], basis: FinitePoint[][]): FiniteSpace;
+export function fromPreorder(points: FinitePoint[], pairs: Array<[FinitePoint, FinitePoint]>): FiniteSpace;
+export function countTopologies(n: number, options?: { t0?: boolean }): number;
+export function allTopologies(points: FinitePoint[], options?: { t0?: boolean }): FiniteSpace[];
+export const finiteSpaces: {
+  discrete(points: FinitePoint[]): FiniteSpace;
+  indiscrete(points: FinitePoint[]): FiniteSpace;
+  sierpinski(): FiniteSpace;
+  pseudocircle(): FiniteSpace;
 };

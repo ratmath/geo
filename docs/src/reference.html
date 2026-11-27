@@ -47,6 +47,33 @@
 <tr><td>construction(given), Construction</td><td>A recorded ruler-and-compass construction: line, circle, meet, get, count. See <a href="constructions.html">Constructions</a>.</td></tr>
 </table></div>
 
+<h2>Measurement</h2>
+<div class="tablewrap"><table class="ref">
+<tr><th>name</th><th>what it gives</th></tr>
+<tr><td>angleSum(n), interiorAngle(n), exteriorAngle(n)</td><td>(n − 2)·180, (n − 2)·180/n and 360/n, in degrees, exactly</td></tr>
+<tr><td>line.slope, line.intercept, line.toSlopeIntercept(), line.toPointSlope(p)</td><td>slope and intercept (null when vertical); "y = mx + b" and "y − y₀ = m(x − x₀)"</td></tr>
+<tr><td>slopeIntercept(p, q), pointSlope(p, m)</td><td>{ slope, intercept, text, line } of the line through two points; the line through p with slope m</td></tr>
+<tr><td>tangentLength(circle, p)</td><td>√(power of p)</td></tr>
+<tr><td>circleFromEquation(text | [A..F]), conicCoefficients(...)</td><td>the circle by completing the square; the six coefficients of a conic</td></tr>
+<tr><td>box(a, b, c), cylinder(r, h), cone(r, h), sphere(r)</td><td>a box as a Polyhedron; the round solids' volume and areas as multiples of π</td></tr>
+<tr><td>similar(k | { lengths | areas | volumes })</td><td>{ scale, length, area, volume } ratios</td></tr>
+</table></div>
+
+<h2>Conic sections</h2>
+<div class="tablewrap"><table class="ref">
+<tr><th>name</th><th>what it gives</th></tr>
+<tr><td>conicProperties(text | [A, B, C, D, E, F]), conic.properties()</td><td>type (degenerate kinds stop there); for an ellipse or hyperbola center, a, b, c, eccentricity, axes, vertices, coVertices, foci, directrices, asymptotes, standardForm; for a parabola vertex, focus, focalLength, axis, directrix, latusRectum</td></tr>
+</table></div>
+
+<h2>Vectors and planes in space</h2>
+<div class="tablewrap"><table class="ref">
+<tr><th>name</th><th>what it gives</th></tr>
+<tr><td>vector(x, y, z)</td><td>dot, cross, norm, norm2, unit, angle, projectOnto, componentAlong, isParallel, isOrthogonal, add, sub, scale</td></tr>
+<tr><td>tripleProduct(u, v, w)</td><td>u·(v × w), the signed volume</td></tr>
+<tr><td>line3(p, q), new Line3(point, direction)</td><td>at(t), contains, distance</td></tr>
+<tr><td>plane(p, q, r), plane(p, { normal }), plane({ coefficients })</td><td>equation, coefficients, contains, distance, foot, angle, meet (a line or a plane), isParallel</td></tr>
+</table></div>
+
 <h2>Triangles</h2>
 <div class="tablewrap"><table class="ref">
 <tr><th>Member of triangle(a, b, c)</th><th>What it is</th></tr>
@@ -140,6 +167,17 @@
 <tr><td>schlafli(p, q), hyperbolicTiling(p, q)</td><td>The regular tiling {p, q}: its geometry and exact tile; a patch of tiles.</td></tr>
 <tr><td>parallelPostulate({ q })</td><td>Playfair's postulate counted in five geometries. See <a href="parallel-postulate.html">The parallel postulate</a>.</td></tr>
 <tr><td>hyperbolicFigure(items, { model }), hyperbolicTilingFigure(p, q, { layers, model })</td><td>Figures in the Poincaré disc, the Klein disc or the half-plane.</td></tr>
+</table></div>
+
+<h2>Topology</h2>
+<div class="tablewrap"><table class="ref">
+<tr><th>Export</th><th>What it does</th></tr>
+<tr><td>surface(word or [words]), Surface</td><td>Glued polygons: cells, eulerCharacteristic, orientable, boundaryComponents, boundaryMatrices, chainComplex(), homology(k, { coefficients }), betti(), classify(), fundamentalGroup(), singleFace(), connectedSum(S). See <a href="surfaces.html">Surfaces from polygons</a>.</td></tr>
+<tr><td>classifySurface({ euler, orientable, boundaryComponents })</td><td>{ genus or crosscaps, name, normalForm } by the classification theorem.</td></tr>
+<tr><td>parseEdgeWord(text), formatEdgeWord(tokens)</td><td>Edge words such as &quot;a b a^-1 b^-1&quot; as { label, exp } tokens and back.</td></tr>
+<tr><td>simplicialComplex(simplices), SimplicialComplex, simplicial</td><td>faces(k), fVector, eulerCharacteristic, boundary(k), chainComplex(), homology, betti, link(v), components(), isSurface, surfaceCheck(), classify(), fundamentalGroup(); simplicial.simplex, sphere, torus, projectivePlane, kleinBottle, fromGraph, fromPolyhedron. See <a href="simplicial.html">Simplicial complexes</a>.</td></tr>
+<tr><td>finiteSpace(points, opens), fromBasis, fromPreorder, finiteSpaces</td><td>FiniteSpace: opens, closedSets, closure, interior, boundary, minimalOpen, specialization, isT0, isT1, components, continuity(f, Y), subspace. See <a href="finite-spaces.html">Finite spaces</a>.</td></tr>
+<tr><td>countTopologies(n, { t0 }), allTopologies(points)</td><td>Topologies on n ≤ 5 points through preorders; every topology on up to 4 points.</td></tr>
 </table></div>
 
 <h2>Solids, symmetry and tilings</h2>

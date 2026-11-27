@@ -1,6 +1,6 @@
 # @ratmath/geo 0.4.0: full documentation
 
-> Geometry for RatMath: Euclidean constructions, theorems checked on exact figures and proved in general, spherical, hyperbolic, projective and finite geometries, symmetry and tilings. From https://ratmath.com/geo/, commit 138ca0c. Each page ends with a runnable example; in it, PRINT(...) prints.
+> Geometry for RatMath: Euclidean constructions, theorems checked on exact figures and proved in general, spherical, hyperbolic, projective and finite geometries, symmetry and tilings. From https://ratmath.com/geo/, commit 17b4d74. Each page ends with a runnable example; in it, PRINT(...) prints.
 
 
 ---
@@ -124,6 +124,42 @@ Every export of `@ratmath/geo`, with what it takes and what it returns. A point 
 | regularPolygon(n, { center, vertex }) | The vertices, exact for every n. |
 
 | construction(given), Construction | A recorded ruler-and-compass construction: line, circle, meet, get, count. See Constructions. |
+
+### Measurement
+
+| name | what it gives |
+
+| angleSum(n), interiorAngle(n), exteriorAngle(n) | (n − 2)·180, (n − 2)·180/n and 360/n, in degrees, exactly |
+
+| line.slope, line.intercept, line.toSlopeIntercept(), line.toPointSlope(p) | slope and intercept (null when vertical); "y = mx + b" and "y − y₀ = m(x − x₀)" |
+
+| slopeIntercept(p, q), pointSlope(p, m) | { slope, intercept, text, line } of the line through two points; the line through p with slope m |
+
+| tangentLength(circle, p) | √(power of p) |
+
+| circleFromEquation(text \| [A..F]), conicCoefficients(...) | the circle by completing the square; the six coefficients of a conic |
+
+| box(a, b, c), cylinder(r, h), cone(r, h), sphere(r) | a box as a Polyhedron; the round solids' volume and areas as multiples of π |
+
+| similar(k \| { lengths \| areas \| volumes }) | { scale, length, area, volume } ratios |
+
+### Conic sections
+
+| name | what it gives |
+
+| conicProperties(text \| [A, B, C, D, E, F]), conic.properties() | type (degenerate kinds stop there); for an ellipse or hyperbola center, a, b, c, eccentricity, axes, vertices, coVertices, foci, directrices, asymptotes, standardForm; for a parabola vertex, focus, focalLength, axis, directrix, latusRectum |
+
+### Vectors and planes in space
+
+| name | what it gives |
+
+| vector(x, y, z) | dot, cross, norm, norm2, unit, angle, projectOnto, componentAlong, isParallel, isOrthogonal, add, sub, scale |
+
+| tripleProduct(u, v, w) | u·(v × w), the signed volume |
+
+| line3(p, q), new Line3(point, direction) | at(t), contains, distance |
+
+| plane(p, q, r), plane(p, { normal }), plane({ coefficients }) | equation, coefficients, contains, distance, foot, angle, meet (a line or a plane), isParallel |
 
 ### Triangles
 
@@ -276,6 +312,22 @@ See [General proofs](https://ratmath.com/geo/proofs.html).
 | parallelPostulate({ q }) | Playfair's postulate counted in five geometries. See The parallel postulate. |
 
 | hyperbolicFigure(items, { model }), hyperbolicTilingFigure(p, q, { layers, model }) | Figures in the Poincaré disc, the Klein disc or the half-plane. |
+
+### Topology
+
+| Export | What it does |
+
+| surface(word or [words]), Surface | Glued polygons: cells, eulerCharacteristic, orientable, boundaryComponents, boundaryMatrices, chainComplex(), homology(k, { coefficients }), betti(), classify(), fundamentalGroup(), singleFace(), connectedSum(S). See Surfaces from polygons. |
+
+| classifySurface({ euler, orientable, boundaryComponents }) | { genus or crosscaps, name, normalForm } by the classification theorem. |
+
+| parseEdgeWord(text), formatEdgeWord(tokens) | Edge words such as "a b a^-1 b^-1" as { label, exp } tokens and back. |
+
+| simplicialComplex(simplices), SimplicialComplex, simplicial | faces(k), fVector, eulerCharacteristic, boundary(k), chainComplex(), homology, betti, link(v), components(), isSurface, surfaceCheck(), classify(), fundamentalGroup(); simplicial.simplex, sphere, torus, projectivePlane, kleinBottle, fromGraph, fromPolyhedron. See Simplicial complexes. |
+
+| finiteSpace(points, opens), fromBasis, fromPreorder, finiteSpaces | FiniteSpace: opens, closedSets, closure, interior, boundary, minimalOpen, specialization, isT0, isT1, components, continuity(f, Y), subspace. See Finite spaces. |
+
+| countTopologies(n, { t0 }), allTopologies(points) | Topologies on n ≤ 5 points through preorders; every topology on up to 4 points. |
 
 ### Solids, symmetry and tilings
 
@@ -449,6 +501,96 @@ PRINT("a vertex of the heptagon:", String(regularPolygon(7)[1]), "(exact, but no
 const c = circle([0, 0], { radius: 1 });
 PRINT("tangents from (2, 0):", tangents(c, [2, 0]).join("   and   "));
 concyclic([1, 0], [0, 1], [-1, 0], ["3/5", "-4/5"])
+```
+
+---
+
+Page: https://ratmath.com/geo/measurement.html
+
+Topic
+
+## Measurement: angles, lines, circles, solids
+
+The everyday measurements of school geometry, each exact: the angles of a polygon, a line written as y = mx + b, the length of a tangent, the centre and radius hidden in an equation, and the volumes and areas of solids, with π kept as a symbol.
+
+### Angles of a polygon
+
+A polygon with n sides cuts into n−2 triangles from one vertex, so its interior angles add to (n−2)⋅180∘. A regular one has each interior angle (n−2)⋅180∘/n, and each exterior angle 360∘/n: walking round the polygon turns you once.
+
+```js
+angleSum(8);        // 1080 (degrees)
+interiorAngle(8);   // 135
+exteriorAngle(8);   // 45
+interiorAngle(7);   // 900/7, exactly
+```
+
+### Forms of a line
+
+geo stores a line as ax+by+c=0, which covers vertical lines too. Every line that is not vertical has a slope m=−a/b and a y-intercept −c/b, and can be written in slope–intercept form y=mx+b or in point–slope form y−y0​=m(x−x0​) through any of its points.
+
+```js
+const l = line([-2, 5], [4, -7]);
+l.slope;                    // -2
+l.toSlopeIntercept();       // "y = -2x + 1"
+l.toPointSlope([-2, 5]);    // "y - 5 = -2(x + 2)"
+slopeIntercept([0, 0], [2, 1]).text;          // "y = (1/2)x"
+pointSlope([1, 2], "3/4").toSlopeIntercept(); // "y = (3/4)x + 5/4"
+```
+
+### Tangent length
+
+The radius to the point of tangency is perpendicular to the tangent, so from a point at distance d from the centre the tangent segment has length d2−r2​: the square root of the point's power with respect to the circle.
+
+```js
+tangentLength(circle([0, 0], [5, 0]), [13, 0]);   // 12
+```
+
+### A circle from its equation
+
+Completing the square turns x2+y2+Dx+Ey+F=0 into (x+D/2)2+(y+E/2)2=(D2+E2)/4−F. `circleFromEquation` reads the equation as text (any common factor, either side of the equals sign) or as the six coefficients of a general conic, and says so when the equation is a single point or has no points at all.
+
+```js
+const c = circleFromEquation("x^2 + y^2 - 6x + 4y - 12 = 0");
+c.center;    // (3, -2)
+c.radius;    // 5
+circleFromEquation("x^2 + y^2 + 1 = 0");   // refused: no real point (r² < 0)
+```
+
+### Solids
+
+`box(a, b, c)` is an exact [polyhedron](https://ratmath.com/geo/polyhedra.html), so it has a volume, a surface area, faces and edges. The round solids report their measures as multiples of π: a cylinder has volume πr2h and surface 2πr(r+h), a cone 31​πr2h and πr(r+s) with slant s=r2+h2​, a sphere 34​πr3 and 4πr2.
+
+```js
+box(4, 5, 6).surfaceArea;   // 148
+cylinder(3, 5).volume.text; // "45·π"
+cone(3, 4).surfaceArea.text;// "24·π" (slant 5)
+sphere(3).volume.text;      // "36·π"
+```
+
+Similar figures with scale factor k have areas in the ratio k2 and volumes in the ratio k3. `similar` takes k, or two corresponding lengths, areas or volumes, and returns all three ratios.
+
+```js
+similar({ volumes: [8, 27] });   // { scale: 3/2, area: 9/4, volume: 27/8 }
+```
+
+### Try it
+
+```js
+// The angles of regular polygons, and the tilings they allow
+for (const n of [3, 4, 5, 6, 8, 12]) PRINT(`${n} sides: each angle ${interiorAngle(n)}°, ${new Rational(360n).divide(interiorAngle(n))} fit round a point`);
+
+// The line through two points, three ways
+const l = line([-2, 5], [4, -7]);
+PRINT(String(l), " | ", l.toSlopeIntercept(), " | ", l.toPointSlope([4, -7]));
+
+// A circle hidden in an equation, and a tangent from outside it
+const c = circleFromEquation("x^2 + y^2 - 6x + 4y - 12 = 0");
+PRINT("centre", String(c.center), "radius", String(c.radius), " tangent from (15, 3):", String(tangentLength(c, [15, 3])));
+
+// Archimedes: a sphere is two thirds of its cylinder, in volume and in area
+const S = sphere(1), C = cylinder(1, 2);
+PRINT("sphere", S.volume.text, S.surfaceArea.text, " cylinder", C.volume.text, C.surfaceArea.text);
+box(4, 5, 6).surfaceArea
 ```
 
 ---
@@ -859,6 +1001,149 @@ PRINT(String(bad), JSON.stringify(bad.instance));
 
 // Every theorem in the library, with its method and time
 proofs.all().map(({ name, proof }) => `${name}: ${proof.proved ? "proved" : "NOT proved"} (${proof.method}, ${proof.ms} ms)`)
+```
+
+---
+
+Page: https://ratmath.com/geo/conics.html
+
+Topic
+
+## Conic sections
+
+Give `conicProperties` any equation Ax2+Bxy+Cy2+Dx+Ey+F=0 and it says what the curve is and finds everything a course asks about it: the centre or vertex, the axes, vertices, foci, eccentricity, directrices and asymptotes. The answers are exact, square roots and all, even when the conic is turned by an angle that is not a nice one.
+
+### What kind of conic
+
+Two numbers decide it. The determinant Δ of the symmetric matrix ​AB/2D/2​B/2CE/2​D/2E/2F​​ says whether the conic is degenerate, and the discriminant B2−4AC says which shape it has:
+
+| | B2−4AC0 |
+
+| Δ=0 | ellipse (circle when A=C, B=0), or empty when (A+C)Δ>0 | parabola | hyperbola |
+
+| Δ=0 | a single point | two parallel lines, a double line, or empty | two crossing lines |
+
+A degenerate or empty conic returns its type and nothing more.
+
+### Centre and axes
+
+An ellipse or hyperbola has a centre, where the gradient of the left side vanishes: a 2 × 2 linear system. Moving the centre to the origin leaves λ1​X2+λ2​Y2+F′=0 in the directions of the eigenvectors of (AB/2​B/2C​), with F′=Δ/(AC−B2/4). Then a2=−F′/λ along the axis whose λ is smaller in size (for a hyperbola, the one whose λ has the sign of −F′), and c2=a2∓b2. With B=0 the axes are the coordinate directions and everything is rational or one square root; with B=0 the eigenvalues are square roots and the directions are algebraic numbers, still exact.
+
+```js
+const e = conicProperties("9x^2 + 4y^2 - 36 = 0");
+e.type;          // "ellipse"
+e.a; e.b;        // 3, 2
+e.foci;          // [(0, √5), (0, −√5)]
+e.eccentricity;  // √5/3
+
+const h = conicProperties("x^2/16 - y^2/9 = 1");
+h.asymptotes;    // ["3·x − 4·y = 0", "3·x + 4·y = 0"]
+h.directrices;   // ["5·x − 16 = 0", "5·x + 16 = 0"]: x = ±a²/c
+
+conicProperties("x^2 + xy + y^2 = 3").axes.major;   // x + y = 0, with a² = 6, b² = 2
+```
+
+### Parabolas
+
+When B2=4AC the quadratic part is a perfect square and one eigenvalue is 0; its eigenvector is the direction of the axis. In coordinates along and across the axis the equation becomes (w−w0​)2=4p(s−s0​): the vertex is (s0​,w0​), the focus is p along the axis from it, and the directrix is p the other way.
+
+```js
+const p = conicProperties("x^2 - 4y - 2x + 9 = 0");
+p.vertex;      // (1, 2)
+p.focus;       // (1, 3)
+p.directrix;   // y − 1 = 0
+conicProperties("x^2 - 2xy + y^2 - 4x - 4y = 0").focus;   // (1/2, 1/2): a parabola turned 45°
+```
+
+A projective `Conic` (see [the projective plane](https://ratmath.com/geo/projective.html)) has the same answers through `conic.properties()`, and [`circleFromEquation`](https://ratmath.com/geo/measurement.html) is the circle case.
+
+### Try it
+
+```js
+// An ellipse turned by the 3-4-5 rotation and moved to (1, −2): X²/25 + Y²/9 = 1
+const e = conicProperties("(3(x-1) + 4(y+2))^2/625 + (-4(x-1) + 3(y+2))^2/225 = 1");
+PRINT(e.type, " centre", String(e.center), " a =", String(e.a), " b =", String(e.b), " foci", e.foci.map(String).join(" "));
+
+// The focal property: from every point of the curve the distances to the foci add to 2a = 10
+for (const P of [...e.vertices, ...e.coVertices]) PRINT(String(P), "→", String(N.add(distance(P, e.foci[0]), distance(P, e.foci[1]))));
+
+// A hyperbola and its asymptotes
+const h = conicProperties("x^2/16 - y^2/9 = 1");
+PRINT("eccentricity", String(h.eccentricity), " asymptotes", h.asymptotes.map(String).join(", "));
+
+// Degenerate cases stop at their type
+for (const t of ["x^2 - y^2 = 0", "x^2 + y^2 = 0", "x^2 = 1", "x^2 + y^2 + 1 = 0"]) PRINT(t, "→", conicProperties(t).type);
+conicProperties("x^2 - 2xy + y^2 - 4x - 4y = 0").directrix
+```
+
+---
+
+Page: https://ratmath.com/geo/space.html
+
+Topic
+
+## Vectors, lines and planes in space
+
+Three-dimensional coordinates, exact: the dot and cross products, lengths that stay square roots, angles, projections, and the lines and planes of multivariable calculus with their equations, distances and intersections.
+
+### Vectors
+
+`vector(x, y, z)` takes rationals or exact numbers such as `"sqrt(2)"`. The dot product u⋅v=u1​v1​+u2​v2​+u3​v3​ is ∣u∣∣v∣cosθ; the cross product
+
+u×v=(u2​v3​−u3​v2​, u3​v1​−u1​v3​, u1​v2​−u2​v1​)
+is perpendicular to both, with length ∣u∣∣v∣sinθ, the area of the parallelogram they span. The scalar triple product u⋅(v×w) is the signed volume of the parallelepiped.
+
+```js
+const u = vector(1, 2, -2), v = vector(3, 0, 4);
+u.dot(v);          // -5
+u.cross(v);        // (8, -10, -6)
+u.norm;            // 3
+u.angle(v).cos;    // -1/3
+v.projectOnto([0, 0, 1]);              // (0, 0, 4)
+tripleProduct([4, 0, 0], [0, 5, 0], [0, 0, 6]);   // 120
+```
+
+### Planes
+
+A plane is n⋅x=d for a normal n. Through three points P,Q,R the normal is (Q−P)×(R−P), and three points on one line are refused. The equation prints with whole coefficients and no common factor. The distance from a point is ∣n⋅p−d∣/∣n∣, reached at the foot of the perpendicular.
+
+```js
+const P = plane([1, 0, 2], [2, 1, 0], [0, 3, 1]);
+P.equation;            // "5x + 3y + 4z = 13"
+P.distance([0, 0, 0]); // 13/√50, an exact square root
+P.foot([0, 0, 0]);     // (13/10, 39/50, 26/25)
+plane([0, 0, 0], { normal: [0, 0, 1] });   // z = 0
+plane({ coefficients: [1, 1, 1, 3] });     // x + y + z = 3
+```
+
+### Lines and intersections
+
+`line3(p, q)` is the line p+t(q−p). A plane meets a line in a point (or contains it, or misses it), and two planes that are not parallel meet in a line whose direction is the cross product of their normals.
+
+```js
+const Q = plane({ coefficients: [1, -1, 0, 1] });
+plane({ coefficients: [1, 1, 1, 3] }).meet(Q);    // a Line3: point + t·(1, 1, -2)
+P.meet(line3([0, 0, 0], [1, 1, 1]));              // (13/12, 13/12, 13/12)
+```
+
+### Try it
+
+```js
+const u = vector(1, 2, -2), v = vector(3, 0, 4);
+PRINT("u·v =", String(u.dot(v)), " u×v =", String(u.cross(v)), " |u| =", String(u.norm), " |v| =", String(v.norm));
+PRINT("angle between u and v:", u.angle(v).degrees.toFixed(4), "degrees");
+// the cross product is perpendicular to both, and |u×v|² = |u|²|v|² − (u·v)²
+const w = u.cross(v);
+PRINT("perpendicular:", w.isOrthogonal(u), w.isOrthogonal(v), " Lagrange:", String(w.norm2), "=", String(u.norm2.multiply(v.norm2).subtract(u.dot(v).multiply(u.dot(v)))));
+
+// The plane through three points, and the distance to the origin
+const P = plane([1, 0, 2], [2, 1, 0], [0, 3, 1]);
+PRINT(P.equation, " distance from the origin:", String(P.distance([0, 0, 0])));
+
+// Where two planes cross
+const L = P.meet(plane([0, 0, 0], { normal: [0, 0, 1] }));
+PRINT("meets z = 0 along", String(L));
+P.foot([0, 0, 0])
 ```
 
 ---
@@ -1772,6 +2057,218 @@ for (const t of types) {
 }
 PRINT("angles of the 3.12.12 type:", [3, 12, 12].map((n) => String(polygonAngle(n))).join(" + "), "= 1");
 regularTilings().map((t) => `${t.symbol} (dual ${t.dual})`)
+```
+
+---
+
+Page: https://ratmath.com/geo/surfaces.html
+
+Topology
+
+## Surfaces from polygons
+
+Textbooks draw a torus as a square with opposite sides glued, and write it as the word aba−1b−1 read around the boundary. `surface` takes such words, works out which corners the gluing identifies, and from the resulting cells computes homology, orientability and which surface it is.
+
+### Edge words and cells
+
+Each polygon is a word in edge labels, read around its boundary: `a` means the edge is traversed along its arrow, `a^-1` (or `a'`, or `a⁻¹`) against it. Edges with the same label are glued, so each label appears twice, or once for an edge left on the boundary. Gluing a to a also glues the tail of one copy to the tail of the other, and the head to the head; following those identifications gives the vertices. A square glued as aba−1b−1 has all four corners become one point, so the torus has one vertex, two edges and one face, and χ=1−2+1=0.
+
+```js
+import { surface } from "@ratmath/geo";
+
+const T = surface("a b a^-1 b^-1");
+T.cells;                    // [1, 2, 1]: V, E, F
+T.eulerCharacteristic;      // 0
+String(T.chainComplex());   // "H0 = Z, H1 = Z^2, H2 = Z"
+String(surface("a a").homology(1));          // "Z/2": the projective plane
+String(surface("a b a^-1 b").homology(1));   // "Z/2 × Z": the Klein bottle
+```
+
+The boundary maps are read off the word: ∂1​ sends an edge to head minus tail, and ∂2​ sends a face to the sum of its edges with their exponents. For the Klein bottle that is a+b−a+b=2b, which is where the Z/2 comes from. The homology itself is computed by [@ratmath/structures](https://ratmath.com/structures/homology.html).
+
+### Orientability and classification
+
+A surface is orientable when the polygons can be given directions so that every glued pair of edges is traversed in opposite directions. Within one polygon that means each label appears once as a and once as a−1; across polygons it is a two-colouring problem. The classification theorem says that a closed connected surface is decided by orientability and χ: the sphere (χ=2), a connected sum of g tori (χ=2−2g), or a connected sum of k projective planes (χ=2−k). Each boundary circle lowers χ by one more.
+
+```js
+surface("a a b b").classify().name;               // "Klein bottle": the same as a b a^-1 b
+surface("a b a c").classify().name;               // "Möbius band": b and c stay on the boundary
+surface("a b a^-1 b^-1 c d c^-1 d^-1").classify();
+// { eulerCharacteristic: -2, orientable: true, genus: 2, name: "connected sum of 2 tori", normalForm: "a1 b1 a1^-1 b1^-1 a2 b2 a2^-1 b2^-1", … }
+
+import { classifySurface } from "@ratmath/geo";
+classifySurface({ euler: 8 - 24 + 14, orientable: true }).name;   // "connected sum of 2 tori"
+```
+
+### Connected sums and several polygons
+
+A surface may be several polygons, glued along shared labels. `singleFace()` merges them along shared edges into one polygon, which changes the cells but not the surface. The connected sum of two closed surfaces is their two words side by side (cut a small disk from each at a vertex and join along the cut), so torus # projective plane is aba−1b−1cc: with χ=−1 and not orientable, it is the connected sum of three projective planes.
+
+```js
+surface(["a b c", "c^-1 b^-1 a^-1"]).classify().name;           // "sphere", from two triangles
+surface("a b a^-1 b^-1").connectedSum("a a").classify().name;   // "connected sum of 3 projective planes"
+```
+
+### The fundamental group
+
+Contract a spanning tree of the edges to a point. The remaining edges are loops, and each polygon becomes a relation among them (van Kampen's theorem for a 2-complex). So `fundamentalGroup()` returns a presentation, with one relator per polygon. Its abelianisation is H1​, which is a good check.
+
+```js
+String(surface("a b a^-1 b^-1").fundamentalGroup());    // "⟨a, b | aba⁻¹b⁻¹⟩", which is Z²
+surface("a a").fundamentalGroup().order();               // 2
+String(surface("a b a^-1 b").fundamentalGroup().abelianInvariants());   // "Z/2 × Z" = H1
+```
+
+### Try it
+
+```js
+// Every closed surface up to χ = −2, from its normal form, with homology and π₁ abelianised
+for (const [chi, orientable] of [[2, true], [0, true], [-2, true], [1, false], [0, false], [-1, false], [-2, false]]) {
+  const c = classifySurface({ euler: chi, orientable });
+  const S = surface(c.normalForm);
+  PRINT(`χ = ${chi}`.padEnd(7), c.name.padEnd(36), String(S.chainComplex()).padEnd(36), "π₁ab =", String(S.fundamentalGroup().abelianInvariants()));
+}
+// A hexagon with sides glued a b c a^-1 b^-1 c^-1: which surface?
+const X = surface("a b c a^-1 b^-1 c^-1");
+X.classify()
+```
+
+---
+
+Page: https://ratmath.com/geo/simplicial.html
+
+Topology
+
+## Simplicial complexes
+
+A simplicial complex is a space built from points, edges, triangles and their higher analogues, glued along whole faces. It is given by its maximal simplices; everything else, from the face counts to the homology and the fundamental group, follows by counting and integer linear algebra.
+
+### Faces and the f-vector
+
+`simplicialComplex` takes a list of simplices, each a list of vertices, and adds every face of each. The f-vector counts the faces in each dimension, and the Euler characteristic is its alternating sum. The boundary of a tetrahedron, four triangles on four vertices, is a sphere: 4−6+4=2.
+
+```js
+import { simplicialComplex, simplicial } from "@ratmath/geo";
+
+const S = simplicialComplex([[1, 2, 3], [1, 2, 4], [1, 3, 4], [2, 3, 4]]);
+S.fVector;               // [4, 6, 4]
+S.eulerCharacteristic;   // 2
+String(S.chainComplex());   // "H0 = Z, H1 = 0, H2 = Z"
+```
+
+The boundary map sends a simplex [v0​,…,vk​] (vertices in increasing order) to ∑i​(−1)i[v0​,…,vi​​,…,vk​], the face without vi​ with sign (−1)i. These matrices go to [@ratmath/structures](https://ratmath.com/structures/homology.html) for the homology, with coefficients in Z, Q or Z/p.
+
+### Named complexes
+
+`simplicial.sphere(n)` is the boundary of the (n+1)-simplex. `simplicial.torus()` is Möbius and Császár's torus on 7 vertices, the smallest possible: every pair of vertices is an edge, (27​)=21, and 7−21+14=0. `simplicial.projectivePlane()` is the 6-vertex projective plane (an icosahedron with opposite points identified), and `simplicial.kleinBottle()` a 12-vertex Klein bottle from a grid of squares.
+
+```js
+const T = simplicial.torus();
+T.fVector;                    // [7, 21, 14]
+String(T.homology(1));        // "Z^2"
+simplicial.projectivePlane().betti({ coefficients: "Z/2" });   // [1, 1, 1]
+simplicial.sphere(3).fVector; // [5, 10, 10, 5]
+```
+
+### Triangulated surfaces
+
+A 2-dimensional complex is a surface when every edge lies in one or two triangles and the triangles around each vertex form a disk: the link of the vertex is a circle (or an arc, on the boundary). `isSurface` checks this, and `classify()` turns the triangles into glued polygons, one edge label per edge, so the classification agrees with the one from an [edge word](https://ratmath.com/geo/surfaces.html).
+
+```js
+simplicial.kleinBottle().classify().name;   // "Klein bottle"
+simplicialComplex([[1, 2, 3], [1, 2, 4], [1, 2, 5]]).surfaceCheck();
+// { surface: false, reason: "edge [1,2] is in 3 triangles" }
+```
+
+### Graphs, polyhedra and π₁
+
+A graph is a 1-dimensional complex: χ=V−E, and for a connected graph b1​=E−V+1 counts independent cycles. `simplicial.fromGraph` takes `{ vertices, edges }` or a graph from [@ratmath/discrete](https://ratmath.com/discrete/). A [polyhedron](https://ratmath.com/geo/polyhedra.html)'s boundary, each face cut into triangles, is a sphere. The fundamental group comes from a spanning tree of the edges: the other edges generate, and each triangle gives a relation.
+
+```js
+import { solids } from "@ratmath/geo";
+simplicial.fromPolyhedron(solids.cube()).classify().name;   // "sphere"
+String(simplicial.sphere(1).fundamentalGroup());             // "⟨e3 | ⟩": the circle, Z
+String(simplicial.torus().fundamentalGroup().abelianInvariants());   // "Z^2"
+```
+
+### Try it
+
+```js
+// Spheres of each dimension, and the three small surfaces
+for (let n = 1; n <= 4; n++) {
+  const S = simplicial.sphere(n);
+  PRINT(`S${n}: f = (${S.fVector.join(", ")}), χ = ${S.eulerCharacteristic}, ${S.chainComplex()}`);
+}
+for (const k of ["torus", "projectivePlane", "kleinBottle"]) {
+  const X = simplicial[k]();
+  PRINT(k.padEnd(16), `f = (${X.fVector.join(", ")})`, String(X.chainComplex()).padEnd(32), "mod 2:", X.betti({ coefficients: "Z/2" }).join(" "));
+}
+// Two tetrahedra sharing a face: still a ball, so contractible
+simplicialComplex([[1, 2, 3, 4], [2, 3, 4, 5]]).homologyGroups().map((H) => H.toString({ additive: true }))
+```
+
+---
+
+Page: https://ratmath.com/geo/finite-spaces.html
+
+Topology
+
+## Finite spaces
+
+A topology on a finite set is a finite list of open sets, so every definition in a first topology course can be checked by hand, or by machine. Finite spaces are also a good source of examples that are connected but not Hausdorff.
+
+### Open sets and the axioms
+
+A family of subsets of X is a topology when it contains ∅ and X and is closed under unions and intersections; for a finite family, pairs are enough. `finiteSpace(points, opens)` checks the axioms and names a failing pair when they do not hold. A basis generates a topology when it covers X and every point of B1​∩B2​ lies in a basis set inside B1​∩B2​; `fromBasis` checks that and takes all unions.
+
+```js
+import { finiteSpace, fromBasis } from "@ratmath/geo";
+
+const X = finiteSpace(["a", "b", "c"], [[], ["a"], ["a", "b"], ["a", "b", "c"]]);
+X.closure(["b"]);        // ["b", "c"]: the smallest closed set containing b
+X.interior(["b", "c"]);  // []: no open set inside {b, c} but ∅
+X.boundary(["a"]);       // ["b", "c"]
+finiteSpace([1, 2, 3], [[], [1], [2], [1, 2, 3]]);   // refused: the union of {1} and {2} is not open
+fromBasis([1, 2, 3], [[1, 2], [2, 3], [2]]).opens;   // [[], [2], [1, 2], [2, 3], [1, 2, 3]]
+```
+
+### Minimal open sets and preorders
+
+In a finite space each point x has a smallest open set Ux​, the intersection of all open sets containing it, and these form the smallest basis. Write x≤y when y∈Ux​. This is a preorder (reflexive and transitive), and the open sets are exactly its up-sets. So topologies on X are the same as preorders on X. The space is T0​ when distinct points have distinct Ux​, which makes the preorder a partial order. T1​ means every Ux​={x}: the discrete topology.
+
+```js
+import { fromPreorder, countTopologies } from "@ratmath/geo";
+
+fromPreorder([1, 2, 3], [[1, 2], [2, 3]]).opens;   // [[], [3], [2, 3], [1, 2, 3]]: a chain
+countTopologies(3);                 // 29
+countTopologies(3, { t0: true });   // 19
+[1, 2, 3, 4, 5].map((n) => countTopologies(n));   // [1, 4, 29, 355, 6942]
+```
+
+The count runs through every reflexive relation and keeps the transitive ones. The tests check it against brute force, every family of subsets tested against the axioms, up to four points.
+
+### Continuity and connectedness
+
+A map is continuous when the preimage of every open set is open; `continuity` returns an open set whose preimage fails when it is not. A finite space is connected when the points are linked through their minimal open sets, and then it is also path connected. The pseudocircle, four points with {a}, {b} open, is connected, not Hausdorff, and has the weak homotopy type of a circle.
+
+```js
+import { finiteSpaces } from "@ratmath/geo";
+const S = finiteSpaces.sierpinski();          // {0, 1} with ∅, {1}, {0, 1} open
+S.continuity((x) => 1 - x, S);               // { continuous: false, witness: { open: [1], preimage: [0] } }
+finiteSpaces.pseudocircle().isConnected;      // true
+```
+
+### Try it
+
+```js
+// All 29 topologies on three points, sorted by how many open sets they have
+const all = allTopologies([1, 2, 3]);
+const byCount = {};
+for (const X of all) (byCount[X.opens.length] ??= []).push(X);
+for (const k of Object.keys(byCount)) PRINT(`${k} open sets: ${byCount[k].length} topologies, ${byCount[k].filter((X) => X.isT0).length} of them T0`);
+// Which of them are connected?
+PRINT("connected:", all.filter((X) => X.isConnected).length, " T0:", all.filter((X) => X.isT0).length, " T1:", all.filter((X) => X.isT1).length);
+countTopologies(4, { t0: true })
 ```
 
 ---

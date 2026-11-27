@@ -2,6 +2,29 @@
 
 ## Unreleased
 
+- Topology (Course Test batch A11): `surface(word)` for glued polygons
+  (cells, homology, orientability, boundary circles, `classify()`,
+  `connectedSum`, `singleFace`, `fundamentalGroup()`), `classifySurface`,
+  `simplicialComplex` and `simplicial` (spheres, the 7-vertex torus, the
+  6-vertex projective plane, a Klein bottle, `fromGraph`, `fromPolyhedron`;
+  homology, links, surface recognition, π₁), and finite spaces
+  (`finiteSpace`, `fromBasis`, `fromPreorder`, closure and interior,
+  continuity, T₀/T₁, `countTopologies`, `allTopologies`, `finiteSpaces`).
+  Homology comes from structures' new `chainComplex`. Docs pages "Surfaces
+  from polygons", "Simplicial complexes" and "Finite spaces".
+- Measurement: `angleSum`, `interiorAngle`, `exteriorAngle`; `Line#slope`,
+  `intercept`, `toSlopeIntercept()`, `toPointSlope(p)`, with `slopeIntercept`
+  and `pointSlope`; `tangentLength`; `circleFromEquation` and
+  `conicCoefficients`; `box`, `cylinder`, `cone`, `sphere` (π kept exact) and
+  `similar`. Docs page "Measurement".
+- `conicProperties(equation)` and `Conic#properties()`: type (with the
+  degenerate kinds), centre or vertex, axes, vertices, foci, eccentricity,
+  directrices and asymptotes, exact also for rotated conics. Docs page
+  "Conic sections".
+- Space: `Vector` (dot, cross, norm, angle, projections), `tripleProduct`,
+  `Line3`/`line3`, `Plane`/`plane` (through three points, from a normal or
+  coefficients; equation, distance, foot, angle, intersections). Docs page
+  "Vectors and planes".
 - `dot` and `cross` were declared in `index.d.ts` but not exported. They are
   exported now and take points or `[x, y]` pairs. A test checks that
   everything `index.d.ts` declares is exported. Found by the Course Test

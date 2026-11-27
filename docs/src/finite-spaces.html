@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Finite spaces · RatMath Geo</title>
+<meta name="description" content="Topologies on finite sets: checking the axioms, closure, interior and boundary, bases, continuity, connectedness, T0 and T1, and counting topologies through preorders.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<script type="module" src="assets/site.js"></script>
+</head>
+<body>
+<div class="shell">
+<aside></aside>
+<main>
+<article>
+<div class="eyebrow">Topology</div>
+<h1>Finite spaces</h1>
+<p class="lede">A topology on a finite set is a finite list of open sets, so every definition in a first topology course can be checked by hand, or by machine. Finite spaces are also a good source of examples that are connected but not Hausdorff.</p>
+
+<h2>Open sets and the axioms</h2>
+<p>A family of subsets of \(X\) is a topology when it contains \(\varnothing\) and \(X\) and is closed under unions and intersections; for a finite family, pairs are enough. <code>finiteSpace(points, opens)</code> checks the axioms and names a failing pair when they do not hold. A <em>basis</em> generates a topology when it covers \(X\) and every point of \(B_1 \cap B_2\) lies in a basis set inside \(B_1 \cap B_2\); <code>fromBasis</code> checks that and takes all unions.</p>
+<pre><code>import { finiteSpace, fromBasis } from "@ratmath/geo";
+
+const X = finiteSpace(["a", "b", "c"], [[], ["a"], ["a", "b"], ["a", "b", "c"]]);
+X.closure(["b"]);        // ["b", "c"]: the smallest closed set containing b
+X.interior(["b", "c"]);  // []: no open set inside {b, c} but ∅
+X.boundary(["a"]);       // ["b", "c"]
+finiteSpace([1, 2, 3], [[], [1], [2], [1, 2, 3]]);   // refused: the union of {1} and {2} is not open
+fromBasis([1, 2, 3], [[1, 2], [2, 3], [2]]).opens;   // [[], [2], [1, 2], [2, 3], [1, 2, 3]]</code></pre>
+
+<h2>Minimal open sets and preorders</h2>
+<p>In a finite space each point \(x\) has a smallest open set \(U_x\), the intersection of all open sets containing it, and these form the smallest basis. Write \(x \le y\) when \(y \in U_x\). This is a preorder (reflexive and transitive), and the open sets are exactly its up-sets. So topologies on \(X\) are the same as preorders on \(X\). The space is \(T_0\) when distinct points have distinct \(U_x\), which makes the preorder a partial order. \(T_1\) means every \(U_x = \{x\}\): the discrete topology.</p>
+<pre><code>import { fromPreorder, countTopologies } from "@ratmath/geo";
+
+fromPreorder([1, 2, 3], [[1, 2], [2, 3]]).opens;   // [[], [3], [2, 3], [1, 2, 3]]: a chain
+countTopologies(3);                 // 29
+countTopologies(3, { t0: true });   // 19
+[1, 2, 3, 4, 5].map((n) =&gt; countTopologies(n));   // [1, 4, 29, 355, 6942]</code></pre>
+<p>The count runs through every reflexive relation and keeps the transitive ones. The tests check it against brute force, every family of subsets tested against the axioms, up to four points.</p>
+
+<h2>Continuity and connectedness</h2>
+<p>A map is continuous when the preimage of every open set is open; <code>continuity</code> returns an open set whose preimage fails when it is not. A finite space is connected when the points are linked through their minimal open sets, and then it is also path connected. The <em>pseudocircle</em>, four points with \(\{a\}\), \(\{b\}\) open, is connected, not Hausdorff, and has the weak homotopy type of a circle.</p>
+<pre><code>import { finiteSpaces } from "@ratmath/geo";
+const S = finiteSpaces.sierpinski();          // {0, 1} with ∅, {1}, {0, 1} open
+S.continuity((x) =&gt; 1 - x, S);               // { continuous: false, witness: { open: [1], preimage: [0] } }
+finiteSpaces.pseudocircle().isConnected;      // true</code></pre>
+
+<template data-runbox>
+// All 29 topologies on three points, sorted by how many open sets they have
+const all = allTopologies([1, 2, 3]);
+const byCount = {};
+for (const X of all) (byCount[X.opens.length] ??= []).push(X);
+for (const k of Object.keys(byCount)) PRINT(`${k} open sets: ${byCount[k].length} topologies, ${byCount[k].filter((X) =&gt; X.isT0).length} of them T0`);
+// Which of them are connected?
+PRINT("connected:", all.filter((X) =&gt; X.isConnected).length, " T0:", all.filter((X) =&gt; X.isT0).length, " T1:", all.filter((X) =&gt; X.isT1).length);
+countTopologies(4, { t0: true })
+</template>
+</article>
+</main>
+</div>
+</body>
+</html>

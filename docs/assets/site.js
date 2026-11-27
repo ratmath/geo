@@ -1,8 +1,8 @@
 // Shared page furniture for the geo docs: the contents column, the theme
 // switch and the code boxes. Add each topic page to PAGES as it is written.
 
-import * as A from "./geo.js?v=a1cd962778";
-import { mountRunboxes } from "./runbox.js?v=a1cd962778";
+import * as A from "./geo.js?v=561a3f4673";
+import { mountRunboxes } from "./runbox.js?v=561a3f4673";
 
 export { A };
 
@@ -12,10 +12,13 @@ export const PAGES = [
   { href: "explore.html", title: "Explore" },
   { group: "The Euclidean plane" },
   { href: "constructions.html", title: "Constructions", blurb: "Points, lines, circles and recorded ruler-and-compass constructions" },
+  { href: "measurement.html", title: "Measurement", blurb: "Polygon angles, forms of a line, tangent lengths, circles from equations, solids" },
   { href: "triangles.html", title: "Triangle centres", blurb: "Centres, circles and lines of a triangle, exactly" },
   { href: "transformations.html", title: "Transformations", blurb: "Isometries, similarities, affine maps and inversion, classified" },
   { href: "theorems.html", title: "Checked theorems", blurb: "Classical theorems tested exactly on your figure" },
   { href: "proofs.html", title: "General proofs", blurb: "Theorems proved for every figure, with a certificate you can multiply out" },
+  { href: "conics.html", title: "Conic sections", blurb: "Type, centre, axes, foci, eccentricity, directrices and asymptotes from any equation" },
+  { href: "space.html", title: "Vectors and planes", blurb: "Dot and cross products, lines and planes in space, distances and intersections" },
   { group: "Discrete and other geometries" },
   { href: "computational.html", title: "Computational geometry", blurb: "Hulls, polygons, Delaunay and Voronoi with exact predicates" },
   { href: "lattice.html", title: "Lattice geometry", blurb: "Pick's theorem and visible points" },
@@ -32,6 +35,10 @@ export const PAGES = [
   { href: "polyhedra.html", title: "Polyhedra", blurb: "Platonic and Archimedean solids: volumes, angles, duals, symmetry groups" },
   { href: "symmetry.html", title: "Symmetry groups", blurb: "Rosettes, the 7 frieze groups and the 17 wallpaper groups" },
   { href: "tilings.html", title: "Tilings", blurb: "The 21 vertex types and the 11 uniform tilings" },
+  { group: "Topology" },
+  { href: "surfaces.html", title: "Surfaces from polygons", blurb: "Edge words, homology, orientability, the classification of surfaces, π₁" },
+  { href: "simplicial.html", title: "Simplicial complexes", blurb: "Faces, homology, triangulated surfaces, graphs and polyhedra" },
+  { href: "finite-spaces.html", title: "Finite spaces", blurb: "Open sets, closure, bases, continuity, counting topologies" },
   { group: "Pictures" },
   { href: "pictures.html", title: "Pictures of geometry", blurb: "Tilings grown from vertex types, solids, patterns, finite planes; the join with graphics" },
 ];

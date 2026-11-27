@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Measurement · RatMath Geo</title>
+<meta name="description" content="Polygon angles, the forms of a line, tangent lengths, circles from their equations, boxes, cylinders, cones, spheres and similar solids in @ratmath/geo, all exact.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<script type="module" src="assets/site.js"></script>
+</head>
+<body>
+<div class="shell">
+<aside></aside>
+<main>
+<article>
+<div class="eyebrow">Topic</div>
+<h1>Measurement: angles, lines, circles, solids</h1>
+<p class="lede">The everyday measurements of school geometry, each exact: the angles of a polygon, a line written as y = mx + b, the length of a tangent, the centre and radius hidden in an equation, and the volumes and areas of solids, with π kept as a symbol.</p>
+<h2>Angles of a polygon</h2>
+<p>A polygon with \(n\) sides cuts into \(n - 2\) triangles from one vertex, so its interior angles add to \((n - 2)\cdot 180^\circ\). A regular one has each interior angle \((n-2)\cdot180^\circ/n\), and each exterior angle \(360^\circ/n\): walking round the polygon turns you once.</p>
+<pre><code>angleSum(8);        // 1080 (degrees)
+interiorAngle(8);   // 135
+exteriorAngle(8);   // 45
+interiorAngle(7);   // 900/7, exactly</code></pre>
+
+<h2>Forms of a line</h2>
+<p>geo stores a line as \(ax + by + c = 0\), which covers vertical lines too. Every line that is not vertical has a slope \(m = -a/b\) and a \(y\)-intercept \(-c/b\), and can be written in slope–intercept form \(y = mx + b\) or in point–slope form \(y - y_0 = m(x - x_0)\) through any of its points.</p>
+<pre><code>const l = line([-2, 5], [4, -7]);
+l.slope;                    // -2
+l.toSlopeIntercept();       // "y = -2x + 1"
+l.toPointSlope([-2, 5]);    // "y - 5 = -2(x + 2)"
+slopeIntercept([0, 0], [2, 1]).text;          // "y = (1/2)x"
+pointSlope([1, 2], "3/4").toSlopeIntercept(); // "y = (3/4)x + 5/4"</code></pre>
+
+<h2>Tangent length</h2>
+<p>The radius to the point of tangency is perpendicular to the tangent, so from a point at distance \(d\) from the centre the tangent segment has length \(\sqrt{d^2 - r^2}\): the square root of the point's <em>power</em> with respect to the circle.</p>
+<pre><code>tangentLength(circle([0, 0], [5, 0]), [13, 0]);   // 12</code></pre>
+
+<h2>A circle from its equation</h2>
+<p>Completing the square turns \(x^2 + y^2 + Dx + Ey + F = 0\) into \((x + D/2)^2 + (y + E/2)^2 = (D^2 + E^2)/4 - F\). <code>circleFromEquation</code> reads the equation as text (any common factor, either side of the equals sign) or as the six coefficients of a general conic, and says so when the equation is a single point or has no points at all.</p>
+<pre><code>const c = circleFromEquation("x^2 + y^2 - 6x + 4y - 12 = 0");
+c.center;    // (3, -2)
+c.radius;    // 5
+circleFromEquation("x^2 + y^2 + 1 = 0");   // refused: no real point (r² &lt; 0)</code></pre>
+
+<h2>Solids</h2>
+<p><code>box(a, b, c)</code> is an exact <a href="polyhedra.html">polyhedron</a>, so it has a volume, a surface area, faces and edges. The round solids report their measures as multiples of \(\pi\): a cylinder has volume \(\pi r^2h\) and surface \(2\pi r(r + h)\), a cone \(\tfrac13\pi r^2h\) and \(\pi r(r + s)\) with slant \(s = \sqrt{r^2 + h^2}\), a sphere \(\tfrac43\pi r^3\) and \(4\pi r^2\).</p>
+<pre><code>box(4, 5, 6).surfaceArea;   // 148
+cylinder(3, 5).volume.text; // "45·π"
+cone(3, 4).surfaceArea.text;// "24·π" (slant 5)
+sphere(3).volume.text;      // "36·π"</code></pre>
+<p>Similar figures with scale factor \(k\) have areas in the ratio \(k^2\) and volumes in the ratio \(k^3\). <code>similar</code> takes \(k\), or two corresponding lengths, areas or volumes, and returns all three ratios.</p>
+<pre><code>similar({ volumes: [8, 27] });   // { scale: 3/2, area: 9/4, volume: 27/8 }</code></pre>
+<template data-runbox>
+// The angles of regular polygons, and the tilings they allow
+for (const n of [3, 4, 5, 6, 8, 12]) PRINT(`${n} sides: each angle ${interiorAngle(n)}°, ${new Rational(360n).divide(interiorAngle(n))} fit round a point`);
+
+// The line through two points, three ways
+const l = line([-2, 5], [4, -7]);
+PRINT(String(l), " | ", l.toSlopeIntercept(), " | ", l.toPointSlope([4, -7]));
+
+// A circle hidden in an equation, and a tangent from outside it
+const c = circleFromEquation("x^2 + y^2 - 6x + 4y - 12 = 0");
+PRINT("centre", String(c.center), "radius", String(c.radius), " tangent from (15, 3):", String(tangentLength(c, [15, 3])));
+
+// Archimedes: a sphere is two thirds of its cylinder, in volume and in area
+const S = sphere(1), C = cylinder(1, 2);
+PRINT("sphere", S.volume.text, S.surfaceArea.text, " cylinder", C.volume.text, C.surfaceArea.text);
+box(4, 5, 6).surfaceArea
+</template>
+</article>
+</main>
+</div>
+</body>
+</html>
