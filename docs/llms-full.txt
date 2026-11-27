@@ -1,6 +1,6 @@
 # @ratmath/geo 0.4.0: full documentation
 
-> Geometry for RatMath: Euclidean constructions, theorems checked on exact figures and proved in general, spherical, hyperbolic, projective and finite geometries, symmetry and tilings. From https://ratmath.com/geo/, commit 138ca0c. Each page ends with a runnable example; in it, PRINT(...) prints.
+> Geometry for RatMath: Euclidean constructions, theorems checked on exact figures and proved in general, spherical, hyperbolic, projective and finite geometries, symmetry and tilings. From https://ratmath.com/geo/, commit 833d9f4. Each page ends with a runnable example; in it, PRINT(...) prints.
 
 
 ---
@@ -124,6 +124,36 @@ Every export of `@ratmath/geo`, with what it takes and what it returns. A point 
 | regularPolygon(n, { center, vertex }) | The vertices, exact for every n. |
 
 | construction(given), Construction | A recorded ruler-and-compass construction: line, circle, meet, get, count. See Constructions. |
+
+### Measurement
+
+| name | what it gives |
+
+| angleSum(n), interiorAngle(n), exteriorAngle(n) | (n − 2)·180, (n − 2)·180/n and 360/n, in degrees, exactly |
+
+| line.slope, line.intercept, line.toSlopeIntercept(), line.toPointSlope(p) | slope and intercept (null when vertical); "y = mx + b" and "y − y₀ = m(x − x₀)" |
+
+| slopeIntercept(p, q), pointSlope(p, m) | { slope, intercept, text, line } of the line through two points; the line through p with slope m |
+
+| tangentLength(circle, p) | √(power of p) |
+
+| circleFromEquation(text \| [A..F]), conicCoefficients(...) | the circle by completing the square; the six coefficients of a conic |
+
+| box(a, b, c), cylinder(r, h), cone(r, h), sphere(r) | a box as a Polyhedron; the round solids' volume and areas as multiples of π |
+
+| similar(k \| { lengths \| areas \| volumes }) | { scale, length, area, volume } ratios |
+
+### Vectors and planes in space
+
+| name | what it gives |
+
+| vector(x, y, z) | dot, cross, norm, norm2, unit, angle, projectOnto, componentAlong, isParallel, isOrthogonal, add, sub, scale |
+
+| tripleProduct(u, v, w) | u·(v × w), the signed volume |
+
+| line3(p, q), new Line3(point, direction) | at(t), contains, distance |
+
+| plane(p, q, r), plane(p, { normal }), plane({ coefficients }) | equation, coefficients, contains, distance, foot, angle, meet (a line or a plane), isParallel |
 
 ### Triangles
 
@@ -449,6 +479,96 @@ PRINT("a vertex of the heptagon:", String(regularPolygon(7)[1]), "(exact, but no
 const c = circle([0, 0], { radius: 1 });
 PRINT("tangents from (2, 0):", tangents(c, [2, 0]).join("   and   "));
 concyclic([1, 0], [0, 1], [-1, 0], ["3/5", "-4/5"])
+```
+
+---
+
+Page: https://ratmath.com/geo/measurement.html
+
+Topic
+
+## Measurement: angles, lines, circles, solids
+
+The everyday measurements of school geometry, each exact: the angles of a polygon, a line written as y = mx + b, the length of a tangent, the centre and radius hidden in an equation, and the volumes and areas of solids, with π kept as a symbol.
+
+### Angles of a polygon
+
+A polygon with n sides cuts into n−2 triangles from one vertex, so its interior angles add to (n−2)⋅180∘. A regular one has each interior angle (n−2)⋅180∘/n, and each exterior angle 360∘/n: walking round the polygon turns you once.
+
+```js
+angleSum(8);        // 1080 (degrees)
+interiorAngle(8);   // 135
+exteriorAngle(8);   // 45
+interiorAngle(7);   // 900/7, exactly
+```
+
+### Forms of a line
+
+geo stores a line as ax+by+c=0, which covers vertical lines too. Every line that is not vertical has a slope m=−a/b and a y-intercept −c/b, and can be written in slope–intercept form y=mx+b or in point–slope form y−y0​=m(x−x0​) through any of its points.
+
+```js
+const l = line([-2, 5], [4, -7]);
+l.slope;                    // -2
+l.toSlopeIntercept();       // "y = -2x + 1"
+l.toPointSlope([-2, 5]);    // "y - 5 = -2(x + 2)"
+slopeIntercept([0, 0], [2, 1]).text;          // "y = (1/2)x"
+pointSlope([1, 2], "3/4").toSlopeIntercept(); // "y = (3/4)x + 5/4"
+```
+
+### Tangent length
+
+The radius to the point of tangency is perpendicular to the tangent, so from a point at distance d from the centre the tangent segment has length d2−r2​: the square root of the point's power with respect to the circle.
+
+```js
+tangentLength(circle([0, 0], [5, 0]), [13, 0]);   // 12
+```
+
+### A circle from its equation
+
+Completing the square turns x2+y2+Dx+Ey+F=0 into (x+D/2)2+(y+E/2)2=(D2+E2)/4−F. `circleFromEquation` reads the equation as text (any common factor, either side of the equals sign) or as the six coefficients of a general conic, and says so when the equation is a single point or has no points at all.
+
+```js
+const c = circleFromEquation("x^2 + y^2 - 6x + 4y - 12 = 0");
+c.center;    // (3, -2)
+c.radius;    // 5
+circleFromEquation("x^2 + y^2 + 1 = 0");   // refused: no real point (r² < 0)
+```
+
+### Solids
+
+`box(a, b, c)` is an exact [polyhedron](https://ratmath.com/geo/polyhedra.html), so it has a volume, a surface area, faces and edges. The round solids report their measures as multiples of π: a cylinder has volume πr2h and surface 2πr(r+h), a cone 31​πr2h and πr(r+s) with slant s=r2+h2​, a sphere 34​πr3 and 4πr2.
+
+```js
+box(4, 5, 6).surfaceArea;   // 148
+cylinder(3, 5).volume.text; // "45·π"
+cone(3, 4).surfaceArea.text;// "24·π" (slant 5)
+sphere(3).volume.text;      // "36·π"
+```
+
+Similar figures with scale factor k have areas in the ratio k2 and volumes in the ratio k3. `similar` takes k, or two corresponding lengths, areas or volumes, and returns all three ratios.
+
+```js
+similar({ volumes: [8, 27] });   // { scale: 3/2, area: 9/4, volume: 27/8 }
+```
+
+### Try it
+
+```js
+// The angles of regular polygons, and the tilings they allow
+for (const n of [3, 4, 5, 6, 8, 12]) PRINT(`${n} sides: each angle ${interiorAngle(n)}°, ${new Rational(360n).divide(interiorAngle(n))} fit round a point`);
+
+// The line through two points, three ways
+const l = line([-2, 5], [4, -7]);
+PRINT(String(l), " | ", l.toSlopeIntercept(), " | ", l.toPointSlope([4, -7]));
+
+// A circle hidden in an equation, and a tangent from outside it
+const c = circleFromEquation("x^2 + y^2 - 6x + 4y - 12 = 0");
+PRINT("centre", String(c.center), "radius", String(c.radius), " tangent from (15, 3):", String(tangentLength(c, [15, 3])));
+
+// Archimedes: a sphere is two thirds of its cylinder, in volume and in area
+const S = sphere(1), C = cylinder(1, 2);
+PRINT("sphere", S.volume.text, S.surfaceArea.text, " cylinder", C.volume.text, C.surfaceArea.text);
+box(4, 5, 6).surfaceArea
 ```
 
 ---
@@ -859,6 +979,76 @@ PRINT(String(bad), JSON.stringify(bad.instance));
 
 // Every theorem in the library, with its method and time
 proofs.all().map(({ name, proof }) => `${name}: ${proof.proved ? "proved" : "NOT proved"} (${proof.method}, ${proof.ms} ms)`)
+```
+
+---
+
+Page: https://ratmath.com/geo/space.html
+
+Topic
+
+## Vectors, lines and planes in space
+
+Three-dimensional coordinates, exact: the dot and cross products, lengths that stay square roots, angles, projections, and the lines and planes of multivariable calculus with their equations, distances and intersections.
+
+### Vectors
+
+`vector(x, y, z)` takes rationals or exact numbers such as `"sqrt(2)"`. The dot product u⋅v=u1​v1​+u2​v2​+u3​v3​ is ∣u∣∣v∣cosθ; the cross product
+
+u×v=(u2​v3​−u3​v2​, u3​v1​−u1​v3​, u1​v2​−u2​v1​)
+is perpendicular to both, with length ∣u∣∣v∣sinθ, the area of the parallelogram they span. The scalar triple product u⋅(v×w) is the signed volume of the parallelepiped.
+
+```js
+const u = vector(1, 2, -2), v = vector(3, 0, 4);
+u.dot(v);          // -5
+u.cross(v);        // (8, -10, -6)
+u.norm;            // 3
+u.angle(v).cos;    // -1/3
+v.projectOnto([0, 0, 1]);              // (0, 0, 4)
+tripleProduct([4, 0, 0], [0, 5, 0], [0, 0, 6]);   // 120
+```
+
+### Planes
+
+A plane is n⋅x=d for a normal n. Through three points P,Q,R the normal is (Q−P)×(R−P), and three points on one line are refused. The equation prints with whole coefficients and no common factor. The distance from a point is ∣n⋅p−d∣/∣n∣, reached at the foot of the perpendicular.
+
+```js
+const P = plane([1, 0, 2], [2, 1, 0], [0, 3, 1]);
+P.equation;            // "5x + 3y + 4z = 13"
+P.distance([0, 0, 0]); // 13/√50, an exact square root
+P.foot([0, 0, 0]);     // (13/10, 39/50, 26/25)
+plane([0, 0, 0], { normal: [0, 0, 1] });   // z = 0
+plane({ coefficients: [1, 1, 1, 3] });     // x + y + z = 3
+```
+
+### Lines and intersections
+
+`line3(p, q)` is the line p+t(q−p). A plane meets a line in a point (or contains it, or misses it), and two planes that are not parallel meet in a line whose direction is the cross product of their normals.
+
+```js
+const Q = plane({ coefficients: [1, -1, 0, 1] });
+plane({ coefficients: [1, 1, 1, 3] }).meet(Q);    // a Line3: point + t·(1, 1, -2)
+P.meet(line3([0, 0, 0], [1, 1, 1]));              // (13/12, 13/12, 13/12)
+```
+
+### Try it
+
+```js
+const u = vector(1, 2, -2), v = vector(3, 0, 4);
+PRINT("u·v =", String(u.dot(v)), " u×v =", String(u.cross(v)), " |u| =", String(u.norm), " |v| =", String(v.norm));
+PRINT("angle between u and v:", u.angle(v).degrees.toFixed(4), "degrees");
+// the cross product is perpendicular to both, and |u×v|² = |u|²|v|² − (u·v)²
+const w = u.cross(v);
+PRINT("perpendicular:", w.isOrthogonal(u), w.isOrthogonal(v), " Lagrange:", String(w.norm2), "=", String(u.norm2.multiply(v.norm2).subtract(u.dot(v).multiply(u.dot(v)))));
+
+// The plane through three points, and the distance to the origin
+const P = plane([1, 0, 2], [2, 1, 0], [0, 3, 1]);
+PRINT(P.equation, " distance from the origin:", String(P.distance([0, 0, 0])));
+
+// Where two planes cross
+const L = P.meet(plane([0, 0, 0], { normal: [0, 0, 1] }));
+PRINT("meets z = 0 along", String(L));
+P.foot([0, 0, 0])
 ```
 
 ---

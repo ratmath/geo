@@ -82,6 +82,14 @@ export class Line {
   at(p: PointLike): Num;
   contains(p: PointLike): boolean;
   equals(o: Line): boolean;
+  /** −a/b, or null for a vertical line. */
+  readonly slope: Num | null;
+  /** The y-intercept −c/b, or null for a vertical line. */
+  readonly intercept: Num | null;
+  /** "y = -2x + 1", or "x = k" for a vertical line. */
+  toSlopeIntercept(): string;
+  /** "y - 5 = -2(x + 2)" through a point of the line. */
+  toPointSlope(p?: PointLike): string;
   toString(): string;
 }
 export function line(p: PointLike, q: PointLike): Line;
@@ -1023,3 +1031,96 @@ export const proofs: { readonly [K in ProvableId]: (options?: ProveOptions) => P
   all(options?: ProveOptions): Array<{ id: ProvableId; name: string; statement: string; proof: Proof }>;
   setup(id: ProvableId): { configuration: Configuration; conclusion: GeoExpr | Array<GeoExpr | GeoExpr[]> };
 };
+
+// ---- measurement (school geometry) ----------------------------------------------
+
+/** (n − 2)·180, in degrees. */
+export function angleSum(n: number): Rational;
+/** (n − 2)·180/n, in degrees: each angle of a regular n-gon. */
+export function interiorAngle(n: number): Rational;
+/** 360/n, in degrees. */
+export function exteriorAngle(n: number): Rational;
+export function slopeIntercept(l: Line): { slope: Num | null; intercept: Num | null; text: string; line: Line };
+export function slopeIntercept(p: PointLike, q: PointLike): { slope: Num | null; intercept: Num | null; text: string; line: Line };
+/** The line through p with slope m. */
+export function pointSlope(p: PointLike, m: NumLike): Line;
+/** √(power of p): the length of a tangent segment from p. */
+export function tangentLength(c: Circle, p: PointLike): Num;
+/** The box a × b × c as an exact polyhedron. */
+export function box(a: NumLike, b: NumLike, c: NumLike): Polyhedron;
+export interface PiMultiple { coefficient: Num; text: string; value(digits?: number): unknown }
+export function cylinder(r: NumLike, h: NumLike): { kind: "cylinder"; radius: Num; height: Num; volume: PiMultiple; lateralArea: PiMultiple; surfaceArea: PiMultiple };
+export function cone(r: NumLike, h: NumLike): { kind: "cone"; radius: Num; height: Num; slant: Num; volume: PiMultiple; lateralArea: PiMultiple; surfaceArea: PiMultiple };
+export function sphere(r: NumLike): { kind: "sphere"; radius: Num; volume: PiMultiple; surfaceArea: PiMultiple };
+/** Ratios for similar figures with scale factor k: lengths k, areas k², volumes k³. */
+export function similar(spec: NumLike | { lengths: [NumLike, NumLike] } | { areas: [NumLike, NumLike] } | { volumes: [NumLike, NumLike] }): { scale: Num; length: Num; area: Num; volume: Num };
+/** [A, B, C, D, E, F] of Ax² + Bxy + Cy² + Dx + Ey + F from text or six numbers. */
+export function conicCoefficients(input: string | NumLike[]): [Num, Num, Num, Num, Num, Num];
+/** The circle x² + y² + Dx + Ey + F = 0, by completing the square. */
+export function circleFromEquation(input: string | NumLike[]): Circle;
+
+// ---- vectors, lines and planes in space ------------------------------------------
+
+export class Vector {
+  constructor(x: NumLike, y: NumLike, z: NumLike);
+  readonly x: Num;
+  readonly y: Num;
+  readonly z: Num;
+  toArray(): [Num, Num, Num];
+  add(o: VectorLike): Vector;
+  sub(o: VectorLike): Vector;
+  scale(k: NumLike): Vector;
+  neg(): Vector;
+  dot(o: VectorLike): Num;
+  cross(o: VectorLike): Vector;
+  readonly norm2: Num;
+  readonly norm: Num;
+  readonly isZero: boolean;
+  unit(): Vector;
+  angle(o: VectorLike): Angle;
+  projectOnto(o: VectorLike): Vector;
+  componentAlong(o: VectorLike): Num;
+  isParallel(o: VectorLike): boolean;
+  isOrthogonal(o: VectorLike): boolean;
+  equals(o: VectorLike): boolean;
+  toString(): string;
+}
+export type VectorLike = Vector | [NumLike, NumLike, NumLike] | { x: NumLike; y: NumLike; z: NumLike };
+export function vector(x: NumLike, y: NumLike, z: NumLike): Vector;
+export function vector(v: VectorLike): Vector;
+/** u·(v × w). */
+export function tripleProduct(u: VectorLike, v: VectorLike, w: VectorLike): Num;
+/** The line p + t·d. */
+export class Line3 {
+  constructor(point: VectorLike, direction: VectorLike);
+  readonly point: Vector;
+  readonly direction: Vector;
+  at(t: NumLike): Vector;
+  contains(p: VectorLike): boolean;
+  distance(p: VectorLike): Num;
+  toString(): string;
+}
+export function line3(p: VectorLike, q: VectorLike): Line3;
+/** The plane n·x = d. */
+export class Plane {
+  constructor(normal: VectorLike, d: NumLike);
+  readonly normal: Vector;
+  readonly d: Num;
+  /** [a, b, c, d] of ax + by + cz = d, whole numbers when rational. */
+  readonly coefficients: [Num, Num, Num, Num];
+  /** "5x + 3y + 4z = 13" */
+  readonly equation: string;
+  at(p: VectorLike): Num;
+  contains(p: VectorLike): boolean;
+  distance(p: VectorLike): Num;
+  foot(p: VectorLike): Vector;
+  isParallel(o: Plane | VectorLike): boolean;
+  angle(o: Plane): Angle;
+  meet(o: Line3): Vector | Line3 | null;
+  meet(o: Plane): Line3 | Plane | null;
+  equals(o: Plane): boolean;
+  toString(): string;
+}
+export function plane(p: VectorLike, q: VectorLike, r: VectorLike): Plane;
+export function plane(p: VectorLike, options: { normal: VectorLike }): Plane;
+export function plane(spec: { coefficients: [NumLike, NumLike, NumLike, NumLike] }): Plane;

@@ -8,6 +8,19 @@ import { num, N, refuse, ZERO, ONE, TWO, Q } from "./num.js";
 
 const half = (a) => N.div(a, TWO);
 
+const wrap = (t) => (/[ +/]/.test(t) || /-/.test(t.slice(1)) ? `(${t})` : t);
+/** "m·v + b" with exact coefficients, tidy signs */
+function linearText(m, v, b) {
+  let out;
+  if (N.isZero(m)) out = "";
+  else if (N.eq(m, ONE)) out = v;
+  else if (N.eq(m, N.neg(ONE))) out = `-${v}`;
+  else out = `${wrap(N.text(m))}${v}`;
+  if (N.isZero(b)) return out || "0";
+  if (!out) return N.text(b);
+  return N.sign(b) < 0 ? `${out} - ${N.text(N.neg(b))}` : `${out} + ${N.text(b)}`;
+}
+
 export class Point {
   constructor(x, y) {
     this.x = num(x);
@@ -68,6 +81,30 @@ export class Line {
   get origin() {
     const n2 = N.add(N.sq(this.a), N.sq(this.b));
     return new Point(N.neg(N.div(N.mul(this.a, this.c), n2)), N.neg(N.div(N.mul(this.b, this.c), n2)));
+  }
+  /** the slope −a/b, or null for a vertical line */
+  get slope() {
+    return N.isZero(this.b) ? null : N.neg(N.div(this.a, this.b));
+  }
+  /** the y-intercept −c/b, or null for a vertical line */
+  get intercept() {
+    return N.isZero(this.b) ? null : N.neg(N.div(this.c, this.b));
+  }
+  /** "y = m·x + b" (or "x = k" for a vertical line), exactly */
+  toSlopeIntercept() {
+    if (N.isZero(this.b)) return `x = ${N.text(N.neg(N.div(this.c, this.a)))}`;
+    return `y = ${linearText(this.slope, "x", this.intercept)}`;
+  }
+  /** "y − y₀ = m(x − x₀)" through a point on the line */
+  toPointSlope(p = this.origin) {
+    const q = P(p);
+    if (!this.contains(q)) refuse("bad-argument", `${q} is not on the line`);
+    if (N.isZero(this.b)) return `x = ${N.text(q.x)}`;
+    const shift = (v, k) => (N.isZero(k) ? v : N.sign(k) < 0 ? `(${v} + ${N.text(N.neg(k))})` : `(${v} - ${N.text(k)})`);
+    const m = this.slope;
+    const left = N.isZero(q.y) ? "y" : N.sign(q.y) < 0 ? `y + ${N.text(N.neg(q.y))}` : `y - ${N.text(q.y)}`;
+    const right = N.isZero(m) ? "0" : `${N.eq(m, ONE) ? "" : N.eq(m, N.neg(ONE)) ? "-" : wrap(N.text(m))}${shift("x", q.x)}`;
+    return `${left} = ${right}`;
   }
   equals(o) {
     return N.isZero(N.sub(N.mul(this.a, o.b), N.mul(this.b, o.a))) && N.isZero(N.sub(N.mul(this.a, o.c), N.mul(this.c, o.a))) && N.isZero(N.sub(N.mul(this.b, o.c), N.mul(this.c, o.b)));

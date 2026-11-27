@@ -2,14 +2,14 @@
 
 > Geometry for RatMath: Euclidean constructions, theorems checked on exact figures and proved in general, spherical, hyperbolic, projective and finite geometries, symmetry and tilings. Part of the RatMath Shelf; numbers come from @ratmath/core (a peer dependency). ESM: `import * as geo from "@ratmath/geo"`.
 
-Built from 0.4.0, commit 138ca0c. `file:line` is relative to the package root (also node_modules/@ratmath/geo/); on GitHub: https://github.com/ratmath/geo/blob/138ca0c/<file>#L<line>. Docs pages are under https://ratmath.com/geo/. Full types: index.d.ts.
+Built from 0.4.0, commit 833d9f4 plus uncommitted changes. `file:line` is relative to the package root (also node_modules/@ratmath/geo/); on GitHub: https://github.com/ratmath/geo/blob/833d9f4/<file>#L<line>. Docs pages are under https://ratmath.com/geo/. Full types: index.d.ts.
 
-Types: `type Num = Rational | AlgebraicValue`; `type NumLike = Num | bigint | number | string`; `type PointLike = Point | [NumLike, NumLike]`; `type TriangleLike = Triangle | [PointLike, PointLike, PointLike]`; `type PPointLike = PPoint | Point | [NumLike, NumLike] | [NumLike, NumLike, NumLike]`; `type Matrix3 = [[NumLike, NumLike, NumLike], [NumLike, NumLike, NumLike], [NumLike, NumLike, NumLike]]`; `type Point3 = [NumLike, NumLike, NumLike]`; `type WallpaperName = "p1" | "p2" | "pm" | "pg" | "cm" | "pmm" | "pmg" | "pgg" | "cmm" | "p3" | "p3m1" | "p31m" | "p4" | "p4m" | "p4g" | "p6" | "p6m"`; `type FriezeName = "p1" | "p11g" | "p1m1" | "p2" | "p2mg" | "p11m" | "p2mm"`; `type AngleLike = Angle | NumLike | { cos: NumLike; sin?: NumLike }`; `type Vec3Like = [NumLike, NumLike, NumLike]`; `type SPointLike = SPoint | Vec3Like`; `type HPointLike = HPoint | Point | [NumLike, NumLike]`; `type HAny = HPointLike | HIdeal`; `type ExactComplex = [Num, Num]`; `type Scalar = number | bigint | string | Rational`; `type Coordinate = Scalar | GeoExpr`; `type GeoLine = [GeoPoint, GeoPoint]`
+Types: `type Num = Rational | AlgebraicValue`; `type NumLike = Num | bigint | number | string`; `type PointLike = Point | [NumLike, NumLike]`; `type TriangleLike = Triangle | [PointLike, PointLike, PointLike]`; `type PPointLike = PPoint | Point | [NumLike, NumLike] | [NumLike, NumLike, NumLike]`; `type Matrix3 = [[NumLike, NumLike, NumLike], [NumLike, NumLike, NumLike], [NumLike, NumLike, NumLike]]`; `type Point3 = [NumLike, NumLike, NumLike]`; `type WallpaperName = "p1" | "p2" | "pm" | "pg" | "cm" | "pmm" | "pmg" | "pgg" | "cmm" | "p3" | "p3m1" | "p31m" | "p4" | "p4m" | "p4g" | "p6" | "p6m"`; `type FriezeName = "p1" | "p11g" | "p1m1" | "p2" | "p2mg" | "p11m" | "p2mm"`; `type AngleLike = Angle | NumLike | { cos: NumLike; sin?: NumLike }`; `type Vec3Like = [NumLike, NumLike, NumLike]`; `type SPointLike = SPoint | Vec3Like`; `type HPointLike = HPoint | Point | [NumLike, NumLike]`; `type HAny = HPointLike | HIdeal`; `type ExactComplex = [Num, Num]`; `type Scalar = number | bigint | string | Rational`; `type Coordinate = Scalar | GeoExpr`; `type GeoLine = [GeoPoint, GeoPoint]`; `type VectorLike = Vector | [NumLike, NumLike, NumLike] | { x: NumLike; y: NumLike; z: NumLike }`
 
 ## Docs
 
 - https://ratmath.com/geo/llms-full.txt: every page below as Markdown, each with a runnable example
-- Pages: index (Overview), reference (Reference), explore (Explore), constructions (Constructions), triangles (Triangle centres), transformations (Transformations), theorems (Checked theorems), proofs (General proofs), computational (Computational geometry), lattice (Lattice geometry), metrics (Taxicab geometry), spherical (Spherical geometry), hyperbolic (The hyperbolic plane), hyperbolic-triangles (Hyperbolic triangles, motions, tilings), parallel-postulate (The parallel postulate), projective (The projective plane), finite-geometries (Finite geometries), polyhedra (Polyhedra), symmetry (Symmetry groups), tilings (Tilings), pictures (Pictures of geometry)
+- Pages: index (Overview), reference (Reference), explore (Explore), constructions (Constructions), measurement (Measurement), triangles (Triangle centres), transformations (Transformations), theorems (Checked theorems), proofs (General proofs), space (Vectors and planes), computational (Computational geometry), lattice (Lattice geometry), metrics (Taxicab geometry), spherical (Spherical geometry), hyperbolic (The hyperbolic plane), hyperbolic-triangles (Hyperbolic triangles, motions, tilings), parallel-postulate (The parallel postulate), projective (The projective plane), finite-geometries (Finite geometries), polyhedra (Polyhedra), symmetry (Symmetry groups), tilings (Tilings), pictures (Pictures of geometry)
 
 ## API
 
@@ -19,45 +19,67 @@ name(params) → result — meaning · file:line · docs page
 - `GeoError class: code` · src/num.js:8
 - `num(x: NumLike) → Num` — An exact number from a whole number, a bigint, a Rational, a string ("7/2", "0.35", "sqrt(2)") or an algebraic number. · src/num.js:33
 - `N: { add(a: Num, b: Num): Num; sub(a: Num, b: Num): Num; mul(a: Num, b: Num): Num; div(a: Num, b: Num): Num; neg(a: Num): Num; sq(a: Num): Num; sqrt(a: Num): Num; sign(a: Num): -1 | 0 | 1; isZero(a: Num): boolean …` · src/num.js:74 · triangles
-- `Point class: x, y, equals, plus, minus, times, toNumbers, toString` · src/plane.js:11 · reference
-- `point(x: NumLike, y: NumLike) → Point (+1 overload)` — A point from exact coordinates: point(1, "1/2"), point("sqrt(3)/2", 0), or point([x, y]). · src/plane.js:37 · pictures
-- `Line class: a, b, c, direction, origin, at, contains, equals, toString` — The line a·x + b·y + c = 0. · src/plane.js:47
-- `line(p: PointLike, q: PointLike) → Line (+1 overload)` — The line through two points, or from coefficients line(a, b, c). · src/plane.js:97 · constructions
-- `Circle class: center, radius2, radius, power, contains, equals, toString` · src/plane.js:105
-- `circle(center: PointLike, through: PointLike) → Circle` — A circle from its centre and either a point on it or { radius } or { radius2 }. · src/plane.js:129 · constructions
-- `distance(p: PointLike, q: PointLike) → Num` · src/plane.js:141 · spherical
-- `distance2(p: PointLike, q: PointLike) → Num` · src/plane.js:137
-- `midpoint(p: PointLike, q: PointLike) → Point` · src/plane.js:142
-- `orientation(p: PointLike, q: PointLike, r: PointLike) → -1 | 0 | 1` — 1 for a left turn p → q → r, −1 for a right turn, 0 when collinear · src/plane.js:144 · constructions
-- `collinear(...points: PointLike[]) → boolean` · src/plane.js:145 · constructions
-- `parallel(l: Line, m: Line) → boolean` · src/plane.js:146 · constructions
-- `perpendicular(l: Line, m: Line) → boolean` · src/plane.js:147 · constructions
-- `concurrent(l: Line, m: Line, n: Line) → boolean` — do three lines pass through one point (or are all parallel)? · src/plane.js:149 · constructions
-- `concyclic(...points: PointLike[]) → boolean` — do the points lie on one circle (or one line)? · src/plane.js:158 · constructions
-- `parallelThrough(l: Line, p: PointLike) → Line` · src/plane.js:168 · parallel-postulate
-- `perpendicularThrough(l: Line, p: PointLike) → Line` · src/plane.js:169
-- `perpendicularBisector(p: PointLike, q: PointLike) → Line` · src/plane.js:170 · constructions
-- `angleBisector(a: PointLike, vertex: PointLike, b: PointLike, options?: { external?: boolean }) → Line` — the bisector of angle AVB (the internal one; { external: true } for the other) · src/plane.js:177
-- `foot(p: PointLike, l: Line) → Point` · src/plane.js:171
-- `reflect(p: PointLike, l: Line) → Point` · src/plane.js:226
-- `meet(f: Line | Circle, g: Line | Circle) → Point[]` — Where two figures meet: a Point or null for two lines; a list of 0, 1 or 2 Points (ordered by x, then y) for a line and a circle or two circles. · src/plane.js:200 · constructions
-- `tangents(c: Circle, p: PointLike) → Line[]` — tangent lines to a circle from a point: two from outside, one on the circle, none inside · src/plane.js:231
-- `circumcircle(a: PointLike, b: PointLike, c: PointLike) → Circle` · src/plane.js:188
-- `regularPolygon(n: number, options?: { center?: PointLike; vertex?: PointLike }) → Point[]` — The regular n-gon with the given centre and first vertex, exactly. · src/plane.js:241 · constructions
-- `Construction class: steps, objects, get, line, circle, meet, count, toString` — A ruler-and-compass construction written down step by step. · src/plane.js:261
-- `construction(given?: Record<string, PointLike>) → Construction` · src/plane.js:309 · constructions
-- `Triangle class: A, B, C, vertices, sides, sides2, area, perimeter, cosines, degrees, classify, barycentric, centroid, circumcenter, orthocenter, incenter, excenters, ninePointCenter, symmedian, circumcircle, incircle, excircles, ninePointCircle, inradius, circumradius, medians, altitudes, feet, bisectors, eulerLine, toString` · src/plane.js:313
-- `triangle(a: PointLike, b: PointLike, c: PointLike) → Triangle` · src/plane.js:430 · triangles
-- `Transform class: m, t, determinant, apply, compose, inverse, equals, isSimilarity, isIsometry, fixed, classify, toString` — The affine map p ↦ M·p + t with M = [[a, b], [c, d]]. · src/plane.js:435 · reference
-- `identity() → Transform` · src/plane.js:534 · proofs
-- `translation(v: PointLike) → Transform` · src/plane.js:535 · hyperbolic-triangles
-- `rotation(center: PointLike, turn: NumLike) → Transform` — Rotation about a centre. · src/plane.js:541 · transformations
-- `reflection(l: Line) → Transform` · src/plane.js:558 · transformations
-- `glide(l: Line, vector: PointLike) → Transform` — reflection in a line followed by a translation along it by the given vector's component along the line · src/plane.js:565 · transformations
-- `dilation(center: PointLike, ratio: NumLike) → Transform` · src/plane.js:571 · transformations
-- `affine(matrix: [[NumLike, NumLike], [NumLike, NumLike]], vector?: PointLike) → Transform` · src/plane.js:576 · parallel-postulate
-- `inversion(c: Circle) → { circle: Circle; apply(p: PointLike): Point; apply(f: Line | Circle): Line | Circle; }` — Inversion in a circle: p ↦ the point on the ray from the centre through p with |Op|·|Op′| = r². · src/plane.js:582 · transformations
+- `Point class: x, y, equals, plus, minus, times, toNumbers, toString` · src/plane.js:24 · reference
+- `point(x: NumLike, y: NumLike) → Point (+1 overload)` — A point from exact coordinates: point(1, "1/2"), point("sqrt(3)/2", 0), or point([x, y]). · src/plane.js:50 · measurement
+- `dot(u: PointLike, v: PointLike) → Num` — u·v for vectors given as points or [x, y]. · src/plane.js:57
+- `cross(u: PointLike, v: PointLike) → Num` — The scalar cross product u_x·v_y − u_y·v_x (twice the signed area of the triangle 0, u, v). · src/plane.js:59
+- `Line class: a, b, c, direction, origin, at, contains, equals, slope, intercept, toSlopeIntercept, toPointSlope, toString` — The line a·x + b·y + c = 0. · src/plane.js:62
+- `line(p: PointLike, q: PointLike) → Line (+1 overload)` — The line through two points, or from coefficients line(a, b, c). · src/plane.js:136 · constructions
+- `Circle class: center, radius2, radius, power, contains, equals, toString` · src/plane.js:144
+- `circle(center: PointLike, through: PointLike) → Circle` — A circle from its centre and either a point on it or { radius } or { radius2 }. · src/plane.js:168 · constructions
+- `distance(p: PointLike, q: PointLike) → Num` · src/plane.js:180 · spherical
+- `distance2(p: PointLike, q: PointLike) → Num` · src/plane.js:176
+- `midpoint(p: PointLike, q: PointLike) → Point` · src/plane.js:181
+- `orientation(p: PointLike, q: PointLike, r: PointLike) → -1 | 0 | 1` — 1 for a left turn p → q → r, −1 for a right turn, 0 when collinear · src/plane.js:183 · constructions
+- `collinear(...points: PointLike[]) → boolean` · src/plane.js:184 · constructions
+- `parallel(l: Line, m: Line) → boolean` · src/plane.js:185 · constructions
+- `perpendicular(l: Line, m: Line) → boolean` · src/plane.js:186 · constructions
+- `concurrent(l: Line, m: Line, n: Line) → boolean` — do three lines pass through one point (or are all parallel)? · src/plane.js:188 · constructions
+- `concyclic(...points: PointLike[]) → boolean` — do the points lie on one circle (or one line)? · src/plane.js:197 · constructions
+- `parallelThrough(l: Line, p: PointLike) → Line` · src/plane.js:207 · parallel-postulate
+- `perpendicularThrough(l: Line, p: PointLike) → Line` · src/plane.js:208
+- `perpendicularBisector(p: PointLike, q: PointLike) → Line` · src/plane.js:209 · constructions
+- `angleBisector(a: PointLike, vertex: PointLike, b: PointLike, options?: { external?: boolean }) → Line` — the bisector of angle AVB (the internal one; { external: true } for the other) · src/plane.js:216
+- `foot(p: PointLike, l: Line) → Point` · src/plane.js:210
+- `reflect(p: PointLike, l: Line) → Point` · src/plane.js:265
+- `meet(f: Line | Circle, g: Line | Circle) → Point[]` — Where two figures meet: a Point or null for two lines; a list of 0, 1 or 2 Points (ordered by x, then y) for a line and a circle or two circles. · src/plane.js:239 · constructions
+- `tangents(c: Circle, p: PointLike) → Line[]` — tangent lines to a circle from a point: two from outside, one on the circle, none inside · src/plane.js:270
+- `circumcircle(a: PointLike, b: PointLike, c: PointLike) → Circle` · src/plane.js:227
+- `regularPolygon(n: number, options?: { center?: PointLike; vertex?: PointLike }) → Point[]` — The regular n-gon with the given centre and first vertex, exactly. · src/plane.js:280 · constructions
+- `Construction class: steps, objects, get, line, circle, meet, count, toString` — A ruler-and-compass construction written down step by step. · src/plane.js:300
+- `construction(given?: Record<string, PointLike>) → Construction` · src/plane.js:348 · constructions
+- `Triangle class: A, B, C, vertices, sides, sides2, area, perimeter, cosines, degrees, classify, barycentric, centroid, circumcenter, orthocenter, incenter, excenters, ninePointCenter, symmedian, circumcircle, incircle, excircles, ninePointCircle, inradius, circumradius, medians, altitudes, feet, bisectors, eulerLine, toString` · src/plane.js:352
+- `triangle(a: PointLike, b: PointLike, c: PointLike) → Triangle` · src/plane.js:469 · triangles
+- `Transform class: m, t, determinant, apply, compose, inverse, equals, isSimilarity, isIsometry, fixed, classify, toString` — The affine map p ↦ M·p + t with M = [[a, b], [c, d]]. · src/plane.js:474 · reference
+- `identity() → Transform` · src/plane.js:573 · proofs
+- `translation(v: PointLike) → Transform` · src/plane.js:574 · hyperbolic-triangles
+- `rotation(center: PointLike, turn: NumLike) → Transform` — Rotation about a centre. · src/plane.js:580 · transformations
+- `reflection(l: Line) → Transform` · src/plane.js:597 · transformations
+- `glide(l: Line, vector: PointLike) → Transform` — reflection in a line followed by a translation along it by the given vector's component along the line · src/plane.js:604 · transformations
+- `dilation(center: PointLike, ratio: NumLike) → Transform` · src/plane.js:610 · transformations
+- `affine(matrix: [[NumLike, NumLike], [NumLike, NumLike]], vector?: PointLike) → Transform` · src/plane.js:615 · parallel-postulate
+- `inversion(c: Circle) → { circle: Circle; apply(p: PointLike): Point; apply(f: Line | Circle): Line | Circle; }` — Inversion in a circle: p ↦ the point on the ray from the centre through p with |Op|·|Op′| = r². · src/plane.js:621 · transformations
 - `theorems: { pythagoras(t: TriangleLike): Checked; eulerLine(t: TriangleLike): Checked; ninePointCircle(t: TriangleLike): Checked; feuerbach(t: TriangleLike): Checked; ceva(t: TriangleLike, D: PointLike, E: PointLike, F: …` · src/theorems.js:20 · theorems
+- `Vector class: x, y, z, toArray, add, sub, scale, neg, dot, cross, norm2, norm, isZero, unit, angle, projectOnto, componentAlong, isParallel, isOrthogonal, equals, toString` · src/space.js:9
+- `vector(x: NumLike, y: NumLike, z: NumLike) → Vector (+1 overload)` — A vector or point in space: vector(1, 2, -2), vector([1, 2, -2]), vector("1/2", "sqrt(2)", 0). · src/space.js:93 · transformations
+- `tripleProduct(u: VectorLike, v: VectorLike, w: VectorLike) → Num` — The scalar triple product u·(v × w): the signed volume of the parallelepiped. · src/space.js:103 · space
+- `Line3 class: point, direction, at, contains, distance, toString` — The line p + t·d in space. · src/space.js:106 · space
+- `line3(p: VectorLike, q: VectorLike) → Line3` — The line through two points. · src/space.js:128 · space
+- `Plane class: normal, d, coefficients, equation, at, contains, distance, foot, isParallel, angle, meet, equals, toString` — The plane n·x = d. · src/space.js:134
+- `plane(p: VectorLike, q: VectorLike, r: VectorLike) → Plane (+2 overloads)` — A plane: through three points plane(p, q, r), or through a point with a normal plane(p, { normal }), or from a·x + b·y + c·z = d as plane([a, b, c], d)… · src/space.js:226 · space
+- `angleSum(n: number) → Rational` — The sum of the interior angles of an n-gon, in degrees: (n − 2)·180. · src/school.js:16 · measurement
+- `interiorAngle(n: number) → Rational` — Each interior angle of a regular n-gon, in degrees: (n − 2)·180/n. · src/school.js:18 · measurement
+- `exteriorAngle(n: number) → Rational` — Each exterior angle of a regular n-gon, in degrees: 360/n. · src/school.js:20 · measurement
+- `slopeIntercept(l: Line) → { slope: Num | null; intercept: Num | null; text: string; line: Line } (+1 overload)` — The slope–intercept form of a line (or of the line through two points): { slope, intercept, text: "y = -2x + 1" }; slope and intercept are null for a… · src/school.js:27 · measurement
+- `pointSlope(p: PointLike, m: NumLike) → Line` — The line through p with slope m (exact): its text forms are toPointSlope() and toSlopeIntercept(). · src/school.js:32 · measurement
+- `tangentLength(c: Circle, p: PointLike) → Num` — The length of a tangent segment from p to the circle: √(power of p), exactly. · src/school.js:40 · measurement
+- `box(a: NumLike, b: NumLike, c: NumLike) → Polyhedron` — The box a × b × c as an exact polyhedron (volume, surfaceArea, …). · src/school.js:47 · measurement
+- `cylinder(r: NumLike, h: NumLike) → { kind: "cylinder"; radius: Num; height: Num; volume: PiMultiple; lateralArea: PiMultiple; surfaceArea: PiMultiple }` — A right circular cylinder: volume πr²h, lateral area 2πrh, surface area 2πr(r + h), as multiples of π. · src/school.js:61 · measurement
+- `cone(r: NumLike, h: NumLike) → { kind: "cone"; radius: Num; height: Num; slant: Num; volume: PiMultiple; lateralArea: PiMultiple; surfaceArea: PiMultiple }` — A right circular cone: volume πr²h/3, slant height √(r² + h²), lateral area πrs, surface area πr(r + s). · src/school.js:66 · measurement
+- `sphere(r: NumLike) → { kind: "sphere"; radius: Num; volume: PiMultiple; surfaceArea: PiMultiple }` — A sphere: volume 4πr³/3, surface area 4πr². · src/school.js:72 · measurement
+- `similar(spec: NumLike | { lengths: [NumLike, NumLike] } | { areas: [NumLike, NumLike] } | { volumes: [NumLike, NumLike] }) → { scale: Num; length: Num; area: Num; volume: Num }` — Similar figures with scale factor k (lengths multiply by k): areas multiply by k², volumes by k³. · src/school.js:81 · measurement
+- `conicCoefficients(input: string | NumLike[]) → [Num, Num, Num, Num, Num, Num]` — The six coefficients [A, B, C, D, E, F] of A·x² + B·xy + C·y² + D·x + E·y + F from text ("x^2 + y^2 - 6x + 4y - 12 = 0", either side of "=") or an array. · src/school.js:110
+- `circleFromEquation(input: string | NumLike[]) → Circle` — The circle x² + y² + Dx + Ey + F = 0 (any common factor allowed), by completing the square: centre (−D/2, −E/2), r² = (D² + E²)/4 − F. · src/school.js:136 · measurement
 - `Polygon class: vertices, edges, signedArea, area, perimeter, centroid, isConvex, isSimple, locate, contains, triangulate, clip, toString` · src/discrete.js:56
 - `polygon(vertices: PointLike[]) → Polygon` · src/discrete.js:183 · computational
 - `convexHull(points: PointLike[]) → Point[]` — The convex hull, counter-clockwise from the lowest-left point, without the points on its edges. · src/discrete.js:16 · computational

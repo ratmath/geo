@@ -13,8 +13,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
 <link rel="stylesheet" href="https://ratmath.com/assets/katex/0.19.1/katex.min.css">
-<link rel="stylesheet" href="assets/style.css?v=a1cd962778">
-<script type="module" src="assets/site.js?v=a1cd962778"></script>
+<link rel="stylesheet" href="assets/style.css?v=14434bc39c">
+<script type="module" src="assets/site.js?v=14434bc39c"></script>
 </head>
 <body>
 <div class="shell">
@@ -50,6 +50,27 @@
 <tr><td>tangents(c, p), circumcircle(a, b, c)</td><td>Tangent lines from a point; the circle through three points.</td></tr>
 <tr><td>regularPolygon(n, { center, vertex })</td><td>The vertices, exact for every n.</td></tr>
 <tr><td>construction(given), Construction</td><td>A recorded ruler-and-compass construction: line, circle, meet, get, count. See <a href="constructions.html">Constructions</a>.</td></tr>
+</table></div>
+
+<h2>Measurement</h2>
+<div class="tablewrap"><table class="ref">
+<tr><th>name</th><th>what it gives</th></tr>
+<tr><td>angleSum(n), interiorAngle(n), exteriorAngle(n)</td><td>(n − 2)·180, (n − 2)·180/n and 360/n, in degrees, exactly</td></tr>
+<tr><td>line.slope, line.intercept, line.toSlopeIntercept(), line.toPointSlope(p)</td><td>slope and intercept (null when vertical); "y = mx + b" and "y − y₀ = m(x − x₀)"</td></tr>
+<tr><td>slopeIntercept(p, q), pointSlope(p, m)</td><td>{ slope, intercept, text, line } of the line through two points; the line through p with slope m</td></tr>
+<tr><td>tangentLength(circle, p)</td><td>√(power of p)</td></tr>
+<tr><td>circleFromEquation(text | [A..F]), conicCoefficients(...)</td><td>the circle by completing the square; the six coefficients of a conic</td></tr>
+<tr><td>box(a, b, c), cylinder(r, h), cone(r, h), sphere(r)</td><td>a box as a Polyhedron; the round solids' volume and areas as multiples of π</td></tr>
+<tr><td>similar(k | { lengths | areas | volumes })</td><td>{ scale, length, area, volume } ratios</td></tr>
+</table></div>
+
+<h2>Vectors and planes in space</h2>
+<div class="tablewrap"><table class="ref">
+<tr><th>name</th><th>what it gives</th></tr>
+<tr><td>vector(x, y, z)</td><td>dot, cross, norm, norm2, unit, angle, projectOnto, componentAlong, isParallel, isOrthogonal, add, sub, scale</td></tr>
+<tr><td>tripleProduct(u, v, w)</td><td>u·(v × w), the signed volume</td></tr>
+<tr><td>line3(p, q), new Line3(point, direction)</td><td>at(t), contains, distance</td></tr>
+<tr><td>plane(p, q, r), plane(p, { normal }), plane({ coefficients })</td><td>equation, coefficients, contains, distance, foot, angle, meet (a line or a plane), isParallel</td></tr>
 </table></div>
 
 <h2>Triangles</h2>

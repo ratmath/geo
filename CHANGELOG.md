@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- Measurement: `angleSum`, `interiorAngle`, `exteriorAngle`; `Line#slope`,
+  `intercept`, `toSlopeIntercept()`, `toPointSlope(p)`, with `slopeIntercept`
+  and `pointSlope`; `tangentLength`; `circleFromEquation` and
+  `conicCoefficients`; `box`, `cylinder`, `cone`, `sphere` (π kept exact) and
+  `similar`. Docs page "Measurement".
+- Space: `Vector` (dot, cross, norm, angle, projections), `tripleProduct`,
+  `Line3`/`line3`, `Plane`/`plane` (through three points, from a normal or
+  coefficients; equation, distance, foot, angle, intersections). Docs page
+  "Vectors and planes".
 - `dot` and `cross` were declared in `index.d.ts` but not exported. They are
   exported now and take points or `[x, y]` pairs. A test checks that
   everything `index.d.ts` declares is exported. Found by the Course Test
