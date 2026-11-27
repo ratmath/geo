@@ -1,6 +1,6 @@
 # @ratmath/geo 0.4.0: full documentation
 
-> Geometry for RatMath: Euclidean constructions, theorems checked on exact figures and proved in general, spherical, hyperbolic, projective and finite geometries, symmetry and tilings. From https://ratmath.com/geo/, commit 7ea0c6c. Each page ends with a runnable example; in it, PRINT(...) prints.
+> Geometry for RatMath: Euclidean constructions, theorems checked on exact figures and proved in general, spherical, hyperbolic, projective and finite geometries, symmetry and tilings. From https://ratmath.com/geo/, commit 17b4d74. Each page ends with a runnable example; in it, PRINT(...) prints.
 
 
 ---
@@ -312,6 +312,22 @@ See [General proofs](https://ratmath.com/geo/proofs.html).
 | parallelPostulate({ q }) | Playfair's postulate counted in five geometries. See The parallel postulate. |
 
 | hyperbolicFigure(items, { model }), hyperbolicTilingFigure(p, q, { layers, model }) | Figures in the Poincaré disc, the Klein disc or the half-plane. |
+
+### Topology
+
+| Export | What it does |
+
+| surface(word or [words]), Surface | Glued polygons: cells, eulerCharacteristic, orientable, boundaryComponents, boundaryMatrices, chainComplex(), homology(k, { coefficients }), betti(), classify(), fundamentalGroup(), singleFace(), connectedSum(S). See Surfaces from polygons. |
+
+| classifySurface({ euler, orientable, boundaryComponents }) | { genus or crosscaps, name, normalForm } by the classification theorem. |
+
+| parseEdgeWord(text), formatEdgeWord(tokens) | Edge words such as "a b a^-1 b^-1" as { label, exp } tokens and back. |
+
+| simplicialComplex(simplices), SimplicialComplex, simplicial | faces(k), fVector, eulerCharacteristic, boundary(k), chainComplex(), homology, betti, link(v), components(), isSurface, surfaceCheck(), classify(), fundamentalGroup(); simplicial.simplex, sphere, torus, projectivePlane, kleinBottle, fromGraph, fromPolyhedron. See Simplicial complexes. |
+
+| finiteSpace(points, opens), fromBasis, fromPreorder, finiteSpaces | FiniteSpace: opens, closedSets, closure, interior, boundary, minimalOpen, specialization, isT0, isT1, components, continuity(f, Y), subspace. See Finite spaces. |
+
+| countTopologies(n, { t0 }), allTopologies(points) | Topologies on n ≤ 5 points through preorders; every topology on up to 4 points. |
 
 ### Solids, symmetry and tilings
 
@@ -2041,6 +2057,218 @@ for (const t of types) {
 }
 PRINT("angles of the 3.12.12 type:", [3, 12, 12].map((n) => String(polygonAngle(n))).join(" + "), "= 1");
 regularTilings().map((t) => `${t.symbol} (dual ${t.dual})`)
+```
+
+---
+
+Page: https://ratmath.com/geo/surfaces.html
+
+Topology
+
+## Surfaces from polygons
+
+Textbooks draw a torus as a square with opposite sides glued, and write it as the word aba−1b−1 read around the boundary. `surface` takes such words, works out which corners the gluing identifies, and from the resulting cells computes homology, orientability and which surface it is.
+
+### Edge words and cells
+
+Each polygon is a word in edge labels, read around its boundary: `a` means the edge is traversed along its arrow, `a^-1` (or `a'`, or `a⁻¹`) against it. Edges with the same label are glued, so each label appears twice, or once for an edge left on the boundary. Gluing a to a also glues the tail of one copy to the tail of the other, and the head to the head; following those identifications gives the vertices. A square glued as aba−1b−1 has all four corners become one point, so the torus has one vertex, two edges and one face, and χ=1−2+1=0.
+
+```js
+import { surface } from "@ratmath/geo";
+
+const T = surface("a b a^-1 b^-1");
+T.cells;                    // [1, 2, 1]: V, E, F
+T.eulerCharacteristic;      // 0
+String(T.chainComplex());   // "H0 = Z, H1 = Z^2, H2 = Z"
+String(surface("a a").homology(1));          // "Z/2": the projective plane
+String(surface("a b a^-1 b").homology(1));   // "Z/2 × Z": the Klein bottle
+```
+
+The boundary maps are read off the word: ∂1​ sends an edge to head minus tail, and ∂2​ sends a face to the sum of its edges with their exponents. For the Klein bottle that is a+b−a+b=2b, which is where the Z/2 comes from. The homology itself is computed by [@ratmath/structures](https://ratmath.com/structures/homology.html).
+
+### Orientability and classification
+
+A surface is orientable when the polygons can be given directions so that every glued pair of edges is traversed in opposite directions. Within one polygon that means each label appears once as a and once as a−1; across polygons it is a two-colouring problem. The classification theorem says that a closed connected surface is decided by orientability and χ: the sphere (χ=2), a connected sum of g tori (χ=2−2g), or a connected sum of k projective planes (χ=2−k). Each boundary circle lowers χ by one more.
+
+```js
+surface("a a b b").classify().name;               // "Klein bottle": the same as a b a^-1 b
+surface("a b a c").classify().name;               // "Möbius band": b and c stay on the boundary
+surface("a b a^-1 b^-1 c d c^-1 d^-1").classify();
+// { eulerCharacteristic: -2, orientable: true, genus: 2, name: "connected sum of 2 tori", normalForm: "a1 b1 a1^-1 b1^-1 a2 b2 a2^-1 b2^-1", … }
+
+import { classifySurface } from "@ratmath/geo";
+classifySurface({ euler: 8 - 24 + 14, orientable: true }).name;   // "connected sum of 2 tori"
+```
+
+### Connected sums and several polygons
+
+A surface may be several polygons, glued along shared labels. `singleFace()` merges them along shared edges into one polygon, which changes the cells but not the surface. The connected sum of two closed surfaces is their two words side by side (cut a small disk from each at a vertex and join along the cut), so torus # projective plane is aba−1b−1cc: with χ=−1 and not orientable, it is the connected sum of three projective planes.
+
+```js
+surface(["a b c", "c^-1 b^-1 a^-1"]).classify().name;           // "sphere", from two triangles
+surface("a b a^-1 b^-1").connectedSum("a a").classify().name;   // "connected sum of 3 projective planes"
+```
+
+### The fundamental group
+
+Contract a spanning tree of the edges to a point. The remaining edges are loops, and each polygon becomes a relation among them (van Kampen's theorem for a 2-complex). So `fundamentalGroup()` returns a presentation, with one relator per polygon. Its abelianisation is H1​, which is a good check.
+
+```js
+String(surface("a b a^-1 b^-1").fundamentalGroup());    // "⟨a, b | aba⁻¹b⁻¹⟩", which is Z²
+surface("a a").fundamentalGroup().order();               // 2
+String(surface("a b a^-1 b").fundamentalGroup().abelianInvariants());   // "Z/2 × Z" = H1
+```
+
+### Try it
+
+```js
+// Every closed surface up to χ = −2, from its normal form, with homology and π₁ abelianised
+for (const [chi, orientable] of [[2, true], [0, true], [-2, true], [1, false], [0, false], [-1, false], [-2, false]]) {
+  const c = classifySurface({ euler: chi, orientable });
+  const S = surface(c.normalForm);
+  PRINT(`χ = ${chi}`.padEnd(7), c.name.padEnd(36), String(S.chainComplex()).padEnd(36), "π₁ab =", String(S.fundamentalGroup().abelianInvariants()));
+}
+// A hexagon with sides glued a b c a^-1 b^-1 c^-1: which surface?
+const X = surface("a b c a^-1 b^-1 c^-1");
+X.classify()
+```
+
+---
+
+Page: https://ratmath.com/geo/simplicial.html
+
+Topology
+
+## Simplicial complexes
+
+A simplicial complex is a space built from points, edges, triangles and their higher analogues, glued along whole faces. It is given by its maximal simplices; everything else, from the face counts to the homology and the fundamental group, follows by counting and integer linear algebra.
+
+### Faces and the f-vector
+
+`simplicialComplex` takes a list of simplices, each a list of vertices, and adds every face of each. The f-vector counts the faces in each dimension, and the Euler characteristic is its alternating sum. The boundary of a tetrahedron, four triangles on four vertices, is a sphere: 4−6+4=2.
+
+```js
+import { simplicialComplex, simplicial } from "@ratmath/geo";
+
+const S = simplicialComplex([[1, 2, 3], [1, 2, 4], [1, 3, 4], [2, 3, 4]]);
+S.fVector;               // [4, 6, 4]
+S.eulerCharacteristic;   // 2
+String(S.chainComplex());   // "H0 = Z, H1 = 0, H2 = Z"
+```
+
+The boundary map sends a simplex [v0​,…,vk​] (vertices in increasing order) to ∑i​(−1)i[v0​,…,vi​​,…,vk​], the face without vi​ with sign (−1)i. These matrices go to [@ratmath/structures](https://ratmath.com/structures/homology.html) for the homology, with coefficients in Z, Q or Z/p.
+
+### Named complexes
+
+`simplicial.sphere(n)` is the boundary of the (n+1)-simplex. `simplicial.torus()` is Möbius and Császár's torus on 7 vertices, the smallest possible: every pair of vertices is an edge, (27​)=21, and 7−21+14=0. `simplicial.projectivePlane()` is the 6-vertex projective plane (an icosahedron with opposite points identified), and `simplicial.kleinBottle()` a 12-vertex Klein bottle from a grid of squares.
+
+```js
+const T = simplicial.torus();
+T.fVector;                    // [7, 21, 14]
+String(T.homology(1));        // "Z^2"
+simplicial.projectivePlane().betti({ coefficients: "Z/2" });   // [1, 1, 1]
+simplicial.sphere(3).fVector; // [5, 10, 10, 5]
+```
+
+### Triangulated surfaces
+
+A 2-dimensional complex is a surface when every edge lies in one or two triangles and the triangles around each vertex form a disk: the link of the vertex is a circle (or an arc, on the boundary). `isSurface` checks this, and `classify()` turns the triangles into glued polygons, one edge label per edge, so the classification agrees with the one from an [edge word](https://ratmath.com/geo/surfaces.html).
+
+```js
+simplicial.kleinBottle().classify().name;   // "Klein bottle"
+simplicialComplex([[1, 2, 3], [1, 2, 4], [1, 2, 5]]).surfaceCheck();
+// { surface: false, reason: "edge [1,2] is in 3 triangles" }
+```
+
+### Graphs, polyhedra and π₁
+
+A graph is a 1-dimensional complex: χ=V−E, and for a connected graph b1​=E−V+1 counts independent cycles. `simplicial.fromGraph` takes `{ vertices, edges }` or a graph from [@ratmath/discrete](https://ratmath.com/discrete/). A [polyhedron](https://ratmath.com/geo/polyhedra.html)'s boundary, each face cut into triangles, is a sphere. The fundamental group comes from a spanning tree of the edges: the other edges generate, and each triangle gives a relation.
+
+```js
+import { solids } from "@ratmath/geo";
+simplicial.fromPolyhedron(solids.cube()).classify().name;   // "sphere"
+String(simplicial.sphere(1).fundamentalGroup());             // "⟨e3 | ⟩": the circle, Z
+String(simplicial.torus().fundamentalGroup().abelianInvariants());   // "Z^2"
+```
+
+### Try it
+
+```js
+// Spheres of each dimension, and the three small surfaces
+for (let n = 1; n <= 4; n++) {
+  const S = simplicial.sphere(n);
+  PRINT(`S${n}: f = (${S.fVector.join(", ")}), χ = ${S.eulerCharacteristic}, ${S.chainComplex()}`);
+}
+for (const k of ["torus", "projectivePlane", "kleinBottle"]) {
+  const X = simplicial[k]();
+  PRINT(k.padEnd(16), `f = (${X.fVector.join(", ")})`, String(X.chainComplex()).padEnd(32), "mod 2:", X.betti({ coefficients: "Z/2" }).join(" "));
+}
+// Two tetrahedra sharing a face: still a ball, so contractible
+simplicialComplex([[1, 2, 3, 4], [2, 3, 4, 5]]).homologyGroups().map((H) => H.toString({ additive: true }))
+```
+
+---
+
+Page: https://ratmath.com/geo/finite-spaces.html
+
+Topology
+
+## Finite spaces
+
+A topology on a finite set is a finite list of open sets, so every definition in a first topology course can be checked by hand, or by machine. Finite spaces are also a good source of examples that are connected but not Hausdorff.
+
+### Open sets and the axioms
+
+A family of subsets of X is a topology when it contains ∅ and X and is closed under unions and intersections; for a finite family, pairs are enough. `finiteSpace(points, opens)` checks the axioms and names a failing pair when they do not hold. A basis generates a topology when it covers X and every point of B1​∩B2​ lies in a basis set inside B1​∩B2​; `fromBasis` checks that and takes all unions.
+
+```js
+import { finiteSpace, fromBasis } from "@ratmath/geo";
+
+const X = finiteSpace(["a", "b", "c"], [[], ["a"], ["a", "b"], ["a", "b", "c"]]);
+X.closure(["b"]);        // ["b", "c"]: the smallest closed set containing b
+X.interior(["b", "c"]);  // []: no open set inside {b, c} but ∅
+X.boundary(["a"]);       // ["b", "c"]
+finiteSpace([1, 2, 3], [[], [1], [2], [1, 2, 3]]);   // refused: the union of {1} and {2} is not open
+fromBasis([1, 2, 3], [[1, 2], [2, 3], [2]]).opens;   // [[], [2], [1, 2], [2, 3], [1, 2, 3]]
+```
+
+### Minimal open sets and preorders
+
+In a finite space each point x has a smallest open set Ux​, the intersection of all open sets containing it, and these form the smallest basis. Write x≤y when y∈Ux​. This is a preorder (reflexive and transitive), and the open sets are exactly its up-sets. So topologies on X are the same as preorders on X. The space is T0​ when distinct points have distinct Ux​, which makes the preorder a partial order. T1​ means every Ux​={x}: the discrete topology.
+
+```js
+import { fromPreorder, countTopologies } from "@ratmath/geo";
+
+fromPreorder([1, 2, 3], [[1, 2], [2, 3]]).opens;   // [[], [3], [2, 3], [1, 2, 3]]: a chain
+countTopologies(3);                 // 29
+countTopologies(3, { t0: true });   // 19
+[1, 2, 3, 4, 5].map((n) => countTopologies(n));   // [1, 4, 29, 355, 6942]
+```
+
+The count runs through every reflexive relation and keeps the transitive ones. The tests check it against brute force, every family of subsets tested against the axioms, up to four points.
+
+### Continuity and connectedness
+
+A map is continuous when the preimage of every open set is open; `continuity` returns an open set whose preimage fails when it is not. A finite space is connected when the points are linked through their minimal open sets, and then it is also path connected. The pseudocircle, four points with {a}, {b} open, is connected, not Hausdorff, and has the weak homotopy type of a circle.
+
+```js
+import { finiteSpaces } from "@ratmath/geo";
+const S = finiteSpaces.sierpinski();          // {0, 1} with ∅, {1}, {0, 1} open
+S.continuity((x) => 1 - x, S);               // { continuous: false, witness: { open: [1], preimage: [0] } }
+finiteSpaces.pseudocircle().isConnected;      // true
+```
+
+### Try it
+
+```js
+// All 29 topologies on three points, sorted by how many open sets they have
+const all = allTopologies([1, 2, 3]);
+const byCount = {};
+for (const X of all) (byCount[X.opens.length] ??= []).push(X);
+for (const k of Object.keys(byCount)) PRINT(`${k} open sets: ${byCount[k].length} topologies, ${byCount[k].filter((X) => X.isT0).length} of them T0`);
+// Which of them are connected?
+PRINT("connected:", all.filter((X) => X.isConnected).length, " T0:", all.filter((X) => X.isT0).length, " T1:", all.filter((X) => X.isT1).length);
+countTopologies(4, { t0: true })
 ```
 
 ---

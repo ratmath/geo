@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- Topology (Course Test batch A11): `surface(word)` for glued polygons
+  (cells, homology, orientability, boundary circles, `classify()`,
+  `connectedSum`, `singleFace`, `fundamentalGroup()`), `classifySurface`,
+  `simplicialComplex` and `simplicial` (spheres, the 7-vertex torus, the
+  6-vertex projective plane, a Klein bottle, `fromGraph`, `fromPolyhedron`;
+  homology, links, surface recognition, π₁), and finite spaces
+  (`finiteSpace`, `fromBasis`, `fromPreorder`, closure and interior,
+  continuity, T₀/T₁, `countTopologies`, `allTopologies`, `finiteSpaces`).
+  Homology comes from structures' new `chainComplex`. Docs pages "Surfaces
+  from polygons", "Simplicial complexes" and "Finite spaces".
 - Measurement: `angleSum`, `interiorAngle`, `exteriorAngle`; `Line#slope`,
   `intercept`, `toSlopeIntercept()`, `toPointSlope(p)`, with `slopeIntercept`
   and `pointSlope`; `tangentLength`; `circleFromEquation` and

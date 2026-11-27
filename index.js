@@ -6,7 +6,8 @@
 // plane and finite geometries; polyhedra, symmetry groups, friezes,
 // wallpaper groups and tilings; the sphere and the hyperbolic plane with
 // exact trigonometry; and general proofs of theorems by algebra, with
-// certificates. `plan` lists what is still to come (nothing).
+// certificates; surfaces from glued polygons, simplicial complexes and
+// finite topological spaces. `plan` lists what is still to come (nothing).
 
 export { plan } from "./src/plan.js";
 export { GeoError, num, N } from "./src/num.js";
@@ -38,6 +39,8 @@ export {
 export { parallelPostulate } from "./src/postulate.js";
 export { configuration, Configuration, GeoPoint, GeoExpr, Proof } from "./src/prove.js";
 export { proofs, provable } from "./src/proofs.js";
+export { surface, Surface, classifySurface, parseEdgeWord, formatEdgeWord, simplicialComplex, SimplicialComplex, simplicial } from "./src/topology.js";
+export { finiteSpace, FiniteSpace, fromBasis, fromPreorder, countTopologies, allTopologies, finiteSpaces } from "./src/finite-spaces.js";
 export { toSurd, toGraphics, fromGraphics, geoFigure, constructionFrames, tilingFigure, solidPicture, wallpaperFigure, incidenceFigure, hyperbolicFigure, hyperbolicTilingFigure } from "./src/pictures.js";
 // Drawing a figure, from @ratmath/graphics (re-exported so geo's pictures need no second import).
 export { figureSVG, figurePNG, figurePDF, figureTikZ, figureASCII, framesSVG, framesPNG } from "@ratmath/graphics";

@@ -13,8 +13,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
 <link rel="stylesheet" href="https://ratmath.com/assets/katex/0.19.1/katex.min.css">
-<link rel="stylesheet" href="assets/style.css?v=d6f3c0ba29">
-<script type="module" src="assets/site.js?v=d6f3c0ba29"></script>
+<link rel="stylesheet" href="assets/style.css?v=561a3f4673">
+<script type="module" src="assets/site.js?v=561a3f4673"></script>
 </head>
 <body>
 <div class="shell">
@@ -172,6 +172,17 @@
 <tr><td>schlafli(p, q), hyperbolicTiling(p, q)</td><td>The regular tiling {p, q}: its geometry and exact tile; a patch of tiles.</td></tr>
 <tr><td>parallelPostulate({ q })</td><td>Playfair's postulate counted in five geometries. See <a href="parallel-postulate.html">The parallel postulate</a>.</td></tr>
 <tr><td>hyperbolicFigure(items, { model }), hyperbolicTilingFigure(p, q, { layers, model })</td><td>Figures in the Poincaré disc, the Klein disc or the half-plane.</td></tr>
+</table></div>
+
+<h2>Topology</h2>
+<div class="tablewrap"><table class="ref">
+<tr><th>Export</th><th>What it does</th></tr>
+<tr><td>surface(word or [words]), Surface</td><td>Glued polygons: cells, eulerCharacteristic, orientable, boundaryComponents, boundaryMatrices, chainComplex(), homology(k, { coefficients }), betti(), classify(), fundamentalGroup(), singleFace(), connectedSum(S). See <a href="surfaces.html">Surfaces from polygons</a>.</td></tr>
+<tr><td>classifySurface({ euler, orientable, boundaryComponents })</td><td>{ genus or crosscaps, name, normalForm } by the classification theorem.</td></tr>
+<tr><td>parseEdgeWord(text), formatEdgeWord(tokens)</td><td>Edge words such as &quot;a b a^-1 b^-1&quot; as { label, exp } tokens and back.</td></tr>
+<tr><td>simplicialComplex(simplices), SimplicialComplex, simplicial</td><td>faces(k), fVector, eulerCharacteristic, boundary(k), chainComplex(), homology, betti, link(v), components(), isSurface, surfaceCheck(), classify(), fundamentalGroup(); simplicial.simplex, sphere, torus, projectivePlane, kleinBottle, fromGraph, fromPolyhedron. See <a href="simplicial.html">Simplicial complexes</a>.</td></tr>
+<tr><td>finiteSpace(points, opens), fromBasis, fromPreorder, finiteSpaces</td><td>FiniteSpace: opens, closedSets, closure, interior, boundary, minimalOpen, specialization, isT0, isT1, components, continuity(f, Y), subspace. See <a href="finite-spaces.html">Finite spaces</a>.</td></tr>
+<tr><td>countTopologies(n, { t0 }), allTopologies(points)</td><td>Topologies on n ≤ 5 points through preorders; every topology on up to 4 points.</td></tr>
 </table></div>
 
 <h2>Solids, symmetry and tilings</h2>

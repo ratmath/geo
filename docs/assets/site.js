@@ -1,8 +1,8 @@
 // Shared page furniture for the geo docs: the contents column, the theme
 // switch and the code boxes. Add each topic page to PAGES as it is written.
 
-import * as A from "./geo.js?v=d6f3c0ba29";
-import { mountRunboxes } from "./runbox.js?v=d6f3c0ba29";
+import * as A from "./geo.js?v=561a3f4673";
+import { mountRunboxes } from "./runbox.js?v=561a3f4673";
 
 export { A };
 
@@ -35,6 +35,10 @@ export const PAGES = [
   { href: "polyhedra.html", title: "Polyhedra", blurb: "Platonic and Archimedean solids: volumes, angles, duals, symmetry groups" },
   { href: "symmetry.html", title: "Symmetry groups", blurb: "Rosettes, the 7 frieze groups and the 17 wallpaper groups" },
   { href: "tilings.html", title: "Tilings", blurb: "The 21 vertex types and the 11 uniform tilings" },
+  { group: "Topology" },
+  { href: "surfaces.html", title: "Surfaces from polygons", blurb: "Edge words, homology, orientability, the classification of surfaces, π₁" },
+  { href: "simplicial.html", title: "Simplicial complexes", blurb: "Faces, homology, triangulated surfaces, graphs and polyhedra" },
+  { href: "finite-spaces.html", title: "Finite spaces", blurb: "Open sets, closure, bases, continuity, counting topologies" },
   { group: "Pictures" },
   { href: "pictures.html", title: "Pictures of geometry", blurb: "Tilings grown from vertex types, solids, patterns, finite planes; the join with graphics" },
 ];

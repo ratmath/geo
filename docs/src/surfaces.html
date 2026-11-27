@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Surfaces from polygons · RatMath Geo</title>
+<meta name="description" content="Surfaces glued from polygons with edge words: cell structure, homology, Euler characteristic, orientability, the classification of surfaces, connected sums and fundamental groups.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<script type="module" src="assets/site.js"></script>
+</head>
+<body>
+<div class="shell">
+<aside></aside>
+<main>
+<article>
+<div class="eyebrow">Topology</div>
+<h1>Surfaces from polygons</h1>
+<p class="lede">Textbooks draw a torus as a square with opposite sides glued, and write it as the word \(aba^{-1}b^{-1}\) read around the boundary. <code>surface</code> takes such words, works out which corners the gluing identifies, and from the resulting cells computes homology, orientability and which surface it is.</p>
+
+<h2>Edge words and cells</h2>
+<p>Each polygon is a word in edge labels, read around its boundary: <code>a</code> means the edge is traversed along its arrow, <code>a^-1</code> (or <code>a'</code>, or <code>a⁻¹</code>) against it. Edges with the same label are glued, so each label appears twice, or once for an edge left on the boundary. Gluing \(a\) to \(a\) also glues the tail of one copy to the tail of the other, and the head to the head; following those identifications gives the vertices. A square glued as \(aba^{-1}b^{-1}\) has all four corners become one point, so the torus has one vertex, two edges and one face, and \(\chi = 1 - 2 + 1 = 0\).</p>
+<pre><code>import { surface } from "@ratmath/geo";
+
+const T = surface("a b a^-1 b^-1");
+T.cells;                    // [1, 2, 1]: V, E, F
+T.eulerCharacteristic;      // 0
+String(T.chainComplex());   // "H0 = Z, H1 = Z^2, H2 = Z"
+String(surface("a a").homology(1));          // "Z/2": the projective plane
+String(surface("a b a^-1 b").homology(1));   // "Z/2 × Z": the Klein bottle</code></pre>
+<p>The boundary maps are read off the word: \(\partial_1\) sends an edge to head minus tail, and \(\partial_2\) sends a face to the sum of its edges with their exponents. For the Klein bottle that is \(a + b - a + b = 2b\), which is where the \(\mathbb Z/2\) comes from. The homology itself is computed by <a href="https://ratmath.com/structures/homology.html">@ratmath/structures</a>.</p>
+
+<h2>Orientability and classification</h2>
+<p>A surface is orientable when the polygons can be given directions so that every glued pair of edges is traversed in opposite directions. Within one polygon that means each label appears once as \(a\) and once as \(a^{-1}\); across polygons it is a two-colouring problem. The classification theorem says that a closed connected surface is decided by orientability and \(\chi\): the sphere (\(\chi = 2\)), a connected sum of \(g\) tori (\(\chi = 2 - 2g\)), or a connected sum of \(k\) projective planes (\(\chi = 2 - k\)). Each boundary circle lowers \(\chi\) by one more.</p>
+<pre><code>surface("a a b b").classify().name;               // "Klein bottle": the same as a b a^-1 b
+surface("a b a c").classify().name;               // "Möbius band": b and c stay on the boundary
+surface("a b a^-1 b^-1 c d c^-1 d^-1").classify();
+// { eulerCharacteristic: -2, orientable: true, genus: 2, name: "connected sum of 2 tori", normalForm: "a1 b1 a1^-1 b1^-1 a2 b2 a2^-1 b2^-1", … }
+
+import { classifySurface } from "@ratmath/geo";
+classifySurface({ euler: 8 - 24 + 14, orientable: true }).name;   // "connected sum of 2 tori"</code></pre>
+
+<h2>Connected sums and several polygons</h2>
+<p>A surface may be several polygons, glued along shared labels. <code>singleFace()</code> merges them along shared edges into one polygon, which changes the cells but not the surface. The connected sum of two closed surfaces is their two words side by side (cut a small disk from each at a vertex and join along the cut), so torus # projective plane is \(aba^{-1}b^{-1}cc\): with \(\chi = -1\) and not orientable, it is the connected sum of three projective planes.</p>
+<pre><code>surface(["a b c", "c^-1 b^-1 a^-1"]).classify().name;           // "sphere", from two triangles
+surface("a b a^-1 b^-1").connectedSum("a a").classify().name;   // "connected sum of 3 projective planes"</code></pre>
+
+<h2>The fundamental group</h2>
+<p>Contract a spanning tree of the edges to a point. The remaining edges are loops, and each polygon becomes a relation among them (van Kampen's theorem for a 2-complex). So <code>fundamentalGroup()</code> returns a presentation, with one relator per polygon. Its abelianisation is \(H_1\), which is a good check.</p>
+<pre><code>String(surface("a b a^-1 b^-1").fundamentalGroup());    // "⟨a, b | aba⁻¹b⁻¹⟩", which is Z²
+surface("a a").fundamentalGroup().order();               // 2
+String(surface("a b a^-1 b").fundamentalGroup().abelianInvariants());   // "Z/2 × Z" = H1</code></pre>
+
+<template data-runbox>
+// Every closed surface up to χ = −2, from its normal form, with homology and π₁ abelianised
+for (const [chi, orientable] of [[2, true], [0, true], [-2, true], [1, false], [0, false], [-1, false], [-2, false]]) {
+  const c = classifySurface({ euler: chi, orientable });
+  const S = surface(c.normalForm);
+  PRINT(`χ = ${chi}`.padEnd(7), c.name.padEnd(36), String(S.chainComplex()).padEnd(36), "π₁ab =", String(S.fundamentalGroup().abelianInvariants()));
+}
+// A hexagon with sides glued a b c a^-1 b^-1 c^-1: which surface?
+const X = surface("a b c a^-1 b^-1 c^-1");
+X.classify()
+</template>
+</article>
+</main>
+</div>
+</body>
+</html>
