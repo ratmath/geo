@@ -12,8 +12,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
-<link rel="stylesheet" href="assets/style.css?v=356fa44d42">
-<script type="module" src="assets/site.js?v=356fa44d42"></script>
+<link rel="stylesheet" href="assets/style.css?v=a1cd962778">
+<script type="module" src="assets/site.js?v=a1cd962778"></script>
 </head>
 <body>
 <div class="shell">
@@ -29,7 +29,7 @@ theorems.feuerbach(t);        // tangent to the incircle and the three excircles
 theorems.ceva(t, D, E, F);    // concurrent exactly when the product of ratios is 1
 theorems.ptolemy(A, B, C, D); // equality exactly when the four points are concyclic</code></pre>
 <h2>What a check is, and is not</h2>
-<p>A check on one triangle is not a proof for all triangles. It is still worth more than a drawing or a floating-point test, for two reasons. First, the conclusion is an exact equality, so a false statement fails rather than passing within a tolerance. Second, a statement that is an identity between polynomials or algebraic functions of the coordinates and holds at a "generic" exact point is very unlikely to be false. General proofs by elimination, where hypotheses and conclusion become polynomials and the proof is a certificate, are a later phase of this package.</p>
+<p>A check on one triangle is not a proof for all triangles. It is still worth more than a drawing or a floating-point test, for two reasons. First, the conclusion is an exact equality, so a false statement fails rather than passing within a tolerance. Second, a statement that is an identity between polynomials or algebraic functions of the coordinates and holds at a "generic" exact point is very unlikely to be false. For a proof that covers every figure, see <a href="proofs.html">General proofs</a>, where the coordinates are letters, hypotheses and conclusion become polynomials, and the proof is a certificate.</p>
 <p>Several of the functions test both directions. <code>ceva</code> reports the product of the ratios and whether the lines are concurrent, and <code>holds</code> says these agree, so it is as informative on a figure where the lines miss as on one where they meet. <code>ptolemy</code>, <code>simson</code> and <code>thales</code> work the same way.</p>
 
 <div class="tablewrap"><table class="ref">

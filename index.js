@@ -5,7 +5,8 @@
 // computational and lattice geometry, and other metrics; the projective
 // plane and finite geometries; polyhedra, symmetry groups, friezes,
 // wallpaper groups and tilings; the sphere and the hyperbolic plane with
-// exact trigonometry. `plan` lists what is coming.
+// exact trigonometry; and general proofs of theorems by algebra, with
+// certificates. `plan` lists what is still to come (nothing).
 
 export { plan } from "./src/plan.js";
 export { GeoError, num, N } from "./src/num.js";
@@ -32,6 +33,8 @@ export {
   HTriangle, htriangle, HIsometry, hreflection, hrotation, hhalfTurn, htranslation, schlafli, hyperbolicTiling,
 } from "./src/hyperbolic.js";
 export { parallelPostulate } from "./src/postulate.js";
+export { configuration, Configuration, GeoPoint, GeoExpr, Proof } from "./src/prove.js";
+export { proofs, provable } from "./src/proofs.js";
 export { toSurd, toGraphics, fromGraphics, geoFigure, constructionFrames, tilingFigure, solidPicture, wallpaperFigure, incidenceFigure, hyperbolicFigure, hyperbolicTilingFigure } from "./src/pictures.js";
 // Drawing a figure, from @ratmath/graphics (re-exported so geo's pictures need no second import).
 export { figureSVG, figurePNG, figurePDF, figureTikZ, figureASCII, framesSVG, framesPNG } from "@ratmath/graphics";

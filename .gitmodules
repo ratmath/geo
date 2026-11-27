@@ -7,3 +7,6 @@
 [submodule "vendor/analytic"]
 	path = vendor/analytic
 	url = https://github.com/ratmath/analytic.git
+[submodule "vendor/structures"]
+	path = vendor/structures
+	url = https://github.com/ratmath/structures.git

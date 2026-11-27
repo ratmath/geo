@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>General proofs · RatMath geo</title>
+<meta name="description" content="Theorems of plane geometry proved in general by algebra: hypotheses and conclusion as polynomials, Wu's method and Gröbner bases, and a certificate that can be multiplied out.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<script type="module" src="assets/site.js"></script>
+</head>
+<body>
+<div class="shell">
+<aside></aside>
+<main>
+<article>
+<div class="eyebrow">Topic</div>
+<h1>General proofs, by algebra</h1>
+<p class="lede">A <a href="theorems.html">check</a> tests a theorem on one figure. A proof here covers every figure at once: the coordinates are letters, the hypotheses and the conclusion are polynomials, and the proof is a single polynomial identity that you can multiply out yourself.</p>
+
+<div class="demo">
+<div class="demo-title">Prove a theorem</div>
+<div class="demo-row">
+<label>Theorem<select id="pf-which"></select></label>
+<label>Method<select id="pf-method"><option value="auto">auto</option><option value="wu">Wu's method</option><option value="groebner">Gröbner basis</option></select></label>
+<label style="flex-direction:row; align-items:center; gap:.4rem"><input id="pf-cof" type="checkbox"> show the cofactors</label>
+<button id="pf-go">Prove</button>
+</div>
+<div id="pf-statement" class="small muted"></div>
+<div class="out" id="pf-out"></div>
+</div>
+
+<h2>From a figure to polynomials</h2>
+<p>Take Thales' theorem: an angle inscribed in a semicircle is a right angle. Put the centre at the origin and the diameter along the x-axis, from \(A = (-r, 0)\) to \(B = (r, 0)\). Nothing is lost by this choice of axes. The third point \(C = (x, y)\) is on the circle, and that is the one hypothesis:</p>
+\[ h = x^2 + y^2 - r^2 = 0 . \]
+<p>The conclusion is that \(CA\) and \(CB\) are perpendicular, so their dot product vanishes:</p>
+\[ g = (x + r)(x - r) + y \cdot y = x^2 + y^2 - r^2 . \]
+<p>Here \(g = h\), so the conclusion follows from the hypothesis for every \(r\), \(x\) and \(y\). That one line is a complete proof of the theorem. Most theorems need more algebra, but the shape is the same.</p>
+<p>The coordinates come in three kinds. Some are <em>numbers</em>, fixed by the choice of axes. Some are <em>parameters</em>: \(r\) and \(x\) above, free to take any value, so that the figure is a general one. The rest are <em>unknowns</em>, tied to the earlier coordinates by the hypotheses: \(y\) above. Each unknown comes with one hypothesis.</p>
+<pre><code>import { configuration } from "@ratmath/geo";
+
+const T = configuration("Thales");
+const O = T.at("O", 0, 0);
+const r = T.parameter("r");
+const A = T.at("A", r.neg(), 0);
+const B = T.at("B", r, 0);
+const C = T.on("C", (P) =&gt; T.onCircle(P, O, A));    // x free, y tied down by the circle
+const proof = T.prove(T.rightAngle(A, C, B));
+proof.proved;       // true
+proof.method;       // "wu"
+proof.replay();     // true: the identity was multiplied out again</code></pre>
+
+
+<h2>What counts as a proof</h2>
+<p>Let \(h_1, \dots, h_r\) be the hypotheses and \(g\) the conclusion. A proof is an identity between polynomials</p>
+\[ d \cdot g^{k} \;=\; c_1 h_1 + c_2 h_2 + \dots + c_r h_r \]
+<p>with a multiplier \(d\) that is not the zero polynomial. At any figure where every \(h_i\) is zero the right side is zero, so \(d \cdot g^k = 0\), and wherever \(d \neq 0\) that forces \(g = 0\). The identity can be checked by expanding both sides. Nothing about how it was found needs to be trusted, and <code>proof.replay()</code> does that expansion each time it is called.</p>
+<p>The multiplier matters. Its factors are the <em>degenerate cases</em>, the figures the proof does not cover: a triangle whose corners are in a line, two points that coincide, two lines that were supposed to meet but are parallel. A textbook proof assumes these away silently. Here they are computed, and <code>proof.conditions</code> lists them with a geometric reading where one is recognised.</p>
+<pre><code>import { proofs } from "@ratmath/geo";
+
+const p = proofs.eulerLine().parts[0];         // O, G, H are collinear
+String(p.identity.multiplier);                 // "b·d"   for A = (0, 0), B = (b, 0), C = (c, d)
+p.identity.cofactors.map(String);              // the six cᵢ
+p.conditions.map((c) =&gt; c.meaning);            // ["A, B, C are not collinear"]
+p.explain();                                   // the whole proof as text</code></pre>
+
+<p>So the Euler line theorem is proved for every triangle that is not flat, which is every triangle.</p>
+
+<h2>Wu's method</h2>
+<p>Build the figure one point at a time, and each new unknown coordinate arrives with the hypothesis that pins it down. The hypotheses are then in <em>triangular form</em>: \(h_1\) involves the first unknown, \(h_2\) the first two, and so on. Wu Wen-tsün's method divides the conclusion by the hypotheses in reverse order, each time treating the hypothesis as a polynomial in the unknown it introduced.</p>
+<p>Division by a polynomial whose leading coefficient is itself a polynomial needs <em>pseudo-division</em>: multiply by that leading coefficient first, so that no fractions appear.</p>
+\[ I^{s} \cdot g = q \cdot h + r, \qquad \deg_x r &lt; \deg_x h, \]
+<p>where \(I\) is the leading coefficient of \(h\) as a polynomial in \(x\). If after dividing by every hypothesis the remainder is zero, the pieces assemble into the identity above, with \(d\) a product of leading coefficients. The method is fast, because it never does more than follow the construction backwards. Every theorem in the list on this page is proved this way in a few milliseconds, except Desargues' theorem, which takes about a third of a second.</p>
+<p>When a point is given by two conditions that both involve both of its coordinates (the intersection of two lines, say), the library first eliminates one coordinate between them, again by pseudo-division, and keeps track of how the new polynomials are built from the original hypotheses, so that the final identity is still in terms of those.</p>
+
+<h2>The Gröbner method</h2>
+<p>The second method follows Kapur. Treat the parameters as constants, that is, work with polynomials in the unknowns whose coefficients are rational functions of the parameters. The conclusion follows from the hypotheses, for general values of the parameters, exactly when</p>
+\[ 1 \in \langle\, h_1, \dots, h_r,\ 1 - t\,g \,\rangle \]
+<p>for a new variable \(t\). (If the hypotheses hold and \(g = 0\), the last generator is 1; if they hold and \(g \ne 0\), choose \(t = 1/g\). So the generators have no common zero exactly when \(g\) vanishes wherever the hypotheses do. This is Rabinowitsch's trick, the same one that proves the Nullstellensatz.) A <a href="https://ratmath.com/structures/groebner.html">Gröbner basis</a> decides the question, and its cofactors, with denominators cleared and \(t\) replaced by \(1/g\), are the identity. The multiplier \(d\) is then a polynomial in the parameters alone, so the degenerate cases are conditions on the given points only.</p>
+<pre><code>const w = proofs.simson({ method: "wu" });
+const k = proofs.simson({ method: "groebner" });
+[w.proved, k.proved];                          // [true, true]
+k.conditions.map((c) =&gt; c.meaning);            // ["A, B, C are not collinear", "A ≠ C", "B ≠ C"]
+[w.size.cofactorTerms, k.size.cofactorTerms];  // the two certificates differ, and both multiply out</code></pre>
+
+<p>The Gröbner method is complete where Wu's simple form is not: it finds a proof whenever the statement holds for general parameters. It is also much slower when the hypotheses are not linear in the unknowns, since it computes with fractions of polynomials. With <code>method: "auto"</code> (the default) Wu's method goes first; if it fails, one figure with random whole-number parameters is tried; and only if the conclusion holds at every solution of that figure is the Gröbner method run, with a time limit.</p>
+
+<h2>What algebra cannot see</h2>
+<p>Polynomial equations do not distinguish inside from outside or one side of a line from the other. Three consequences are worth knowing.</p>
+<ul>
+<li><strong>Bisectors.</strong> The condition "equal angles" describes the internal and the external bisector together. A point on a bisector at A and a bisector at B is the incentre or one of the three excentres; <code>tritangentCenter</code> means all four. Theorems true of all four (the third bisector passes through, the distances to the sides are equal) are proved. Theorems true only of the incentre are not, and the report says at how many of the solutions the conclusion held.</li>
+<li><strong>Second intersections.</strong> "A point on this line and on this circle" has two solutions, and if one of them is already in the figure, the algebra allows the new point to be the old one. Use <code>otherIntersection</code>, which asks for the second point by a linear condition. The butterfly theorem is proved when stated that way and fails when stated loosely, as it should.</li>
+<li><strong>Complex figures.</strong> The identity holds for complex coordinates too. That is usually harmless, but it means a statement can be true of all real figures and still not provable this way, if it fails for complex ones.</li>
+</ul>
+<p>When no proof exists the result has <code>proved: false</code> and an <code>instance</code>: the parameters tried, the number of solutions of the hypotheses there, and at how many the conclusion holds. A statement that is simply false shows 0.</p>
+<pre><code>const T = configuration("a false statement");
+const A = T.at("A", 0, 0), B = T.at("B", "b", 0), C = T.at("C", "c", "d");
+const M = T.midpoint("M", B, C);
+const no = T.prove(T.perpendicular(A, M, B, C));     // "every median is an altitude"
+no.proved;          // false
+no.instance;        // { parameters: { b: 14, c: 13, d: 22 }, solutions: 1, holdsAt: 0 }</code></pre>
+
+
+<h2>Stating your own theorem</h2>
+<p>A configuration is built from points. The predicates return polynomials, and serve both as conditions on a new point and as conclusions.</p>
+<div class="tablewrap"><table class="ref">
+<tr><th>Points</th><th>meaning</th></tr>
+<tr><td>T.at(name, x, y)</td><td>given coordinates: numbers, names of parameters (made on first use), or expressions</td></tr>
+<tr><td>T.free(name)</td><td>both coordinates are parameters</td></tr>
+<tr><td>T.on(name, P =&gt; condition, { free })</td><td>one coordinate free, the other tied down by one condition</td></tr>
+<tr><td>T.where(name, P =&gt; [c1, c2])</td><td>both coordinates tied down by two conditions</td></tr>
+<tr><td>T.parameter(name), T.unknown(name, v =&gt; condition)</td><td>a free number; a number defined by an equation, such as s with s² = 3</td></tr>
+<tr><td>midpoint, intersection, foot, reflection, parallelogram</td><td>constructions: T.intersection("P", [A, B], [C, D])</td></tr>
+<tr><td>circumcenter, orthocenter, centroid, tritangentCenter</td><td>triangle centres</td></tr>
+<tr><td>onLine, onCircumcircle, otherIntersection</td><td>points on a line or circle</td></tr>
+</table></div>
+<div class="tablewrap"><table class="ref">
+<tr><th>Predicates and quantities</th><th>vanishes when</th></tr>
+<tr><td>collinear(A, B, C), concurrent(l1, l2, l3)</td><td>three points on a line; three lines through a point</td></tr>
+<tr><td>parallel(A, B, C, D), perpendicular(A, B, C, D)</td><td>AB ∥ CD; AB ⊥ CD</td></tr>
+<tr><td>equidistant(P, A, B), equalLength(A, B, C, D)</td><td>|PA| = |PB|; |AB| = |CD|</td></tr>
+<tr><td>onCircle(P, O, A), concyclic(A, B, C, D), tangent(l, O, P)</td><td>circles</td></tr>
+<tr><td>rightAngle(A, B, C), equalAngle(A, B, C, D, E, F)</td><td>angles, as angles between lines</td></tr>
+<tr><td>isMidpoint(M, A, B)</td><td>two polynomials</td></tr>
+<tr><td>distance2, area2, dot, cross, equal(a, b)</td><td>build your own: T.equal(T.distance2(A, B), T.distance2(C, D).mul(4))</td></tr>
+</table></div>
+
+<h2>The theorems proved</h2>
+<p><code>provable</code> lists them, and <code>proofs.&lt;id&gt;(options)</code> proves one. <code>proofs.setup(id)</code> hands back the configuration and conclusion for inspection.</p>
+<div class="tablewrap"><table class="ref" id="pf-table"><tr><th>proofs.…</th><th>statement</th></tr></table></div>
+<template data-runbox>
+// A theorem that is not in the list: reflect the orthocentre H in the midpoint of BC.
+// The image is on the circumcircle, and is the point opposite A.
+const T = configuration("antipode");
+const A = T.at("A", 0, 0), B = T.at("B", "b", 0), C = T.at("C", "c", "d");
+const H = T.orthocenter("H", A, B, C);
+const O = T.circumcenter("O", A, B, C);
+const M = T.midpoint("M", B, C);
+const K = T.where("K", (P) =&gt; T.isMidpoint(M, H, P), "M is the midpoint of HK");
+const proof = T.prove([T.concyclic(A, B, C, K), T.isMidpoint(O, A, K)]);
+PRINT(String(proof), " replayed:", proof.replay(), " in", proof.ms, "ms");
+PRINT("degenerate cases:", proof.conditions.map((c) =&gt; c.meaning ?? c.text).join("; "));
+PRINT(proof.parts[0].explain({ cofactors: false }));
+
+// A statement that is true of some solutions only: a centre I on two bisectors, with |IA| = |IB|.
+const U = configuration("isosceles?");
+const P = U.at("A", 0, 0), Q = U.at("B", "b", 0), R = U.at("C", "c", "d");
+const I = U.tritangentCenter("I", P, Q, R);
+const bad = U.prove(U.equidistant(I, P, Q));
+PRINT(String(bad), JSON.stringify(bad.instance));
+
+// Every theorem in the library, with its method and time
+proofs.all().map(({ name, proof }) =&gt; `${name}: ${proof.proved ? "proved" : "NOT proved"} (${proof.method}, ${proof.ms} ms)`)
+</template>
+</article>
+</main>
+</div>
+<script type="module">
+import { A as G, h } from "./assets/site.js";
+const which = document.getElementById("pf-which");
+const out = document.getElementById("pf-out");
+const table = document.getElementById("pf-table");
+for (const t of G.provable) {
+  which.append(h("option", { value: t.id, selected: t.id === "eulerLine" }, t.name));
+  table.append(h("tr", {}, h("td", {}, t.id + "()"), h("td", {}, t.name + ": " + t.statement)));
+}
+function go() {
+  const t = G.provable.find((x) => x.id === which.value);
+  document.getElementById("pf-statement").textContent = t.statement;
+  out.classList.add("busy");
+  setTimeout(() => {
+    try {
+      const t0 = performance.now();
+      const proof = G.proofs[t.id]({ method: document.getElementById("pf-method").value, timeLimit: 8000 });
+      const ms = performance.now() - t0;
+      const pre = h("pre", { style: "margin:0; white-space:pre-wrap; overflow-wrap:anywhere; font-size:.8rem" }, proof.explain({ cofactors: document.getElementById("pf-cof").checked, limit: 300 }));
+      const gaveUp = (proof.parts ?? [proof]).find((p) => p.gaveUp);
+      out.replaceChildren(h("div", { class: "big" }, proof.proved ? `Proved, and the certificate multiplies out (${ms.toFixed(0)} ms)` : gaveUp ? `Not decided in the time allowed: try Wu's method` : "Not proved"), pre);
+      out.classList.toggle("err", !proof.proved);
+    } catch (e) {
+      out.replaceChildren(h("div", {}, e.message));
+      out.classList.add("err");
+    }
+    out.classList.remove("busy");
+  }, 20);
+}
+document.getElementById("pf-go").onclick = go;
+which.onchange = go;
+document.getElementById("pf-method").onchange = go;
+document.getElementById("pf-cof").onchange = go;
+go();
+</script>
+</body>
+</html>
