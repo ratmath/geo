@@ -1,7 +1,23 @@
 # Changelog
 
-## Unreleased
+## 0.3.0
 
+- Phase 3, the sphere: `spoint`, `greatCircle`, `striangle`, `scircle`,
+  `srotation`. Distances and angles keep exact cosines; a triangle's excess
+  is its area, an exact multiple of π when it is one; the laws of spherical
+  trigonometry are tested as exact equalities; isometries are classified.
+- Phase 3, the hyperbolic plane: `hpoint`, `ideal`, `hline`, `hcircle`,
+  `htriangle`, one exact object seen in the Poincaré disc, the Klein disc,
+  the half-plane and the hyperboloid. Exact cosh of distances, the three
+  relations of two lines, limiting parallels and the angle of parallelism,
+  defect as area, isometries classified (rotation, parabolic, translation,
+  reflection, glide) with their Möbius form, the regular tilings `{p, q}`
+  with exact tiles (`schlafli`, `hyperbolicTiling`).
+- `Angle` decides whether an angle is a rational multiple of π from the
+  degree of its cosine; `Length` keeps a hyperbolic length as exact cosh and
+  sinh. `parallelPostulate()` counts parallels in five geometries.
+- `hyperbolicFigure` and `hyperbolicTilingFigure` draw in each model.
+- Docs: four new topic pages and two new explore panels.
 - `@ratmath/core` is now a peer dependency (`>=0.10.0 <0.12.0`): the package
   uses the program's own copy of Core instead of bringing its own, so Core 0.11
   works and there is never a second copy whose `Rational` is not the same class.

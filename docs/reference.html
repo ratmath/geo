@@ -13,8 +13,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
 <link rel="stylesheet" href="https://ratmath.com/assets/katex/0.19.1/katex.min.css">
-<link rel="stylesheet" href="assets/style.css?v=124a82ef6a">
-<script type="module" src="assets/site.js?v=124a82ef6a"></script>
+<link rel="stylesheet" href="assets/style.css?v=356fa44d42">
+<script type="module" src="assets/site.js?v=356fa44d42"></script>
 </head>
 <body>
 <div class="shell">
@@ -108,6 +108,27 @@
 <tr><td>projectivePlane(q), affinePlane(q), fano(), incidence(lines)</td><td>Finite planes and incidence structures: axioms, designParameters, parallels, completion, collineations, collineationGroup. See <a href="finite-geometries.html">Finite geometries</a>.</td></tr>
 </table></div>
 
+<h2>The sphere and the hyperbolic plane</h2>
+<div class="tablewrap"><table class="ref">
+<tr><th>Export</th><th>What it does</th></tr>
+<tr><td>angle(x), Angle, turnsOfCos(c), piTimes(k)</td><td>Angles with exact cosine and sine; <code>turns</code> is the fraction of a full turn or null, decided exactly; <code>value(digits)</code> encloses the radians. See <a href="spherical.html">Spherical geometry</a>.</td></tr>
+<tr><td>Length</td><td>A hyperbolic length by its exact cosh and sinh: exp, text, value(digits), add, double, half.</td></tr>
+<tr><td>spoint, latLon, fromStereographic, northPole, SPoint</td><td>Points of the unit sphere: antipode, distanceTo, latLon, stereographic.</td></tr>
+<tr><td>greatCircle(P, Q), equator(), GreatCircle</td><td>contains, poles, meet, angleWith, perpendicularThrough, distanceTo, reflection, parallelsThrough.</td></tr>
+<tr><td>striangle(A, B, C), STriangle, lune</td><td>sides, angles, excess, area, fractionOfSphere, polar, classify(), checks().</td></tr>
+<tr><td>scircle(centre, through), SCircle</td><td>radius, circumference and area as multiples of π.</td></tr>
+<tr><td>srotation(axis, turns), antipodalMap(), SIsometry</td><td>apply, then, inverse, classify(): rotation, reflection or rotary reflection.</td></tr>
+<tr><td>hpoint(x, y), fromKlein, fromHalfPlane, fromHyperboloid, horigin, HPoint</td><td>A point of the hyperbolic plane: disc, klein, halfPlane, hyperboloid, distanceTo. See <a href="hyperbolic.html">The hyperbolic plane</a>.</td></tr>
+<tr><td>ideal(x, y), HIdeal</td><td>A point at infinity.</td></tr>
+<tr><td>hline(a, b), hbisector, hmidpoint, HLine</td><td>ends, disc, klein, halfPlane, distanceTo, foot, perpendicularThrough, relation, reflection, parallelsThrough.</td></tr>
+<tr><td>hcircle(centre, through), horocycle(ideal, p), HCircle</td><td>radius, circumference, area, and the Euclidean circle in the disc.</td></tr>
+<tr><td>htriangle(A, B, C), HTriangle</td><td>sides, angles, defect, area, checks(); vertices may be ideal. See <a href="hyperbolic-triangles.html">Hyperbolic triangles, motions, tilings</a>.</td></tr>
+<tr><td>hreflection, hrotation, hhalfTurn, htranslation, HIsometry</td><td>apply, then, inverse, classify(), toMobius().</td></tr>
+<tr><td>schlafli(p, q), hyperbolicTiling(p, q)</td><td>The regular tiling {p, q}: its geometry and exact tile; a patch of tiles.</td></tr>
+<tr><td>parallelPostulate({ q })</td><td>Playfair's postulate counted in five geometries. See <a href="parallel-postulate.html">The parallel postulate</a>.</td></tr>
+<tr><td>hyperbolicFigure(items, { model }), hyperbolicTilingFigure(p, q, { layers, model })</td><td>Figures in the Poincaré disc, the Klein disc or the half-plane.</td></tr>
+</table></div>
+
 <h2>Solids, symmetry and tilings</h2>
 <div class="tablewrap"><table class="ref">
 <tr><th>Export</th><th>What it does</th></tr>
@@ -126,6 +147,7 @@ PRINT("rotation by a sixth of a turn sends (1, 0) to", String(rotation([0, 0], "
 PRINT("Feuerbach holds:", theorems.feuerbach(t).holds);
 PRINT("hull:", convexHull([[0, 0], [4, 0], [5, 3], [2, 5], [-1, 3], [2, 2]]).join(" "));
 PRINT("taxicab π =", N.text(metric("taxicab").pi));
+PRINT("sphere:", striangle([1, 0, 0], [1, 1, 0], [1, 1, 1]).excess.text, " hyperbolic:", horigin().distanceTo(hpoint("1/2", 0)).text);
 plan.map((p) =&gt; p.phase)</textarea>
   <div class="runbox-bar"><button type="button" data-run>Run</button><button type="button" class="ghost" data-reset>Reset</button><span class="runbox-meta">Ctrl/⌘ + Enter runs</span></div>
   <div class="runbox-out" aria-live="polite"></div>

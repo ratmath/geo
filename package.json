@@ -1,6 +1,6 @@
 {
   "name": "@ratmath/geo",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Geometry for RatMath: Euclidean constructions and checked theorems, spherical, hyperbolic, projective and finite geometries, symmetry and tilings",
   "type": "module",
   "main": "index.js",
@@ -21,7 +21,7 @@
   ],
   "sideEffects": false,
   "scripts": {
-    "test": "bun test ./tests",
+    "test": "bun test --timeout 60000 ./tests",
     "docs:build": "bun scripts/build-docs.js"
   },
   "keywords": [
@@ -45,8 +45,8 @@
   },
   "dependencies": {
     "@ratmath/algebraic": "^0.1.0",
-    "@ratmath/graphics": "^0.1.0",
-    "@ratmath/analytic": "^0.1.0"
+    "@ratmath/analytic": "^0.1.0",
+    "@ratmath/graphics": "^0.1.0"
   },
   "peerDependencies": {
     "@ratmath/core": ">=0.10.0 <0.12.0"

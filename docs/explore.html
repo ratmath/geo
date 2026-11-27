@@ -12,8 +12,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
-<link rel="stylesheet" href="assets/style.css?v=124a82ef6a">
-<script type="module" src="assets/site.js?v=124a82ef6a"></script>
+<link rel="stylesheet" href="assets/style.css?v=356fa44d42">
+<script type="module" src="assets/site.js?v=356fa44d42"></script>
 </head>
 <body>
 <div class="shell">
@@ -68,6 +68,31 @@
 <div id="ex-wp-out"></div>
 </div>
 <p>The pattern is made by applying the group's generators to the seed point and two companions of other colours, then classified again from scratch by the flowchart.</p>
+
+<h2>A hyperbolic triangle</h2>
+<div class="demo">
+<div class="demo-row">
+<label>A<input id="ex-ha" class="text" value="0, 0" size="9" spellcheck="false"></label>
+<label>B<input id="ex-hb" class="text" value="1/2, 0" size="9" spellcheck="false"></label>
+<label>C<input id="ex-hc" class="text" value="1/4, 1/2" size="9" spellcheck="false"></label>
+<label>Model<select id="ex-hm"><option value="disc">Poincaré disc</option><option value="klein">Klein disc</option><option value="halfPlane">half-plane</option></select></label>
+</div>
+<div id="ex-h-pic"></div>
+<div id="ex-h-out"></div>
+</div>
+<p>The points are given in the Poincaré disc (inside the unit circle) and shown in the model chosen. The angles have exact cosines; the defect, π minus their sum, is the area.</p>
+
+<h2>A regular tiling {p, q}</h2>
+<div class="demo">
+<div class="demo-row">
+<label>p<input id="ex-tp" class="text" type="number" min="3" max="12" value="7" size="4"></label>
+<label>q<input id="ex-tq" class="text" type="number" min="3" max="12" value="3" size="4"></label>
+<label>Steps<input id="ex-tl" class="text" type="number" min="0" max="5" value="3" size="4"></label>
+</div>
+<div id="ex-t-pic"></div>
+<div id="ex-t-out"></div>
+</div>
+<p>Regular p-gons, q at each corner. The page says which geometry the tiling lives in; a hyperbolic one is drawn in the Poincaré disc, from floats, with the tile's exact size beside it.</p>
 <section class="runbox" aria-label="Runnable code">
   <div class="runbox-head"><strong>Try it</strong><span>Edit the code and run it with <code>@ratmath/geo</code> and Core's <code>Rational</code> in scope. The last line's value is shown; <code>PRINT(…)</code> adds lines, <code>TEX(…)</code> typesets math.</span></div>
   <textarea spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Code">// The page above, as code.
@@ -77,7 +102,11 @@ PRINT("Euler line:", String(t.eulerLine), "  checked:", theorems.eulerLine(t).ho
 const pts = [[0, 0], [6, 0], [7, 4], [3, 7], [-1, 4], [2, 2], [4, 3], [3, 1]];
 PRINT("hull:", convexHull(pts).join(" "));
 PRINT("closest pair:", closestPair(pts).points.join(" and "));
-delaunay(pts).triangles.length + " Delaunay triangles"</textarea>
+PRINT(delaunay(pts).triangles.length, "Delaunay triangles");
+const ht = htriangle([0, 0], ["1/2", 0], ["1/4", "1/2"]);
+PRINT("hyperbolic triangle: angles", ht.angles.A.text, ht.angles.B.text, ht.angles.C.text, " area", ht.area.text);
+const s73 = schlafli(7, 3);
+`{7, 3} is ${s73.geometry}: tile area ${s73.tileArea.text}, edge ${s73.edge.text}`</textarea>
   <div class="runbox-bar"><button type="button" data-run>Run</button><button type="button" class="ghost" data-reset>Reset</button><span class="runbox-meta">Ctrl/⌘ + Enter runs</span></div>
   <div class="runbox-out" aria-live="polite"></div>
 </section>
@@ -86,7 +115,7 @@ delaunay(pts).triangles.length + " Delaunay triangles"</textarea>
 </main>
 </div>
 <script type="module">
-import { A as G, h } from "./assets/site.js?v=124a82ef6a";
+import { A as G, h } from "./assets/site.js?v=356fa44d42";
 const $ = (id) => document.getElementById(id);
 const fail = (out, e) => out.replaceChildren(h("div", { class: "out err" }, e.message));
 const svg = (tag, attrs, ...kids) => {
@@ -297,6 +326,47 @@ function wallpaperPanel() {
 }
 for (const id of ["ex-solid", "ex-dual"]) $(id).addEventListener("change", solidPanel);
 $("ex-turn").addEventListener("input", solidPanel);
+function hyperPanel() {
+  const out = $("ex-h-out");
+  const pic = $("ex-h-pic");
+  try {
+    const pts = ["ex-ha", "ex-hb", "ex-hc"].map((id) => G.hpoint(pair($(id).value)));
+    const t = G.htriangle(...pts);
+    const names = ["A", "B", "C"];
+    pic.innerHTML = G.figureSVG(G.hyperbolicFigure([t, ...pts.map((p, i) => ({ item: p, label: names[i], color: "#334155" }))], { model: $("ex-hm").value }), { width: W, height: W });
+    const a = t.angles;
+    const sd = t.sides;
+    out.replaceChildren(h("div", { class: "tablewrap" }, h("table", { class: "ref" },
+      h("tr", {}, h("th", {}, ""), h("th", {}, "angle"), h("th", {}, "cosine"), h("th", {}, "opposite side")),
+      ...names.map((n) => h("tr", {}, h("td", {}, n), h("td", {}, a[n].text), h("td", {}, G.N.text(a[n].cos)), h("td", {}, sd[n.toLowerCase()].text))))),
+      h("p", {}, `Angle sum ${t.angleSum.text}; defect and area ${t.defect.text} (π is 3.1415926535…). The laws of cosines and sines hold exactly: ${t.checks().all}.`));
+  } catch (e) {
+    pic.replaceChildren();
+    fail(out, e);
+  }
+}
+for (const id of ["ex-ha", "ex-hb", "ex-hc"]) $(id).addEventListener("change", hyperPanel);
+$("ex-hm").addEventListener("change", hyperPanel);
+hyperPanel();
+function tilingPanel() {
+  const out = $("ex-t-out");
+  const pic = $("ex-t-pic");
+  try {
+    const [p, q, layers] = ["ex-tp", "ex-tq", "ex-tl"].map((id) => Number($(id).value));
+    const s = G.schlafli(p, q);
+    pic.replaceChildren();
+    if (s.geometry === "hyperbolic") {
+      pic.innerHTML = G.figureSVG(G.hyperbolicTilingFigure(p, q, { layers: Math.max(0, Math.min(5, layers)) }), { width: W, height: W });
+      out.replaceChildren(h("p", {}, `${s.symbol} is hyperbolic. Each tile has corner angle ${s.interiorAngle.text}, area ${s.tileArea.text}, side ${s.edge.text} and circumradius ${s.circumradius.text}.`));
+    } else if (s.geometry === "spherical") out.replaceChildren(h("p", {}, `${s.symbol} lives on the sphere: it is the ${s.solid}, with ${s.faces} faces, ${s.edges} edges and ${s.vertices} vertices. Each face covers ${s.tileArea.text} of the sphere's 4π, and its side subtends ${s.edge.text} radians.`));
+    else out.replaceChildren(h("p", {}, `${s.symbol} tiles the Euclidean plane, at any size. See the tilings page.`));
+  } catch (e) {
+    pic.replaceChildren();
+    fail(out, e);
+  }
+}
+for (const id of ["ex-tp", "ex-tq", "ex-tl"]) $(id).addEventListener("change", tilingPanel);
+tilingPanel();
 wpSelect.addEventListener("change", wallpaperPanel);
 $("ex-seed").addEventListener("input", wallpaperPanel);
 solidPanel();

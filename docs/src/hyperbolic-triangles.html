@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hyperbolic triangles, motions and tilings · RatMath Geo</title>
+<meta name="description" content="Hyperbolic triangles with exact angles and sides, the angle defect as area, ideal triangles, the laws of hyperbolic trigonometry as exact equalities, isometries classified as rotations, parabolic maps, translations, reflections and glides, their Möbius form, and the regular tilings {p, q}.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<script type="module" src="assets/site.js"></script>
+</head>
+<body>
+<div class="shell">
+<aside></aside>
+<main>
+<article>
+<div class="eyebrow">Topic</div>
+<h1>Hyperbolic triangles, motions and tilings</h1>
+<p class="lede">The angles of a hyperbolic triangle add up to less than two right angles, and what is missing is its area. So no triangle, however long its sides, has area more than π. Regular polygons can have any small enough angle, which is why seven-sided tiles can meet three at a corner.</p>
+<pre><code>const t = htriangle([0, 0], ["1/2", 0], [0, "1/2"]);
+t.angles.A.text;                  // "π/2"
+t.defect;                         // π − (A + B + C): the area
+t.checks().all;                   // true: the laws of hyperbolic trigonometry, exactly
+htriangle(ideal(1, 0), ideal(0, 1), ideal(-1, 0)).area.text;   // "π": the largest a triangle can be
+hrotation(["1/2", 0], "1/6").classify();        // { kind: "rotation", center, angle: π/3 }
+htranslation([0, 0], ["1/2", 0]).classify();    // { kind: "translation", axis, length: ln(3) }
+hyperbolicTiling(7, 3).patch(4).counts;         // [1, 7, 21, 56, 147]</code></pre>
+
+<h2>Triangles and their defect</h2>
+<p>For a triangle with angles \(A, B, C\), the <em>defect</em> is \(\pi - (A + B + C)\). It is always positive, and by Gauss's theorem it is the area. A vertex may be an ideal point: the two sides that run to it are infinitely long and asymptotic, and the angle there is 0. A triangle with all three vertices ideal has defect, and area, exactly π, and every such triangle is congruent to every other.</p>
+<p>The angle at a vertex has an exact cosine, computed from the tangent vectors there; the sides have exact \(\cosh\). As on the <a href="spherical.html">sphere</a>, whether an angle or the defect is a rational multiple of π is decided, and otherwise it is enclosed.</p>
+
+<h2>Hyperbolic trigonometry</h2>
+<p>Replace the sphere's \(\cos\) and \(\sin\) of a side by \(\cosh\) and \(\sinh\):</p>
+\[ \cosh a = \cosh b \cosh c - \sinh b \sinh c \cos A, \qquad \cos A = -\cos B \cos C + \sin B \sin C \cosh a, \]
+\[ \frac{\sin A}{\sinh a} = \frac{\sin B}{\sinh b} = \frac{\sin C}{\sinh c}. \]
+<p>For a right angle at \(A\) the first is Pythagoras' theorem here: \(\cosh a = \cosh b \cosh c\). The second says the three angles determine the sides, so there are no similar triangles: a shape has one size. <code>checks()</code> tests all three laws on the triangle given, each as an exact equality.</p>
+
+<h2>Isometries</h2>
+<p>An isometry is a 3 × 3 matrix that keeps the form \(B\) and the upper sheet of the hyperboloid. <code>line.reflection</code>, <code>hrotation(centre, turns)</code>, <code>hhalfTurn(centre)</code> and <code>htranslation(a, b)</code> build them, <code>then</code> composes them, and they act on points, ideal points, lines, triangles and circles. <code>classify()</code> reads any isometry back. The ones that keep orientation come in three kinds, told apart by the trace:</p>
+<ul>
+<li>a <strong>rotation</strong> about a point (trace less than 3), with its centre and angle;</li>
+<li>a <strong>parabolic</strong> map (trace exactly 3), which fixes one ideal point and no point of the plane: what a rotation becomes when its centre goes to infinity;</li>
+<li>a <strong>translation</strong> along a line (trace more than 3), with its axis and length. Only the axis is moved along itself; points off it travel along curves at a fixed distance from it, which are not lines.</li>
+</ul>
+<p>Those that reverse orientation are reflections and glide reflections. Every isometry is a product of at most three reflections, and the kind of a product of two is the relation of the two mirrors: intersecting mirrors give a rotation, asymptotic ones a parabolic map, ultraparallel ones a translation along the common perpendicular, by twice the distance between them.</p>
+<p><code>toMobius()</code> gives the same map of the Poincaré disc as a Möbius map \(z \mapsto \dfrac{az + b}{cz + d}\) with exact complex coefficients, each a pair [re, im]. The translation taking 0 to ½ is \(z \mapsto \dfrac{z + \frac12}{\frac12 z + 1}\). The coefficients can be handed to the complex package's Möbius maps.</p>
+
+<h2>Regular tilings</h2>
+<p>The symbol \(\{p, q\}\) means regular \(p\)-gons, \(q\) around each vertex, so each corner has angle \(2\pi/q\). A Euclidean regular \(p\)-gon has corner angle \(\pi - 2\pi/p\), and comparing the two sorts every symbol into one of three geometries:</p>
+\[ (p - 2)(q - 2) \; \begin{cases} &lt; 4 &amp; \text{sphere: the five Platonic solids} \\ = 4 &amp; \text{plane: } \{4,4\},\ \{3,6\},\ \{6,3\} \\ &gt; 4 &amp; \text{hyperbolic plane: all the rest} \end{cases} \]
+<p>On the sphere and in the hyperbolic plane the corner angle fixes the size of the tile, and <code>schlafli(p, q)</code> gives it exactly: for the hyperbolic ones,</p>
+\[ \cosh\frac s2 = \frac{\cos(\pi/p)}{\sin(\pi/q)}, \qquad \cosh R = \cot\frac\pi p \cot\frac\pi q, \qquad \text{area} = \pi\Bigl(p - 2 - \frac{2p}q\Bigr), \]
+<p>for the side \(s\) and the circumradius \(R\). Every tile of \(\{7, 3\}\) has area exactly \(\pi/3\).</p>
+<p><code>hyperbolicTiling(p, q)</code> places one tile at the centre of the disc with exact vertices; <code>check()</code> confirms, exactly, that its corner angle is \(2\pi/q\) and its side is the one above (for {7, 3} the numbers have high degree and this takes several seconds). <code>patch(n)</code> grows the tiling outward by reflecting in sides, in floats and labelled <code>kind: "float"</code>, and counts the tiles at each step. The counts grow exponentially, as areas do in this plane.</p>
+<div class="tablewrap"><table class="ref">
+<tr><th>call</th><th>returns</th></tr>
+<tr><td>htriangle(A, B, C)</td><td>HTriangle: sides, angles, angleSum, defect, area, lines, idealVertices, checks()</td></tr>
+<tr><td>line.reflection, hrotation(c, turns), hhalfTurn(c), htranslation(a, b)</td><td>HIsometry: apply, then, inverse, preservesOrientation, classify(), toMobius()</td></tr>
+<tr><td>schlafli(p, q)</td><td>{ geometry, interiorAngle, tileArea, edge, circumradius, inradius }, and for the sphere the solid with its faces, vertices and edges</td></tr>
+<tr><td>hyperbolicTiling(p, q)</td><td>The same, with tile (exact vertices), discRadius, check(), patch(layers)</td></tr>
+<tr><td>hyperbolicTilingFigure(p, q, { layers, model })</td><td>A figure of the tiling in the Poincaré or Klein disc</td></tr>
+</table></div>
+<template data-runbox>
+const t = htriangle([0, 0], ["1/2", 0], [0, "1/2"]);
+PRINT("angles:", t.angles.A.text, t.angles.B.text, t.angles.C.text, "  defect = area:", t.defect.text);
+PRINT("sides:", t.sides.a.text, t.sides.b.text, t.sides.c.text, "  laws:", JSON.stringify(t.checks()));
+PRINT("ideal triangle: area", htriangle(ideal(1, 0), ideal(0, 1), ideal(-1, 0)).area.text);
+const r = hrotation(["1/2", 0], "1/6");
+const tr = htranslation([0, 0], ["1/2", 0]);
+PRINT(String(r));
+PRINT(String(tr));
+PRINT("rotation then translation:", String(r.then(tr)), "(cos 60° = tanh(ln √3), so the mirrors are asymptotic)");
+const m = tr.toMobius();
+PRINT("as a Möbius map: a =", m.a.map((c) =&gt; N.text(c)).join(" + i·"), " b =", m.b.map((c) =&gt; N.text(c)).join(" + i·"), " c =", m.c.map((c) =&gt; N.text(c)).join(" + i·"), " d = 1");
+for (const [p, q] of [[5, 3], [4, 4], [5, 4], [7, 3]]) {
+  const s = schlafli(p, q);
+  PRINT(s.symbol, s.geometry, s.solid ?? "", s.tileArea ? "tile area " + s.tileArea.text : "", s.edge ? "edge " + s.edge.text : "");
+}
+const T = hyperbolicTiling(5, 4);
+PRINT("{5, 4}: right-angled pentagons; exact check", JSON.stringify(T.check()), " tiles by step:", T.patch(3).counts.join(", "));
+SHOW(figureSVG(hyperbolicTilingFigure(7, 3, { layers: 4 }), { width: 360, height: 360 }));
+</template>
+</article>
+</main>
+</div>
+</body>
+</html>

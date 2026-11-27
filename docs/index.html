@@ -8,13 +8,13 @@
 <meta property="og:description" content="Geometry for RatMath: Euclidean constructions and checked theorems, spherical, hyperbolic, projective and finite geometries, symmetry and tilings.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://ratmath.com/geo/">
-<meta name="description" content="Geometry for RatMath: the Euclidean plane with exact coordinates, constructions, triangle centres, transformations, theorems checked on exact figures, exact computational and lattice geometry, and taxicab geometry.">
+<meta name="description" content="Geometry for RatMath: the Euclidean plane with exact coordinates, constructions, triangle centres, transformations, theorems checked on exact figures, exact computational and lattice geometry, taxicab geometry, the sphere and the hyperbolic plane.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
 <link rel="stylesheet" href="https://ratmath.com/assets/katex/0.19.1/katex.min.css">
-<link rel="stylesheet" href="assets/style.css?v=124a82ef6a">
-<script type="module" src="assets/site.js?v=124a82ef6a"></script>
+<link rel="stylesheet" href="assets/style.css?v=356fa44d42">
+<script type="module" src="assets/site.js?v=356fa44d42"></script>
 </head>
 <body>
 <div class="shell">
@@ -59,8 +59,11 @@ metric("taxicab").pi;                       // 4</code></pre>
 <h2>Projective, finite, solid and symmetric</h2>
 <p>The <a href="projective.html">projective plane</a> works in homogeneous coordinates, where cross-ratios and projective maps are exact and Desargues, Pappus, Pascal and Brianchon can be checked on any exact figure. <a href="finite-geometries.html">Finite geometries</a> are built over algebraic's finite fields, from the seven-point Fano plane up, with their collineation groups. <a href="polyhedra.html">Polyhedra</a> have exact coordinates in Q(√2) or Q(√5): volumes, dihedral angles, duals and symmetry groups. Plane patterns get their <a href="symmetry.html">rosette, frieze or wallpaper group</a>, and the <a href="tilings.html">tilings page</a> shows why only 11 of the 21 vertex types of regular polygons tile uniformly. <a href="pictures.html">Pictures of geometry</a> grows and draws those 11 tilings, draws solids, patterns, finite planes and constructions with RatMath Graphics, and joins geo's exact plane with graphics'.</p>
 
+<h2>The sphere and the hyperbolic plane</h2>
+<p>On the <a href="spherical.html">sphere</a> a triangle's angles add up to more than π, and in the <a href="hyperbolic.html">hyperbolic plane</a> to less; in both, the difference is the area. Points have exact coordinates, distances keep their exact cosine or cosh, and whether an angle is a rational multiple of π is decided, so the octant triangle covers exactly one eighth of the sphere and a triangle with three ideal vertices has area exactly π. The hyperbolic plane is one object seen in four models, with its <a href="hyperbolic-triangles.html">isometries classified and its regular tilings</a> sized exactly. <a href="parallel-postulate.html">The parallel postulate</a> is then a count that comes out differently in each geometry.</p>
+
 <h2>Still to come</h2>
-<p>Spherical and hyperbolic models, and general proofs of theorems by elimination. The <code>plan</code> export lists the phases, from the <a href="https://github.com/ratmath/ratmath/blob/main/docs/design/library-roadmap.md#11-a-geometry-package-ratmathgeo">library roadmap</a>, and the <a href="https://ratmath.com/shelf/">RatMath Shelf</a> page lists what exists across all the libraries.</p>
+<p>General proofs of theorems by elimination. The <code>plan</code> export lists the phases, from the <a href="https://github.com/ratmath/ratmath/blob/main/docs/design/library-roadmap.md#11-a-geometry-package-ratmathgeo">library roadmap</a>, and the <a href="https://ratmath.com/shelf/">RatMath Shelf</a> page lists what exists across all the libraries.</p>
 <section class="runbox" aria-label="Runnable code">
   <div class="runbox-head"><strong>Try it</strong><span>Edit the code and run it with <code>@ratmath/geo</code> and Core's <code>Rational</code> in scope. The last line's value is shown; <code>PRINT(…)</code> adds lines, <code>TEX(…)</code> typesets math.</span></div>
   <textarea spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Code">const t = triangle([0, 0], [4, 0], [1, 3]);
@@ -69,6 +72,7 @@ PRINT("incentre", String(t.incenter));
 PRINT("area", N.text(t.area), " circumradius", N.text(t.circumradius), " cos A", N.text(t.cosines.A));
 for (const name of ["eulerLine", "ninePointCircle", "feuerbach", "napoleon"]) PRINT(theorems[name](t).theorem + ":", theorems[name](t).statement, "→", theorems[name](t).holds);
 PRINT("two unit circles meet at", meet(circle([0, 0], [1, 0]), circle([1, 0], [0, 0])).join(" and "));
+PRINT("octant triangle: excess", striangle([1, 0, 0], [0, 1, 0], [0, 0, 1]).excess.text, "  ideal hyperbolic triangle: area", htriangle(ideal(1, 0), ideal(0, 1), ideal(-1, 0)).area.text);
 plan.map((p) =&gt; `${p.phase}. ${p.contents}`)</textarea>
   <div class="runbox-bar"><button type="button" data-run>Run</button><button type="button" class="ghost" data-reset>Reset</button><span class="runbox-meta">Ctrl/⌘ + Enter runs</span></div>
   <div class="runbox-out" aria-live="polite"></div>
@@ -78,7 +82,7 @@ plan.map((p) =&gt; `${p.phase}. ${p.contents}`)</textarea>
 </main>
 </div>
 <script type="module">
-import { topicCards } from "./assets/site.js?v=124a82ef6a";
+import { topicCards } from "./assets/site.js?v=356fa44d42";
 topicCards(document.getElementById("cards"));
 </script>
 </body>
