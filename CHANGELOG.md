@@ -2,6 +2,8 @@
 
 ## 0.4.0
 
+- The `@ratmath/structures` range is now `^0.5.0` (was `^0.4.0`, which under 0.x
+  rejects structures 0.5.0, so the package could not be installed from npm).
 - Phase 6, general proofs. `configuration()` states a theorem in
   coordinates: points that are fixed, free, or tied to earlier ones by
   conditions, with predicates (`collinear`, `parallel`, `perpendicular`,
