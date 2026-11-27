@@ -1,0 +1,205 @@
+# @ratmath/geo
+
+> Geometry for RatMath: Euclidean constructions, theorems checked on exact figures and proved in general, spherical, hyperbolic, projective and finite geometries, symmetry and tilings. Part of the RatMath Shelf; numbers come from @ratmath/core (a peer dependency). ESM: `import * as geo from "@ratmath/geo"`.
+
+Built from 0.4.0, commit 138ca0c. `file:line` is relative to the package root (also node_modules/@ratmath/geo/); on GitHub: https://github.com/ratmath/geo/blob/138ca0c/<file>#L<line>. Docs pages are under https://ratmath.com/geo/. Full types: index.d.ts.
+
+Types: `type Num = Rational | AlgebraicValue`; `type NumLike = Num | bigint | number | string`; `type PointLike = Point | [NumLike, NumLike]`; `type TriangleLike = Triangle | [PointLike, PointLike, PointLike]`; `type PPointLike = PPoint | Point | [NumLike, NumLike] | [NumLike, NumLike, NumLike]`; `type Matrix3 = [[NumLike, NumLike, NumLike], [NumLike, NumLike, NumLike], [NumLike, NumLike, NumLike]]`; `type Point3 = [NumLike, NumLike, NumLike]`; `type WallpaperName = "p1" | "p2" | "pm" | "pg" | "cm" | "pmm" | "pmg" | "pgg" | "cmm" | "p3" | "p3m1" | "p31m" | "p4" | "p4m" | "p4g" | "p6" | "p6m"`; `type FriezeName = "p1" | "p11g" | "p1m1" | "p2" | "p2mg" | "p11m" | "p2mm"`; `type AngleLike = Angle | NumLike | { cos: NumLike; sin?: NumLike }`; `type Vec3Like = [NumLike, NumLike, NumLike]`; `type SPointLike = SPoint | Vec3Like`; `type HPointLike = HPoint | Point | [NumLike, NumLike]`; `type HAny = HPointLike | HIdeal`; `type ExactComplex = [Num, Num]`; `type Scalar = number | bigint | string | Rational`; `type Coordinate = Scalar | GeoExpr`; `type GeoLine = [GeoPoint, GeoPoint]`
+
+## Docs
+
+- https://ratmath.com/geo/llms-full.txt: every page below as Markdown, each with a runnable example
+- Pages: index (Overview), reference (Reference), explore (Explore), constructions (Constructions), triangles (Triangle centres), transformations (Transformations), theorems (Checked theorems), proofs (General proofs), computational (Computational geometry), lattice (Lattice geometry), metrics (Taxicab geometry), spherical (Spherical geometry), hyperbolic (The hyperbolic plane), hyperbolic-triangles (Hyperbolic triangles, motions, tilings), parallel-postulate (The parallel postulate), projective (The projective plane), finite-geometries (Finite geometries), polyhedra (Polyhedra), symmetry (Symmetry groups), tilings (Tilings), pictures (Pictures of geometry)
+
+## API
+
+name(params) → result — meaning · file:line · docs page
+
+- `plan: readonly PlannedPhase[]` · src/plan.js:4
+- `GeoError class: code` · src/num.js:8
+- `num(x: NumLike) → Num` — An exact number from a whole number, a bigint, a Rational, a string ("7/2", "0.35", "sqrt(2)") or an algebraic number. · src/num.js:33
+- `N: { add(a: Num, b: Num): Num; sub(a: Num, b: Num): Num; mul(a: Num, b: Num): Num; div(a: Num, b: Num): Num; neg(a: Num): Num; sq(a: Num): Num; sqrt(a: Num): Num; sign(a: Num): -1 | 0 | 1; isZero(a: Num): boolean …` · src/num.js:74 · triangles
+- `Point class: x, y, equals, plus, minus, times, toNumbers, toString` · src/plane.js:11 · reference
+- `point(x: NumLike, y: NumLike) → Point (+1 overload)` — A point from exact coordinates: point(1, "1/2"), point("sqrt(3)/2", 0), or point([x, y]). · src/plane.js:37 · pictures
+- `Line class: a, b, c, direction, origin, at, contains, equals, toString` — The line a·x + b·y + c = 0. · src/plane.js:47
+- `line(p: PointLike, q: PointLike) → Line (+1 overload)` — The line through two points, or from coefficients line(a, b, c). · src/plane.js:97 · constructions
+- `Circle class: center, radius2, radius, power, contains, equals, toString` · src/plane.js:105
+- `circle(center: PointLike, through: PointLike) → Circle` — A circle from its centre and either a point on it or { radius } or { radius2 }. · src/plane.js:129 · constructions
+- `distance(p: PointLike, q: PointLike) → Num` · src/plane.js:141 · spherical
+- `distance2(p: PointLike, q: PointLike) → Num` · src/plane.js:137
+- `midpoint(p: PointLike, q: PointLike) → Point` · src/plane.js:142
+- `orientation(p: PointLike, q: PointLike, r: PointLike) → -1 | 0 | 1` — 1 for a left turn p → q → r, −1 for a right turn, 0 when collinear · src/plane.js:144 · constructions
+- `collinear(...points: PointLike[]) → boolean` · src/plane.js:145 · constructions
+- `parallel(l: Line, m: Line) → boolean` · src/plane.js:146 · constructions
+- `perpendicular(l: Line, m: Line) → boolean` · src/plane.js:147 · constructions
+- `concurrent(l: Line, m: Line, n: Line) → boolean` — do three lines pass through one point (or are all parallel)? · src/plane.js:149 · constructions
+- `concyclic(...points: PointLike[]) → boolean` — do the points lie on one circle (or one line)? · src/plane.js:158 · constructions
+- `parallelThrough(l: Line, p: PointLike) → Line` · src/plane.js:168 · parallel-postulate
+- `perpendicularThrough(l: Line, p: PointLike) → Line` · src/plane.js:169
+- `perpendicularBisector(p: PointLike, q: PointLike) → Line` · src/plane.js:170 · constructions
+- `angleBisector(a: PointLike, vertex: PointLike, b: PointLike, options?: { external?: boolean }) → Line` — the bisector of angle AVB (the internal one; { external: true } for the other) · src/plane.js:177
+- `foot(p: PointLike, l: Line) → Point` · src/plane.js:171
+- `reflect(p: PointLike, l: Line) → Point` · src/plane.js:226
+- `meet(f: Line | Circle, g: Line | Circle) → Point[]` — Where two figures meet: a Point or null for two lines; a list of 0, 1 or 2 Points (ordered by x, then y) for a line and a circle or two circles. · src/plane.js:200 · constructions
+- `tangents(c: Circle, p: PointLike) → Line[]` — tangent lines to a circle from a point: two from outside, one on the circle, none inside · src/plane.js:231
+- `circumcircle(a: PointLike, b: PointLike, c: PointLike) → Circle` · src/plane.js:188
+- `regularPolygon(n: number, options?: { center?: PointLike; vertex?: PointLike }) → Point[]` — The regular n-gon with the given centre and first vertex, exactly. · src/plane.js:241 · constructions
+- `Construction class: steps, objects, get, line, circle, meet, count, toString` — A ruler-and-compass construction written down step by step. · src/plane.js:261
+- `construction(given?: Record<string, PointLike>) → Construction` · src/plane.js:309 · constructions
+- `Triangle class: A, B, C, vertices, sides, sides2, area, perimeter, cosines, degrees, classify, barycentric, centroid, circumcenter, orthocenter, incenter, excenters, ninePointCenter, symmedian, circumcircle, incircle, excircles, ninePointCircle, inradius, circumradius, medians, altitudes, feet, bisectors, eulerLine, toString` · src/plane.js:313
+- `triangle(a: PointLike, b: PointLike, c: PointLike) → Triangle` · src/plane.js:430 · triangles
+- `Transform class: m, t, determinant, apply, compose, inverse, equals, isSimilarity, isIsometry, fixed, classify, toString` — The affine map p ↦ M·p + t with M = [[a, b], [c, d]]. · src/plane.js:435 · reference
+- `identity() → Transform` · src/plane.js:534 · proofs
+- `translation(v: PointLike) → Transform` · src/plane.js:535 · hyperbolic-triangles
+- `rotation(center: PointLike, turn: NumLike) → Transform` — Rotation about a centre. · src/plane.js:541 · transformations
+- `reflection(l: Line) → Transform` · src/plane.js:558 · transformations
+- `glide(l: Line, vector: PointLike) → Transform` — reflection in a line followed by a translation along it by the given vector's component along the line · src/plane.js:565 · transformations
+- `dilation(center: PointLike, ratio: NumLike) → Transform` · src/plane.js:571 · transformations
+- `affine(matrix: [[NumLike, NumLike], [NumLike, NumLike]], vector?: PointLike) → Transform` · src/plane.js:576 · parallel-postulate
+- `inversion(c: Circle) → { circle: Circle; apply(p: PointLike): Point; apply(f: Line | Circle): Line | Circle; }` — Inversion in a circle: p ↦ the point on the ray from the centre through p with |Op|·|Op′| = r². · src/plane.js:582 · transformations
+- `theorems: { pythagoras(t: TriangleLike): Checked; eulerLine(t: TriangleLike): Checked; ninePointCircle(t: TriangleLike): Checked; feuerbach(t: TriangleLike): Checked; ceva(t: TriangleLike, D: PointLike, E: PointLike, F: …` · src/theorems.js:20 · theorems
+- `Polygon class: vertices, edges, signedArea, area, perimeter, centroid, isConvex, isSimple, locate, contains, triangulate, clip, toString` · src/discrete.js:56
+- `polygon(vertices: PointLike[]) → Polygon` · src/discrete.js:183 · computational
+- `convexHull(points: PointLike[]) → Point[]` — The convex hull, counter-clockwise from the lowest-left point, without the points on its edges. · src/discrete.js:16 · computational
+- `segmentIntersection(a: PointLike, b: PointLike, c: PointLike, d: PointLike) → SegmentMeeting` — Do the closed segments ab and cd meet? { meets, kind, point } with kind "cross" (one interior point each), "touch" (an endpoint is involved), "overlap"… · src/discrete.js:36
+- `onSegment(a: PointLike, b: PointLike, p: PointLike) → boolean` — is p on the closed segment ab? · src/discrete.js:13
+- `inCircle(a: PointLike, b: PointLike, c: PointLike, d: PointLike) → -1 | 0 | 1` — is d strictly inside the circle through a, b, c? 1 inside, 0 on it, −1 outside (any orientation of abc) · src/discrete.js:186
+- `delaunay(points: PointLike[]) → Delaunay` — The Delaunay triangulation of a set of points (Bowyer–Watson, with the exact in-circle test). { points, triangles: [[i, j, k]], edges, cocircular }. · src/discrete.js:208 · computational
+- `voronoi(points: PointLike[]) → Voronoi` — The Voronoi diagram, from the Delaunay triangulation: for each point its cell's corners (the circumcentres of the triangles around it, exact) and whether… · src/discrete.js:258 · computational
+- `closestPair(points: PointLike[]) → { points: [Point, Point]; distance2: Num; distance: Num }` — the two closest points and their distance, exactly · src/discrete.js:301
+- `latticePointsOn(p: PointLike, q: PointLike) → number` — the number of lattice points on the closed segment from p to q (both lattice points) · src/discrete.js:327 · lattice
+- `pick(vertices: Polygon | PointLike[]) → { area: Num; interior: number; boundary: number; formula: Num; holds: boolean }` — Pick's theorem on a simple polygon with lattice vertices: area = I + B/2 − 1. · src/discrete.js:337 · lattice
+- `isVisible(x: NumLike, y: NumLike) → boolean` — can (x, y) be seen from the origin, with no lattice point in the way? · src/discrete.js:354 · lattice
+- `visiblePoints(n: number) → { n: number; count: number; share: Rational; limit: string }` — Lattice points (x, y) with 1 ≤ x, y ≤ n visible from the origin: the exact count and its share, which tends to 6/π² ≈ 0.6079. · src/discrete.js:359 · lattice
+- `metric(name?: "taxicab" | "chebyshev" | "euclidean") → Metric` — The plane with another way to measure distance: "taxicab" (|dx| + |dy|), "chebyshev" (max(|dx|, |dy|)) or "euclidean". { distance, circle, bisector,… · src/discrete.js:378 · metrics
+- `PPoint class: coords, key, atInfinity, dual, equals, on, toAffine, toString` — A point of the projective plane, [x : y : z]. · src/projective.js:44
+- `PLine class: coords, key, dual, isAtInfinity, equals, contains, toString` — A line of the projective plane, ax + by + cz = 0, written [a : b : c]. · src/projective.js:61
+- `ppoint(...coords: NumLike[] | [PPointLike]) → PPoint` — A point: ppoint(x, y) for the ordinary point, ppoint(x, y, z) in homogeneous coordinates. · src/projective.js:83 · projective
+- `pline(...coords: NumLike[] | [[NumLike, NumLike, NumLike]]) → PLine` — A line [a : b : c], meaning ax + by + cz = 0. · src/projective.js:85
+- `lineAtInfinity() → PLine` — The line at infinity, z = 0. · src/projective.js:87 · projective
+- `join(p: PPointLike, q: PPointLike) → PLine` — The line through two distinct points. · src/projective.js:90 · projective
+- `meetLines(l: PLine | [NumLike, NumLike, NumLike], m: PLine | [NumLike, NumLike, NumLike]) → PPoint` — The point where two distinct lines meet (at infinity when they are parallel). · src/projective.js:96 · projective
+- `collinearP(p: PPointLike, q: PPointLike, r: PPointLike) → boolean` · src/projective.js:101
+- `concurrentP(l: PLine, m: PLine, n: PLine) → boolean` · src/projective.js:102
+- `crossRatio(a: PPointLike | PLine, b: PPointLike | PLine, c: PPointLike | PLine, d: PPointLike | PLine) → Num | "infinity"` — The cross-ratio (A, B; C, D) of four collinear points, exactly: [A C][B D] / ([A D][B C]) where [P Q] is a 2 × 2 determinant of coordinates taken in a pair… · src/projective.js:112 · projective
+- `harmonicConjugate(a: PPointLike, b: PPointLike, c: PPointLike) → PPoint` — The harmonic conjugate of C with respect to A and B: the D with (A, B; C, D) = −1. · src/projective.js:128 · projective
+- `Projectivity class: matrix, isAffine, apply, compose, inverse, equals, toString` — A projective map of the plane, x ↦ M·x for an invertible 3 × 3 matrix M, defined up to a non-zero multiple. · src/projective.js:162
+- `projectivity(matrix: Matrix3) → Projectivity` · src/projective.js:199
+- `projectivityFrom(from: PPointLike[], to: PPointLike[]) → Projectivity` — The one projective map sending four points to four points, no three of either set collinear (the fundamental theorem of projective geometry). · src/projective.js:218 · projective
+- `Conic class: fromCoefficients, matrix, coefficients, determinant, degenerate, value, contains, polar, pole, tangentAt, transform, classify, toString` — A conic xᵀ C x = 0 for a symmetric 3 × 3 matrix C, or from the six coefficients of a x² + b xy + c y² + d x + e y + f = 0. · src/projective.js:234
+- `conicThrough(points: PPointLike[]) → Conic` — The conic through five points, no four collinear (unique). · src/projective.js:316 · projective
+- `desargues(t1: PPointLike[], t2: PPointLike[]) → { fromPoint: boolean; fromLine: boolean; holds: boolean; center: PPoint | null; axis: PLine | null; meets: PPoint[] }` — Desargues: triangles ABC and A′B′C′ are in perspective from a point (AA′, BB′, CC′ concurrent) exactly when they are in perspective from a line (the meets… · src/projective.js:361
+- `pappus(abc: PPointLike[], ABC: PPointLike[]) → { holds: boolean; points: PPoint[]; line: PLine }` — Pappus: with A, B, C on one line and a, b, c on another, the points Ab ∩ aB, Ac ∩ aC, Bc ∩ bC are collinear. · src/projective.js:377
+- `pascal(points: PPointLike[], conic?: Conic | null) → { holds: boolean; points: PPoint[]; line: PLine; conic: Conic }` — Pascal: for six points on a conic, the meets of opposite sides of the hexagon ABCDEF (AB·DE, BC·EF, CD·FA) are collinear. · src/projective.js:390 · projective
+- `brianchon(conic: Conic, points: PPointLike[]) → { holds: boolean; vertices: PPoint[]; center: PPoint | null }` — Brianchon, the dual of Pascal: the diagonals of a hexagon whose sides touch a conic meet in a point. · src/projective.js:402
+- `Incidence class: v, b, lines, name, labels, matrix, order, linesThrough, lineThrough, meet, parallels, projectiveAxioms, isProjectivePlane, affineAxioms, isAffinePlane, hasQuadrangle, designParameters, dual, collineations, toString` — An incidence structure: points 0 … v − 1 and lines given as lists of points. · src/finite.js:55
+- `incidence(lines: number[][], options?: { points?: number | null; name?: string; labels?: string[] | null }) → Incidence` · src/finite.js:216 · finite-geometries
+- `FiniteProjectivePlane class: q, coordinates, pointAt, collineationGroup` — A finite projective plane PG(2, q) with its coordinates. · src/finite.js:236
+- `FiniteAffinePlane class: q, parallelClasses, completion` — A finite affine plane AG(2, q): the points (x, y) of GF(q)² and the lines y = mx + c and x = c. · src/finite.js:298
+- `projectivePlane(q: number) → FiniteProjectivePlane` · src/finite.js:341 · finite-geometries
+- `affinePlane(q: number) → FiniteAffinePlane` · src/finite.js:342 · finite-geometries
+- `fano() → FiniteProjectivePlane` · src/finite.js:343 · finite-geometries
+- `Polyhedron class: vertices, faces, center, name, V, E, F, edges, euler, faceCounts, vertexConfigurations, edgeLengths2, volume, surfaceArea, dihedralCosines, vertexConfiguration, faceArea, dual, symmetry, toString` — A convex polyhedron with exact vertices and faces (each a cycle of vertex numbers, counter-clockwise from outside). · src/solids.js:72
+- `polyhedron(points: Point3[], options?: { name?: string }) → Polyhedron` — The convex hull of exact points of space. · src/solids.js:360 · polyhedra
+- `solids: Readonly<Record<"tetrahedron" | "cube" | "octahedron" | "dodecahedron" | "icosahedron" | "cuboctahedron" | "truncatedOctahedron" | "truncatedTetrahedron" | "truncatedCube", () => Polyhedron>>` — The classical solids with exact coordinates. · src/solids.js:382 · polyhedra
+- `prism(n: number, options?: { height?: NumLike }) → Polyhedron` — The prism over a regular n-gon (vertices cos(2πk/n), sin(2πk/n), ±h), exact. · src/solids.js:412
+- `figureSymmetry(points: PointLike[], options?: { labels?: unknown[] | null }) → { order: number; rotations: number; reflections: number; name: string; center?: Point; transforms: Transform[]; group: PermGroupLike | null }` — The symmetries of a finite set of points (optionally labelled, so only like points may be swapped). · src/symmetry.js:21 · symmetry
+- `wallpaperGroup(pattern: LatticePatternSpec) → { name: WallpaperName; orbifold: string; pointGroupOrder: number; symmetries: number; steps: string[] }` — The wallpaper group of a pattern, by the usual flowchart: the highest order of rotation, whether there are mirrors, in how many directions, whether there… · src/symmetry.js:218 · symmetry
+- `wallpaper: { readonly names: readonly WallpaperName[]; readonly orbifold: Readonly<Record<WallpaperName, string>>; pattern(name: WallpaperName, seeds?: Array<[NumLike, NumLike]>): { gram: [[NumLike, NumLike], [NumLike …` · src/symmetry.js:314 · symmetry
+- `friezeGroup(spec: { points: Array<[NumLike, NumLike]>; period?: NumLike; labels?: unknown[] | null }) → { name: FriezeName; conway: string; orbifold: string; horizontalMirror: boolean; verticalMirror: boolean; halfTurn: boolean …` — The frieze group of a pattern repeated by the translation (period, 0): give the points of one period (exact coordinates, labels optional). · src/symmetry.js:340 · symmetry
+- `friezes: Readonly<Record<FriezeName, { name: FriezeName; conway: string; orbifold: string }>>` · src/symmetry.js:390
+- `polygonAngle(n: number) → Rational` — The interior angle of a regular n-gon, as a fraction of a full turn: (n − 2)/(2n). · src/tilings.js:15 · tilings
+- `vertexTypes() → number[][]` — Every way regular polygons can fill the space around a point, up to rotation and reflection: 21 cyclic sequences. · src/tilings.js:31 · tilings
+- `uniformTiling(type: string | number[]) → { type: string; fits: boolean; uniform: boolean; reason: string }` — Can every vertex of a tiling have this type? · src/tilings.js:75 · tilings
+- `regularTilings() → Array<{ p: number; q: number; symbol: string; dual: string }>` — The regular tilings {p, q}: q regular p-gons at each vertex. · src/tilings.js:126 · tilings
+- `tilingPatch(type: string | number[], options?: { radius?: number; maxPolygons?: number }) → { readonly type: string; readonly ok: boolean; readonly polygons: { n: number; points: [number, number][] }[]; readonly vertices: number …` — Grow a patch of an edge-to-edge tiling in which every vertex has this type, out to `radius` (edges of length 1), starting with one vertex at the origin. · src/tilings.js:158 · pictures
+- `Angle class: cos, sin, approx, ofCos, ofTurns, PI, ZERO, RIGHT, turns, isRational, isRight, isZero, degrees, text, value, toNumber, add, sub, neg, equals, compare, toString` · src/angle.js:64 · spherical
+- `angle(x: AngleLike) → Angle` — An angle from a fraction of a full turn, or from { cos } (between 0 and π) or { cos, sin }. · src/angle.js:156 · spherical
+- `Length class: cosh, sinh, ofCosh, ofSinh, ofExp, exp, tanh, isZero, text, add, double, half, equals, compare, value, toNumber, toString` — A hyperbolic length d, held as cosh d and sinh d (d ≥ 0), both exact. · src/angle.js:179 · hyperbolic
+- `piTimes(k: NumLike) → PiMultiple` — π times an exact number: { coefficient, text, value(digits) }. · src/angle.js:163
+- `turnsOfCos(c: NumLike) → Rational | null` — The fraction q of a full turn, 0 ≤ q ≤ 1/2, with cos(2πq) = c, or null when the angle with this cosine is not a rational multiple of π. · src/angle.js:37
+- `SPoint class: v, x, y, z, antipode, latLon, stereographic, equals, isAntipodeOf, dot, distanceTo, toNumbers, toString` — A point of the unit sphere. · src/sphere.js:28
+- `spoint(x: NumLike, y: NumLike, z: NumLike) → SPoint (+1 overload)` — A point of the sphere: spoint(x, y, z) in the direction of any non-zero vector, or spoint([x, y, z]). · src/sphere.js:82 · spherical
+- `latLon(lat: AngleLike, lon: AngleLike) → SPoint` — The point at a latitude and longitude, each a fraction of a full turn: latLon("1/8", "1/4") is 45° north, 90° east. · src/sphere.js:89 · spherical
+- `fromStereographic(p: PointLike) → SPoint` — The point that projects stereographically (from the north pole) to a point of the plane. · src/sphere.js:94 · spherical
+- `northPole() → SPoint` · src/sphere.js:100
+- `GreatCircle class: n, poles, reflection, contains, side, equals, meet, angleWith, isPerpendicularTo, perpendicularThrough, distanceTo, parallelsThrough, toString` — A great circle: the points p with n·p = 0. · src/sphere.js:103
+- `greatCircle(a: SPointLike, b?: SPointLike) → GreatCircle` — The great circle through two points (refused when they are equal or opposite), or with a given pole. · src/sphere.js:176 · spherical
+- `equator() → GreatCircle` — the equator z = 0 · src/sphere.js:181
+- `SCircle class: center, cosRadius, radius, circumference, area, isGreat, contains, toString` — A circle on the sphere: the points at a given distance from a centre. · src/sphere.js:184
+- `scircle(center: SPointLike, through: SPointLike | { radius: AngleLike } | { cos: NumLike }) → SCircle` — The circle with a centre through a point, or scircle(centre, { radius }) with the radius as a fraction of a full turn, or { cos }. · src/sphere.js:212
+- `STriangle class: A, B, C, vertices, angles, angleSum, excess, area, fractionOfSphere, perimeter, polar, sidesAsCircles, classify, checks, toString` — A spherical triangle: three points not on one great circle, joined by the shorter arcs. · src/sphere.js:221
+- `striangle(a: SPointLike, b: SPointLike, c: SPointLike) → STriangle` · src/sphere.js:312 · spherical
+- `lune(a: AngleLike) → Angle` — The area of a lune between two great half-circles meeting at the given angle: twice the angle. · src/sphere.js:314
+- `SIsometry class: matrix, inverse, determinant, apply, then, equals, classify, toString` — An isometry of the sphere: an orthogonal 3 × 3 matrix. · src/sphere.js:320
+- `srotation(axis: SPointLike, turns: AngleLike) → SIsometry` — The rotation about an axis (a point of the sphere, or any vector) by a fraction of a full turn, counter-clockwise seen from outside along the axis. { cos,… · src/sphere.js:391 · spherical
+- `antipodalMap() → SIsometry` — the map p → −p · src/sphere.js:400
+- `HPoint class: v, hyperboloid, disc, klein, halfPlane, equals, distanceTo, toString` — A point of the hyperbolic plane. · src/hyperbolic.js:36
+- `hpoint(x: NumLike, y: NumLike) → HPoint (+1 overload)` — The point with coordinates (x, y) in the Poincaré disc: hpoint(0, "1/2"), or hpoint([x, y]). · src/hyperbolic.js:72 · hyperbolic
+- `fromKlein(x: NumLike | Point | [NumLike, NumLike], y?: NumLike) → HPoint` — The point with coordinates (x, y) in the Klein disc. · src/hyperbolic.js:83 · hyperbolic
+- `fromHalfPlane(x: NumLike | Point | [NumLike, NumLike], y?: NumLike) → HPoint` — The point x + iy of the upper half-plane (y > 0). · src/hyperbolic.js:91 · hyperbolic
+- `fromHyperboloid(t: NumLike | Vec3Like, x?: NumLike, y?: NumLike) → HPoint` — The point (t, x, y) of the hyperboloid t² − x² − y² = 1. · src/hyperbolic.js:98 · hyperbolic
+- `horigin() → HPoint` — the centre of the disc · src/hyperbolic.js:100 · hyperbolic
+- `HIdeal class: x, y, disc, klein, halfPlane, equals, toString` — An ideal point: a point of the circle at infinity, x² + y² = 1 in either disc. · src/hyperbolic.js:103
+- `ideal(x: NumLike | Point | [NumLike, NumLike] | HIdeal, y?: NumLike) → HIdeal` — The ideal point in the direction (x, y), or ideal(turns) at an angle given as a fraction of a full turn. · src/hyperbolic.js:132 · hyperbolic
+- `HLine class: n, klein, disc, halfPlane, ends, reflection, contains, side, equals, distanceTo, foot, perpendicularThrough, relation, meets, isPerpendicularTo, parallelsThrough, toString` — A line (geodesic): the points p with B(n, p) = 0, for a vector n with B(n, n) < 0. · src/hyperbolic.js:153
+- `hline(a: HAny, b: HAny) → HLine` — The line through two points; either may be ideal. · src/hyperbolic.js:254 · hyperbolic
+- `hmidpoint(a: HPointLike, b: HPointLike) → HPoint` — the midpoint of two points · src/hyperbolic.js:260
+- `hbisector(a: HPointLike, b: HPointLike) → HLine` — the line of points equally far from two points · src/hyperbolic.js:264
+- `HCircle class: center, radius, circumference, area, disc, contains, toString` — A circle: the points at a given distance from a centre. · src/hyperbolic.js:271
+- `hcircle(center: HPointLike, through: HPointLike | Length | { cosh: NumLike } | { exp: NumLike }) → HCircle` — The circle with a centre through a point, or hcircle(centre, { cosh }) or { exp } for the radius. · src/hyperbolic.js:300
+- `horocycle(at: HIdeal | NumLike, p: HPointLike) → { ideal: HIdeal; through: HPoint; disc: Circle }` — The horocycle about an ideal point through p: in the Poincaré disc, the circle through p that touches the unit circle there. · src/hyperbolic.js:311
+- `HTriangle class: A, B, C, vertices, idealVertices, sides, angles, angleSum, defect, area, lines, checks, toString` — A triangle; any of its vertices may be ideal (the angle there is 0 and the two sides to it are infinite). · src/hyperbolic.js:319
+- `htriangle(a: HAny, b: HAny, c: HAny) → HTriangle` · src/hyperbolic.js:381 · hyperbolic-triangles
+- `HIsometry class: matrix, inverse, preservesOrientation, apply, then, equals, classify, toMobius, toString` — An isometry of the hyperbolic plane: a 3 × 3 matrix that keeps the form B and the upper sheet. · src/hyperbolic.js:384
+- `hreflection(l: HLine) → HIsometry` — the reflection in a line · src/hyperbolic.js:483
+- `hrotation(center: HPointLike, turns: AngleLike) → HIsometry` — The rotation about a point by a fraction of a full turn (counter-clockwise in the disc), or by { cos, sin }. · src/hyperbolic.js:485 · hyperbolic-triangles
+- `hhalfTurn(center: HPointLike) → HIsometry` — the half turn about a point · src/hyperbolic.js:497 · hyperbolic-triangles
+- `htranslation(a: HPointLike, b: HPointLike) → HIsometry` — The translation along the line through a and b that takes a to b. · src/hyperbolic.js:503 · hyperbolic-triangles
+- `schlafli(p: number, q: number) → Schlafli` — The regular tiling {p, q}: regular p-gons, q at each vertex. · src/hyperbolic.js:519 · hyperbolic-triangles
+- `hyperbolicTiling(p: number, q: number) → HyperbolicTiling` — The hyperbolic tiling {p, q} around the centre of the disc. tile the central p-gon, its vertices exact check() its interior angle is 2π/q and its edge is… · src/hyperbolic.js:555 · hyperbolic-triangles
+- `parallelPostulate(options?: { q?: number }) → Array<{ geometry: string; parallels: "exactly one" | "none" | "infinitely many"; count: number; example: Record<string, unknown>; checked: boolean }>` — One row per geometry: { geometry, parallels, count, example, checked }. · src/postulate.js:25 · parallel-postulate
+- `configuration(name?: string) → Configuration` — Start a configuration: points, conditions, and then prove(conclusion). · src/prove.js:487 · proofs
+- `Configuration class: name, points, parameters, unknowns, hypotheses, parameter, unknown` — A figure described in coordinates: points fixed, free, or tied to earlier ones by conditions. · src/prove.js:151
+- `GeoPoint class: name, x, y, kind, toString` — A point of a configuration: a name and two coordinate expressions. · src/prove.js:84
+- `GeoExpr class: in, add, sub, mul, neg, pow, label` — A polynomial expression in the coordinates of a configuration. · src/prove.js:38
+- `Proof class: configuration, theorem, statement, proved, method, identity, parts, instance, gaveUp, ms, replay, conditions, size, explain, toString` — The outcome of prove. · src/prove.js:671
+- `proofs: { readonly [K in ProvableId]: (options?: ProveOptions) => Proof } & { all(options?: ProveOptions): Array<{ id: ProvableId; name: string; statement: string; proof: Proof }>; setup(id: ProvableId): { configuration: …` — General proofs of classical theorems. proofs.eulerLine(options) builds the figure with free parameters and returns the Proof; options are those of… · src/proofs.js:316 · proofs
+- `provable: ReadonlyArray<{ readonly id: ProvableId; readonly name: string; readonly statement: string }>` — The theorems that are proved in general: [{ id, name, statement }]. · src/proofs.js:302 · proofs
+- `toSurd(x: unknown) → Surd | null` — An exact number as a graphics Surd a + b√d, or null when it is not of that form. · src/pictures.js:35
+- `toGraphics(x: Point) → GPoint (+3 overloads)` — A geo point, line, circle, polygon or triangle as the graphics object with the same exact coordinates. · src/pictures.js:57 · pictures
+- `fromGraphics(x: GPoint) → Point (+3 overloads)` — A graphics point, line, circle or polygon in geo. · src/pictures.js:66 · pictures
+- `geoFigure(items: unknown[], options?: { x?: [number, number]; y?: [number, number]; title?: string; axes?: boolean }) → Figure` — Geo objects in one figure: items are objects or { item, color, label, … }. · src/pictures.js:131 · pictures
+- `constructionFrames(c: Construction, options?: { title?: string }) → Frames` — A Construction's steps as frames: each frame adds what one step made, highlighted. · src/pictures.js:139 · pictures
+- `tilingFigure(type: string | number[], options?: { radius?: number; view?: number; title?: string }) → Figure` — A patch of the tiling whose every vertex has this type, polygons coloured by their number of sides. · src/pictures.js:153 · pictures
+- `solidPicture(poly: Polyhedron | { vertices: unknown[][]; faces: number[][]; name?: string }, options?: { cam?: Camera; colors?: string[]; opacity?: number }) → Figure` — A Polyhedron (or { vertices, faces }) lit and coloured by face size. · src/pictures.js:161 · pictures
+- `wallpaperFigure(pattern: { gram: unknown[][]; points: unknown[][]; labels?: number[] }, options?: { cells?: number; title?: string }) → Figure` — A lattice pattern (wallpaper.pattern's result) repeated over cells: the lattice drawn from its Gram matrix, one cell outlined, the points coloured by label. · src/pictures.js:171 · pictures
+- `incidenceFigure(geometry: Incidence, options?: { title?: string }) → Figure` — A finite geometry (Incidence, projectivePlane(q), fano()) as its Levi graph: points on the left, lines on the right. · src/pictures.js:189 · pictures
+- `hyperbolicFigure(items: unknown[], options?: { model?: "disc" | "klein" | "halfPlane"; title?: string; x?: [number, number]; y?: [number, number] }) → Figure` — Hyperbolic objects in one figure, in a chosen model: "disc" (Poincaré, the default), "klein" or "halfPlane". · src/pictures.js:232
+- `hyperbolicTilingFigure(p: number, q: number, options?: { layers?: number; model?: "disc" | "klein"; title?: string }) → Figure` — The tiling {p, q} of the hyperbolic plane, drawn in the Poincaré disc (or "klein"), tiles coloured by their distance in steps from the central one. · src/pictures.js:287
+- `figureSVG` — from @ratmath/graphics
+- `figurePNG` — from @ratmath/graphics
+- `figurePDF` — from @ratmath/graphics
+- `figureTikZ` — from @ratmath/graphics
+- `figureASCII` — from @ratmath/graphics
+- `framesSVG` — from @ratmath/graphics
+- `framesPNG` — from @ratmath/graphics
+
+## Example
+
+```js
+import { plan, N, circle, meet, triangle, striangle, ideal, htriangle } from "@ratmath/geo";
+const t = triangle([0, 0], [4, 0], [1, 3]);
+console.log("centroid", String(t.centroid), " circumcentre", String(t.circumcenter), " orthocentre", String(t.orthocenter));
+console.log("incentre", String(t.incenter));
+console.log("area", N.text(t.area), " circumradius", N.text(t.circumradius), " cos A", N.text(t.cosines.A));
+for (const name of ["eulerLine", "ninePointCircle", "feuerbach", "napoleon"]) console.log(theorems[name](t).theorem + ":", theorems[name](t).statement, "→", theorems[name](t).holds);
+console.log("two unit circles meet at", meet(circle([0, 0], [1, 0]), circle([1, 0], [0, 0])).join(" and "));
+console.log("octant triangle: excess", striangle([1, 0, 0], [0, 1, 0], [0, 0, 1]).excess.text, "  ideal hyperbolic triangle: area", htriangle(ideal(1, 0), ideal(0, 1), ideal(-1, 0)).area.text);
+plan.map((p) => `${p.phase}. ${p.contents}`)
+```
+
+## More
+
+- tests/: worked examples for every function
+- https://ratmath.com/core/ (numbers), https://ratmath.com/shelf/ (all the libraries)
