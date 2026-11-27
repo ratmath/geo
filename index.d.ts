@@ -415,6 +415,8 @@ export class Conic {
   tangentAt(p: PPointLike): PLine;
   transform(T: Projectivity): Conic;
   classify(): string;
+  /** See conicProperties. */
+  properties(): ConicPropertiesBase | CentralConicProperties | ParabolaProperties;
   toString(): string;
 }
 export function conicThrough(points: PPointLike[]): Conic;
@@ -1124,3 +1126,47 @@ export class Plane {
 export function plane(p: VectorLike, q: VectorLike, r: VectorLike): Plane;
 export function plane(p: VectorLike, options: { normal: VectorLike }): Plane;
 export function plane(spec: { coefficients: [NumLike, NumLike, NumLike, NumLike] }): Plane;
+
+// ---- conic sections -------------------------------------------------------------
+
+export type ConicType = "ellipse" | "circle" | "hyperbola" | "parabola" | "point" | "two crossing lines" | "two parallel lines" | "double line" | "empty";
+export interface ConicPropertiesBase {
+  type: ConicType;
+  coefficients: [Num, Num, Num, Num, Num, Num];
+  /** B² − 4AC */
+  discriminant: Num;
+  /** det of the 3 × 3 matrix */
+  determinant: Num;
+  degenerate: boolean;
+  note?: string;
+}
+export interface CentralConicProperties extends ConicPropertiesBase {
+  type: "ellipse" | "circle" | "hyperbola";
+  center: Point;
+  a: Num; b: Num; c: Num;
+  semiMajor: Num; semiMinor: Num;
+  eccentricity: Num;
+  axes: { major: Line; minor: Line };
+  axisDirection: [Num, Num];
+  vertices: [Point, Point];
+  coVertices: [Point, Point];
+  foci: Point[];
+  directrices: Line[];
+  asymptotes?: [Line, Line];
+  radius?: Num;
+  standardForm: string;
+}
+export interface ParabolaProperties extends ConicPropertiesBase {
+  type: "parabola";
+  vertex: Point;
+  focus: Point;
+  focalLength: Num;
+  eccentricity: Num;
+  axis: Line;
+  axisDirection: [Num, Num];
+  directrix: Line;
+  latusRectum: Num;
+  standardForm: string;
+}
+/** Type, centre or vertex, axes, vertices, foci, eccentricity, directrices and asymptotes of Ax² + Bxy + Cy² + Dx + Ey + F = 0. */
+export function conicProperties(input: string | NumLike[]): ConicPropertiesBase | CentralConicProperties | ParabolaProperties;

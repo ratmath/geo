@@ -7,6 +7,10 @@
   and `pointSlope`; `tangentLength`; `circleFromEquation` and
   `conicCoefficients`; `box`, `cylinder`, `cone`, `sphere` (π kept exact) and
   `similar`. Docs page "Measurement".
+- `conicProperties(equation)` and `Conic#properties()`: type (with the
+  degenerate kinds), centre or vertex, axes, vertices, foci, eccentricity,
+  directrices and asymptotes, exact also for rotated conics. Docs page
+  "Conic sections".
 - Space: `Vector` (dot, cross, norm, angle, projections), `tripleProduct`,
   `Line3`/`line3`, `Plane`/`plane` (through three points, from a normal or
   coefficients; equation, distance, foot, angle, intersections). Docs page

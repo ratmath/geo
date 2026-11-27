@@ -1,8 +1,8 @@
 // Shared page furniture for the geo docs: the contents column, the theme
 // switch and the code boxes. Add each topic page to PAGES as it is written.
 
-import * as A from "./geo.js?v=14434bc39c";
-import { mountRunboxes } from "./runbox.js?v=14434bc39c";
+import * as A from "./geo.js?v=d6f3c0ba29";
+import { mountRunboxes } from "./runbox.js?v=d6f3c0ba29";
 
 export { A };
 
@@ -17,6 +17,7 @@ export const PAGES = [
   { href: "transformations.html", title: "Transformations", blurb: "Isometries, similarities, affine maps and inversion, classified" },
   { href: "theorems.html", title: "Checked theorems", blurb: "Classical theorems tested exactly on your figure" },
   { href: "proofs.html", title: "General proofs", blurb: "Theorems proved for every figure, with a certificate you can multiply out" },
+  { href: "conics.html", title: "Conic sections", blurb: "Type, centre, axes, foci, eccentricity, directrices and asymptotes from any equation" },
   { href: "space.html", title: "Vectors and planes", blurb: "Dot and cross products, lines and planes in space, distances and intersections" },
   { group: "Discrete and other geometries" },
   { href: "computational.html", title: "Computational geometry", blurb: "Hulls, polygons, Delaunay and Voronoi with exact predicates" },

@@ -17,6 +17,7 @@ export {
   Transform, identity, translation, rotation, reflection, glide, dilation, affine, inversion,
 } from "./src/plane.js";
 export { theorems } from "./src/theorems.js";
+export { conicProperties } from "./src/conics.js";
 export { Vector, vector, tripleProduct, Line3, line3, Plane, plane } from "./src/space.js";
 export { angleSum, interiorAngle, exteriorAngle, slopeIntercept, pointSlope, tangentLength, box, cylinder, cone, sphere, similar, conicCoefficients, circleFromEquation } from "./src/school.js";
 export { Polygon, polygon, convexHull, segmentIntersection, onSegment, inCircle, delaunay, voronoi, closestPair, latticePointsOn, pick, isVisible, visiblePoints, metric } from "./src/discrete.js";
