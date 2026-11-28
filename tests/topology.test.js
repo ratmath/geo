@@ -66,12 +66,18 @@ describe("surfaces from glued polygons", () => {
     expect(() => surface(["a a^-1", "b b^-1"])).toThrow(/connected/);
     expect(() => surface("a ? b")).toThrow(/cannot read/);
   });
-  test("classifySurface from χ: 8 − 24 + 14 = −2 orientable is genus 2", () => {
-    const c = classifySurface({ euler: 8 - 24 + 14, orientable: true });
+  test("classifySurface from χ: 10 − 36 + 24 = −2 orientable is genus 2", () => {
+    // f-vector of a minimal genus-2 triangulation; 3F = 2E as for every closed triangulated surface
+    const c = classifySurface({ euler: 10 - 36 + 24, orientable: true });
     expect([c.genus, c.name]).toEqual([2, "connected sum of 2 tori"]);
     expect(classifySurface({ euler: -1, orientable: false }).crosscaps).toBe(3);
     expect(() => classifySurface({ euler: -1, orientable: true })).toThrow();
     expect(() => classifySurface({ euler: 3, orientable: false })).toThrow();
+    // a boundary count is a whole number, 0 or more
+    expect(() => classifySurface({ euler: 2, orientable: true, boundaryComponents: -2 })).toThrow(/whole number/);
+    expect(() => classifySurface({ euler: 0, orientable: true, boundaryComponents: 1.5 })).toThrow(/whole number/);
+    expect(classifySurface({ euler: -1, orientable: true, boundaryComponents: 1 }).name).toBe("torus with 1 hole");
+    expect(classifySurface({ euler: 0, orientable: true, boundaryComponents: 2 }).name).toBe("annulus");
   });
 });
 

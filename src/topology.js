@@ -71,6 +71,7 @@ export function classifySurface({ eulerCharacteristic, euler, orientable, bounda
   if (!Number.isInteger(chi)) refuse("bad-argument", "classifySurface needs the Euler characteristic as a whole number");
   if (typeof orientable !== "boolean") refuse("bad-argument", "classifySurface needs orientable: true or false");
   const b = boundaryComponents;
+  if (!Number.isInteger(b) || b < 0) refuse("bad-argument", `the number of boundary circles is a whole number, 0 or more; got ${b}`);
   const twice = 2 - chi - b;
   let genus = null;
   let crosscaps = null;

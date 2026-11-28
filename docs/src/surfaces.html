@@ -40,7 +40,7 @@ surface("a b a^-1 b^-1 c d c^-1 d^-1").classify();
 // { eulerCharacteristic: -2, orientable: true, genus: 2, name: "connected sum of 2 tori", normalForm: "a1 b1 a1^-1 b1^-1 a2 b2 a2^-1 b2^-1", … }
 
 import { classifySurface } from "@ratmath/geo";
-classifySurface({ euler: 8 - 24 + 14, orientable: true }).name;   // "connected sum of 2 tori"</code></pre>
+classifySurface({ euler: 10 - 36 + 24, orientable: true }).name; // "connected sum of 2 tori"</code></pre>
 
 <h2>Connected sums and several polygons</h2>
 <p>A surface may be several polygons, glued along shared labels. <code>singleFace()</code> merges them along shared edges into one polygon, which changes the cells but not the surface. The connected sum of two closed surfaces is their two words side by side (cut a small disk from each at a vertex and join along the cut), so torus # projective plane is \(aba^{-1}b^{-1}cc\): with \(\chi = -1\) and not orientable, it is the connected sum of three projective planes.</p>

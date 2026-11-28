@@ -13,8 +13,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
 <link rel="stylesheet" href="https://ratmath.com/assets/katex/0.19.1/katex.min.css">
-<link rel="stylesheet" href="assets/style.css?v=561a3f4673">
-<script type="module" src="assets/site.js?v=561a3f4673"></script>
+<link rel="stylesheet" href="assets/style.css?v=553ee9c5fe">
+<script type="module" src="assets/site.js?v=553ee9c5fe"></script>
 </head>
 <body>
 <div class="shell">
@@ -45,7 +45,7 @@ surface("a b a^-1 b^-1 c d c^-1 d^-1").classify();
 // { eulerCharacteristic: -2, orientable: true, genus: 2, name: "connected sum of 2 tori", normalForm: "a1 b1 a1^-1 b1^-1 a2 b2 a2^-1 b2^-1", … }
 
 import { classifySurface } from "@ratmath/geo";
-classifySurface({ euler: 8 - 24 + 14, orientable: true }).name;   // "connected sum of 2 tori"</code></pre>
+classifySurface({ euler: 10 - 36 + 24, orientable: true }).name; // "connected sum of 2 tori"</code></pre>
 
 <h2>Connected sums and several polygons</h2>
 <p>A surface may be several polygons, glued along shared labels. <code>singleFace()</code> merges them along shared edges into one polygon, which changes the cells but not the surface. The connected sum of two closed surfaces is their two words side by side (cut a small disk from each at a vertex and join along the cut), so torus # projective plane is <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mi>b</mi><msup><mi>a</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><msup><mi>b</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mi>c</mi><mi>c</mi></mrow><annotation encoding="application/x-tex">aba^{-1}b^{-1}cc</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord mathnormal">ab</span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">1</span></span></span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal">b</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">1</span></span></span></span></span></span></span></span></span><span class="mord mathnormal">cc</span></span></span></span>: with <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>χ</mi><mo>=</mo><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\chi = -1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">χ</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">−</span><span class="mord">1</span></span></span></span> and not orientable, it is the connected sum of three projective planes.</p>
