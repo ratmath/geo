@@ -1,6 +1,6 @@
 # @ratmath/geo 0.4.0: full documentation
 
-> Geometry for RatMath: Euclidean constructions, theorems checked on exact figures and proved in general, spherical, hyperbolic, projective and finite geometries, symmetry and tilings. From https://ratmath.com/geo/, commit 8293332. Each page ends with a runnable example; in it, PRINT(...) prints.
+> Geometry for RatMath: Euclidean constructions, theorems checked on exact figures and proved in general, spherical, hyperbolic, projective and finite geometries, symmetry and tilings. From https://ratmath.com/geo/, commit f147654. Each page ends with a runnable example; in it, PRINT(...) prints.
 
 
 ---
