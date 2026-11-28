@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Requires Core 0.12: the `@ratmath/core` peer range is now `>=0.12.0` (Core 0.12 returns Integers from `floor`/`ceil`/`trunc`/`round` and rounds half up by default).
+- Fix: `classifySurface` refuses a boundary count that is negative or not a
+  whole number (`boundaryComponents: -2` gave "torus with -2 holes"). The
+  genus-2 example now uses a realisable f-vector, 10 − 36 + 24.
 - Topology (Course Test batch A11): `surface(word)` for glued polygons
   (cells, homology, orientability, boundary circles, `classify()`,
   `connectedSum`, `singleFace`, `fundamentalGroup()`), `classifySurface`,

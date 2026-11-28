@@ -1,6 +1,6 @@
 # @ratmath/geo 0.4.0: full documentation
 
-> Geometry for RatMath: Euclidean constructions, theorems checked on exact figures and proved in general, spherical, hyperbolic, projective and finite geometries, symmetry and tilings. From https://ratmath.com/geo/, commit 17b4d74. Each page ends with a runnable example; in it, PRINT(...) prints.
+> Geometry for RatMath: Euclidean constructions, theorems checked on exact figures and proved in general, spherical, hyperbolic, projective and finite geometries, symmetry and tilings. From https://ratmath.com/geo/, commit 8293332. Each page ends with a runnable example; in it, PRINT(...) prints.
 
 
 ---
@@ -2097,7 +2097,7 @@ surface("a b a^-1 b^-1 c d c^-1 d^-1").classify();
 // { eulerCharacteristic: -2, orientable: true, genus: 2, name: "connected sum of 2 tori", normalForm: "a1 b1 a1^-1 b1^-1 a2 b2 a2^-1 b2^-1", … }
 
 import { classifySurface } from "@ratmath/geo";
-classifySurface({ euler: 8 - 24 + 14, orientable: true }).name;   // "connected sum of 2 tori"
+classifySurface({ euler: 10 - 36 + 24, orientable: true }).name; // "connected sum of 2 tori"
 ```
 
 ### Connected sums and several polygons
